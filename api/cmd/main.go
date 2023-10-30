@@ -12,7 +12,7 @@ func main() {
 	config.LoadConfig(config.API)
 	err := config.ConfigureLog()
 	if err != nil {
-		log.Fatal("configuring logssss", err)
+		log.Fatal("configuring log", err)
 	}
 
 	r := gin.Default()
