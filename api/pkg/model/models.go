@@ -3,11 +3,16 @@ package model
 import "github.com/google/uuid"
 
 type Inbox struct {
-	ID        uuid.UUID
-	Timestamp int64
-	Response  string
-	Requests  []Request
-	Obfuscate []string
+	ID                    uuid.UUID
+	Timestamp             int64
+	Response              Response
+	Requests              []Request
+	ObfuscateHeaderFields []string
+}
+
+type Response struct {
+	ResponseBody    string
+	ResponseHeaders map[string]string
 }
 
 type Request struct {
