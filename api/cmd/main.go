@@ -28,7 +28,9 @@ func main() {
 	dao, err := database.GetInboxDAO(ctx, database.GetDatabaseEngine(config.GetString(config.DBEngine)))
 	defer func() {
 		err := dao.Close(ctx)
-		log.Fatal("error closing DB:", err)
+		if err != nil {
+			log.Fatal("error closing DB:", err)
+		}
 	}()
 	if err != nil {
 		log.Fatal("failed to obtain InboxDAO:", err)
