@@ -24,7 +24,10 @@ const (
 	ReleaseIDDefault   string = ""
 
 	DBEngine       Key    = "DB_ENGINE"
-	DBEngineMemory string = "memory"
+	DBEngineBadger string = "badger"
+
+	DBBadgerPath        Key    = "DB_BADGER_PATH"
+	DBBadgerPathDefault string = "/tmp/inbox.db"
 
 	APIHTTPPort        Key    = "API_HTTP_PORT"
 	APIHTTPPortDefault string = "8080"
@@ -65,7 +68,10 @@ func setDefaults(app App) {
 	setDefault(ReleaseID, ReleaseIDDefault)
 	setDefault(Version, VersionDefault)
 	setDefault(APIHTTPPort, APIHTTPPortDefault)
-	setDefault(DBEngine, DBEngineMemory)
+
+	setDefault(DBEngine, DBEngineBadger)
+	setDefault(DBBadgerPath, DBBadgerPathDefault)
+
 	setDefault(LogLevel, slog.LevelDebug.String())
 	setDefault(LogFormat, LogFormatText)
 }
