@@ -23,13 +23,13 @@ func main() {
 	// Define the routes and their handlers
 	v1 := r.Group("/api/v1")
 	{
-		inboxs := v1.Group("/inboxs")
+		inboxes := v1.Group("/inboxes")
 		{
-			inboxs.GET("/", handler.ListInboxs)
-			inboxs.POST("/", handler.CreateInbox)
-			inboxs.DELETE("/:id", handler.DeleteInbox)
-			inboxs.GET("/:id", handler.GetInbox)
-			inboxs.Any("/:id/in/", handler.InboxRequest)
+			inboxes.GET("/", handler.ListInbox)
+			inboxes.POST("/", handler.CreateInbox)
+			inboxes.DELETE("/:id", handler.DeleteInbox)
+			inboxes.GET("/:id", handler.GetInbox)
+			inboxes.Any("/:id/in/", handler.InboxRequest)
 		}
 	}
 

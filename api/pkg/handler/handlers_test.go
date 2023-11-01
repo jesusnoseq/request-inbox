@@ -18,10 +18,10 @@ func performRequest(r http.Handler, method, path string, body string) *httptest.
 
 func TestCreateInbox(t *testing.T) {
 	r := gin.Default()
-	r.POST("/api/v1/inboxs/", CreateInbox)
+	r.POST("/api/v1/inboxes/", CreateInbox)
 
 	body := `{"Response":"Test Response"}`
-	w := performRequest(r, "POST", "/api/v1/inboxs/", body)
+	w := performRequest(r, "POST", "/api/v1/inboxes/", body)
 
 	if w.Code != http.StatusCreated {
 		t.Errorf("Expected status %d; got %d", http.StatusCreated, w.Code)
@@ -31,10 +31,10 @@ func TestCreateInbox(t *testing.T) {
 	// Example: check if the response contains the newly created inbox data.
 }
 
-// Add more test cases for other handlers (ListInboxs, DeleteInbox, GetInbox, InboxRequest) as needed.
+// Add more test cases for other handlers (ListInboxes, DeleteInbox, GetInbox, InboxRequest) as needed.
 
-func TestListInboxs(t *testing.T) {
-	// Implement test cases for ListInboxs handler
+func TestListInbox(t *testing.T) {
+	// Implement test cases for ListInbox handler
 }
 
 func TestDeleteInbox(t *testing.T) {

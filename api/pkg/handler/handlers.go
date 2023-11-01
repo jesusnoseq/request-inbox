@@ -10,7 +10,7 @@ import (
 
 var inboxes []model.Inbox
 
-func ListInboxs(c *gin.Context) {
+func ListInbox(c *gin.Context) {
 	c.JSON(http.StatusOK, inboxes)
 }
 
