@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  api: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+        sh -c "make run-api-hotreloading"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api:/github.com/jesusnoseq/request-inbox/api
+      - ./Makefile:/github.com/jesusnoseq/request-inbox/Makefile
