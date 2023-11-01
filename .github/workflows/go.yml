@@ -24,6 +24,11 @@ jobs:
 
     - name: Build
       run: cd api && go build -v ./...
+      
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        working-directory: api
 
     - name: Test
       run: cd api && go test -v ./...
