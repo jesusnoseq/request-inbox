@@ -2,9 +2,9 @@ package database_test
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/hex"
 	"math"
-	"math/rand"
 	"testing"
 	"time"
 
