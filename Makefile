@@ -38,7 +38,7 @@ download-tools:	## Download all required tools to validate and generate document
 .PHONY: build-api
 build-api:	## Build API go application
 	set CGO_ENABLED=0
-	cd $(CODE_DIR) && go build -o $(BIN_OUTPUT) $(CMD_FILE)
+	cd $(CODE_DIR) && go build -tags=jsoniter -o $(BIN_OUTPUT) $(CMD_FILE)
 
 .PHONY: fmt
 fmt:	## Format code
