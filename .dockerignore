@@ -1,0 +1,6 @@
+*
+!api/*
+!static/*
+!Makefile
+!go.mod
+!go.sum
