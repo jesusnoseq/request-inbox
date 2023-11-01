@@ -1,6 +1,8 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type Inbox struct {
 	ID                    uuid.UUID
