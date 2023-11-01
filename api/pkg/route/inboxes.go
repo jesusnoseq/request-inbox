@@ -11,11 +11,12 @@ func SetInboxRoutes(r gin.IRouter, ih *handler.InboxHandler) {
 	{
 		inboxes := v1.Group("/inboxes")
 		{
-			inboxes.GET("/", ih.ListInbox)
-			inboxes.POST("/", ih.CreateInbox)
+			inboxes.GET("", ih.ListInbox)
+			inboxes.POST("", ih.CreateInbox)
 			inboxes.DELETE("/:id", ih.DeleteInbox)
 			inboxes.GET("/:id", ih.GetInbox)
-			inboxes.Any("/:id/in/*", ih.RegisterInboxRequest)
+			inboxes.PUT("/:id", ih.UpdateInbox)
+			inboxes.Any("/:id/in", ih.RegisterInboxRequest)
 		}
 	}
 
