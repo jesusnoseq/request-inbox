@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -101,5 +102,40 @@ func (ih *InboxHandler) ListInbox(c *gin.Context) {
 }
 
 func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, gin.H{"error": "Not implemented"})
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
+		return
+	}
+	inbox, err := ih.dao.GetInbox(c, id)
+	if err != nil {
+		c.AbortWithStatusJSON(model.ErrorResponseWithError("inbox not found", err, http.StatusNotFound))
+		return
+	}
+
+	body, err := c.GetRawData()
+	if err != nil {
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+		return
+	}
+	request := model.Request{
+		Timestamp: time.Now().UnixMilli(),
+		Headers:   c.Request.Header,
+		Body:      string(body),
+	}
+	inbox.Requests = append(inbox.Requests, request)
+	_, err = ih.dao.UpdateInbox(c, inbox)
+	if err != nil {
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+		return
+	}
+	if inbox.Response.Code == 0 {
+		return
+	}
+	err = c.ShouldBindHeader(inbox.Response.Headers)
+	if err != nil {
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+		return
+	}
+	c.JSON(inbox.Response.Code, inbox.Response.Body)
 }
