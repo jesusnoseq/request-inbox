@@ -1,10 +1,9 @@
 package embedded
 
 import (
-	"bytes"
 	"context"
-	"encoding/gob"
 	"fmt"
+	"time"
 
 	badger "github.com/dgraph-io/badger/v4"
 	"github.com/google/uuid"
@@ -39,6 +38,7 @@ func (ib *InboxBadger) Close(ctx context.Context) error {
 
 func (ib *InboxBadger) CreateInbox(ctx context.Context, inbox model.Inbox) (model.Inbox, error) {
 	inbox.ID = uuid.New()
+	inbox.Timestamp = time.Now().UnixMilli()
 	data, err := encode(inbox)
 	if err != nil {
 		return model.Inbox{}, err
@@ -119,24 +119,4 @@ func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
 		return nil
 	})
 	return inboxList, err
-}
-
-func encode(inbox model.Inbox) ([]byte, error) {
-	var buffer bytes.Buffer
-	encoder := gob.NewEncoder(&buffer)
-	err := encoder.Encode(inbox)
-	if err != nil {
-		return nil, err
-	}
-	return buffer.Bytes(), nil
-}
-
-func decode(b []byte) (model.Inbox, error) {
-	decoder := gob.NewDecoder(bytes.NewReader(b))
-	var inbox model.Inbox
-	err := decoder.Decode(&inbox)
-	if err != nil {
-		return model.Inbox{}, fmt.Errorf("error decoding inbox: %w", err)
-	}
-	return inbox, nil
 }
