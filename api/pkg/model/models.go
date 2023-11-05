@@ -13,13 +13,14 @@ type Inbox struct {
 }
 
 type Response struct {
-	ResponseBody    string
-	ResponseHeaders map[string]string
+	Code    int
+	Body    string
+	Headers map[string]string
 }
 
 type Request struct {
 	ID        int
 	Timestamp int64
-	Headers   map[string]string
+	Headers   map[string][]string
 	Body      string
 }

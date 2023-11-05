@@ -19,8 +19,9 @@ func GenerateInbox() Inbox {
 	return Inbox{
 		Timestamp: time.Now().UnixMilli(),
 		Response: Response{
-			ResponseBody:    "response body" + randomString(5),
-			ResponseHeaders: map[string]string{randomString(5): randomString(5)},
+			Code:    200,
+			Body:    "response body" + randomString(5),
+			Headers: map[string]string{randomString(5): randomString(5)},
 		},
 		Requests:              []Request{GenerateRequest(1), GenerateRequest(2)},
 		ObfuscateHeaderFields: []string{"Authorization"},
@@ -31,9 +32,9 @@ func GenerateRequest(id int) Request {
 	return Request{
 		ID:        id,
 		Timestamp: time.Now().UnixMilli(),
-		Headers: map[string]string{
-			"Content-Type":  "application/json",
-			"Authorization": "Bearer access_token" + randomString(5),
+		Headers: map[string][]string{
+			"Content-Type":  {"application/json"},
+			"Authorization": {"Bearer access_token"},
 		},
 		Body: "This is the request body." + randomString(10),
 	}
