@@ -10,7 +10,7 @@ import (
 // Generates a Base16 random string
 func randomString(l int) string {
 	buff := make([]byte, int(math.Ceil(float64(l)/2)))
-	rand.Read(buff)
+	_, _ = rand.Read(buff)
 	str := hex.EncodeToString(buff)
 	return str[:l] // strip 1 extra character we get from odd length results
 }

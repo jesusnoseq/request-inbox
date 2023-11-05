@@ -12,9 +12,31 @@ type ErrorResponse struct {
 	Details []ErrorDetail `json:"details,omitempty"`
 }
 
-func BuildSimpleErrorResponse(message string, code int) ErrorResponse {
-	return ErrorResponse{
+func DetailedErrorResponse(message string, code int, details []ErrorDetail) (int, ErrorResponse) {
+	return code, ErrorResponse{
 		Code:    code,
 		Message: message,
+		Details: details,
+	}
+}
+
+func ErrorResponseMsg(message string, code int) (int, ErrorResponse) {
+	return code, ErrorResponse{
+		Code:    code,
+		Message: message,
+	}
+}
+
+func ErrorResponseWithError(msg string, err error, code int) (int, ErrorResponse) {
+	return code, ErrorResponse{
+		Code:    code,
+		Message: msg + ": " + err.Error(),
+	}
+}
+
+func ErrorResponseFromError(err error, code int) (int, ErrorResponse) {
+	return code, ErrorResponse{
+		Code:    code,
+		Message: err.Error(),
 	}
 }
