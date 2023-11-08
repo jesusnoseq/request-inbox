@@ -17,6 +17,7 @@ func SetInboxRoutes(r gin.IRouter, ih *handler.InboxHandler) {
 			inboxes.GET("/:id", ih.GetInbox)
 			inboxes.PUT("/:id", ih.UpdateInbox)
 			inboxes.Any("/:id/in", ih.RegisterInboxRequest)
+			inboxes.Any("/:id/in/*path", ih.RegisterInboxRequest)
 		}
 	}
 
