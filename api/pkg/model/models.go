@@ -21,6 +21,7 @@ type Response struct {
 type Request struct {
 	ID        int
 	Timestamp int64
+	Path      string
 	Headers   map[string][]string
 	Body      string
 }
