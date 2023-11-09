@@ -38,7 +38,6 @@ func main() {
 
 	ih := handler.NewInboxHandler(dao)
 	route.SetInboxRoutes(r, ih)
-	route.SetStaticRoutes(r, "./static")
 
 	err = r.Run(":" + config.GetString(config.APIHTTPPort))
 	if err != nil {
