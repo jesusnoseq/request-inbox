@@ -1,6 +1,8 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type Inbox struct {
 	ID                    uuid.UUID
@@ -11,13 +13,15 @@ type Inbox struct {
 }
 
 type Response struct {
-	ResponseBody    string
-	ResponseHeaders map[string]string
+	Code    int
+	Body    string
+	Headers map[string]string
 }
 
 type Request struct {
 	ID        int
 	Timestamp int64
-	Headers   map[string]string
+	Path      string
+	Headers   map[string][]string
 	Body      string
 }

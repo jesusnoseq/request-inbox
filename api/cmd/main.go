@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
+	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/handler"
+	"github.com/jesusnoseq/request-inbox/pkg/route"
 )
 
 func main() {
@@ -17,27 +20,24 @@ func main() {
 
 	r := gin.Default()
 
-	// Serve static files from the "static" folder
-	r.Static("/static", "./static")
+	r.HandleMethodNotAllowed = true
+	r.NoMethod(handler.MethodNotAllowedHandler)
+	r.NoRoute(handler.NotFoundHandler)
 
-	// Define the routes and their handlers
-	v1 := r.Group("/api/v1")
-	{
-		inboxs := v1.Group("/inboxs")
-		{
-			inboxs.GET("/", handler.ListInboxs)
-			inboxs.POST("/", handler.CreateInbox)
-			inboxs.DELETE("/:id", handler.DeleteInbox)
-			inboxs.GET("/:id", handler.GetInbox)
-			inboxs.Any("/:id/in/", handler.InboxRequest)
+	ctx := context.Background()
+	dao, err := database.GetInboxDAO(ctx, database.GetDatabaseEngine(config.GetString(config.DBEngine)))
+	defer func() {
+		err := dao.Close(ctx)
+		if err != nil {
+			log.Fatal("error closing DB:", err)
 		}
+	}()
+	if err != nil {
+		log.Fatal("failed to obtain InboxDAO:", err)
 	}
 
-	// Serve the web page at the root path
-	r.LoadHTMLGlob("../static/*.html")
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(200, "index.html", nil)
-	})
+	ih := handler.NewInboxHandler(dao)
+	route.SetInboxRoutes(r, ih)
 
 	err = r.Run(":" + config.GetString(config.APIHTTPPort))
 	if err != nil {
