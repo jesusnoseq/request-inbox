@@ -2,11 +2,7 @@ package database_test
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
-	"math"
 	"testing"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
@@ -37,43 +33,11 @@ func MustCreateInbox(ctx context.Context, db database.InboxDAO, inbox model.Inbo
 	return created
 }
 
-// Generates a Base16 random string
-func randomString(l int) string {
-	buff := make([]byte, int(math.Ceil(float64(l)/2)))
-	rand.Read(buff)
-	str := hex.EncodeToString(buff)
-	return str[:l] // strip 1 extra character we get from odd length results
-}
-
-func GenerateInbox() model.Inbox {
-	return model.Inbox{
-		Timestamp: time.Now().UnixMilli(),
-		Response: model.Response{
-			ResponseBody:    "response body" + randomString(5),
-			ResponseHeaders: map[string]string{randomString(5): randomString(5)},
-		},
-		Requests:              []model.Request{GenerateRequest(1), GenerateRequest(2)},
-		ObfuscateHeaderFields: []string{"Authorization"},
-	}
-}
-
-func GenerateRequest(id int) model.Request {
-	return model.Request{
-		ID:        id,
-		Timestamp: time.Now().UnixMilli(),
-		Headers: map[string]string{
-			"Content-Type":  "application/json",
-			"Authorization": "Bearer access_token" + randomString(5),
-		},
-		Body: "This is the request body." + randomString(10),
-	}
-}
-
 func TestCreateInbox(t *testing.T) {
 	ctx := context.Background()
 	db, close := MustGetDB()
 	defer close(ctx)
-	inbox := GenerateInbox()
+	inbox := model.GenerateInbox()
 	created, err := db.CreateInbox(ctx, inbox)
 	if err != nil {
 		t.Errorf("expected no error. Got %v", err)
@@ -89,8 +53,8 @@ func TestGetInbox(t *testing.T) {
 	ctx := context.Background()
 	db, close := MustGetDB()
 	defer close(ctx)
-	inDBInbox := MustCreateInbox(ctx, db, GenerateInbox())
-	notInDBInbox := GenerateInbox()
+	inDBInbox := MustCreateInbox(ctx, db, model.GenerateInbox())
+	notInDBInbox := model.GenerateInbox()
 	notInDBInbox.ID = uuid.New()
 	empty := model.Inbox{}
 
@@ -139,7 +103,7 @@ func TestListInbox(t *testing.T) {
 		}
 	})
 	t.Run("List inbox with one item", func(t *testing.T) {
-		newInbox := MustCreateInbox(ctx, db, GenerateInbox())
+		newInbox := MustCreateInbox(ctx, db, model.GenerateInbox())
 		list, err := db.ListInbox(ctx)
 		if err != nil {
 			t.Errorf("Expected no error, but got an error: %v", err)
@@ -154,10 +118,10 @@ func TestUpdateInbox(t *testing.T) {
 	ctx := context.Background()
 	db, close := MustGetDB()
 	defer close(ctx)
-	inDBInbox := MustCreateInbox(ctx, db, GenerateInbox())
-	modDBInbox := GenerateInbox()
+	inDBInbox := MustCreateInbox(ctx, db, model.GenerateInbox())
+	modDBInbox := model.GenerateInbox()
 	modDBInbox.ID = inDBInbox.ID
-	newInbox := GenerateInbox()
+	newInbox := model.GenerateInbox()
 	t.Run("Modify item that exists", func(t *testing.T) {
 		got, err := db.UpdateInbox(ctx, modDBInbox)
 		if err != nil {
@@ -189,8 +153,8 @@ func TestDeleteInbox(t *testing.T) {
 	ctx := context.Background()
 	db, close := MustGetDB()
 	defer close(ctx)
-	inDBInbox := MustCreateInbox(ctx, db, GenerateInbox())
-	notInDBInbox := GenerateInbox()
+	inDBInbox := MustCreateInbox(ctx, db, model.GenerateInbox())
+	notInDBInbox := model.GenerateInbox()
 	notInDBInbox.ID = uuid.New()
 	empty := model.Inbox{}
 

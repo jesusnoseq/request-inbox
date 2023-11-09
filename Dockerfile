@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM dockerhub-proxy/library/golang:1.21-alpine3.18 AS builder
+FROM golang:1.21-alpine3.18 AS builder
 
 RUN apk update && \
     apk add --no-cache --no-progress \
@@ -13,6 +13,8 @@ RUN apk update && \
     tar \
     tzdata \
     && rm -rf /var/cache/apk/* && update-ca-certificates
+
+WORKDIR /github.com/jesusnoseq/request-inbox/
 
 COPY Makefile Makefile
 RUN make download-tools

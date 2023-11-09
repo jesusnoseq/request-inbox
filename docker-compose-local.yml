@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     command: >
-        sh -c "make run-api-hotreloading"
+        sh -c "make run-api-hot"
     ports:
       - "8080:8080"
     volumes:

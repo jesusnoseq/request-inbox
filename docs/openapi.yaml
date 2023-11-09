@@ -1,0 +1,187 @@
+openapi: "3.1.0"
+info:
+  version: "1.0.0"
+  title: "Request inbox"
+  description: Register requests
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local server
+paths:
+  /inboxes/{inboxID}:
+    parameters:
+      - name: inboxID
+        description: The unique identifier of the inbox
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/InboxID"
+    get:
+      summary: Read an Inbox
+      responses:
+        200:
+          description: found for the provided `inboxID`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Inbox"
+        404:
+          description: No spacecraft found for the provided `inboxID`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update Inbox by ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Inbox"
+      responses:
+        200:
+          description: Inbox updated successfully
+        404:
+          description: No inbox found for the provided `inboxID`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete an Inbox
+      responses:
+        204:
+          description: delete the provided `inboxID`
+        404:
+          description: No inbox found for the provided `inboxID`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /inboxes:
+    get:
+      summary: List of Inboxes
+      responses:
+        200:
+          description: List of Inboxes successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Inbox"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create Inbox
+      operationId: createInbox
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Inbox"
+      responses:
+        201:
+          description: Inbox created successfully
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /inboxes/{inboxID}/in:
+    summary: Collect request in a specific Inbox
+    parameters:
+      - name: inboxID
+        description: The unique identifier of the inbox
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/InboxID"
+components:
+  schemas:
+    InboxID:
+      type: string
+      format: uuid
+    Inbox:
+      type: object
+      properties:
+        ID:
+          $ref: "#/components/schemas/InboxID"
+        Timestamp:
+          type: integer
+          format: int64
+        Response:
+          $ref: "#/components/schemas/Response"
+        Requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/Request"
+        ObfuscateHeaderFields:
+          type: array
+          items:
+            type: string
+    Response:
+      type: object
+      properties:
+        ResponseBody:
+          type: string
+        ResponseHeaders:
+          type: object
+          additionalProperties:
+            type: string
+    Request:
+      type: object
+      properties:
+        ID:
+          type: integer
+        Timestamp:
+          type: integer
+          format: int64
+        Headers:
+          type: object
+          additionalProperties:
+            type: string
+        Body:
+          type: string
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: A human readable error message
+          type: string
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+security:
+  - ApiKey: []
