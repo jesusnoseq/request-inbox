@@ -5,7 +5,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/handler"
 )
 
-func SetInboxRoutes(r gin.IRouter, ih *handler.InboxHandler) {
+func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
 	// Define the routes and their handlers
 	v1 := r.Group("/api/v1")
 	{
