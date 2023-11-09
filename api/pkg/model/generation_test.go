@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/jesusnoseq/request-inbox/pkg/collection"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
@@ -12,7 +13,7 @@ func TestGenerateInbox(t *testing.T) {
 
 	t.Run("it should have random values", func(t *testing.T) {
 		inbox := model.GenerateInbox()
-		if hasEmptyField(t, inbox) {
+		if hasEmptyField(t, inbox, nil) {
 			t.Errorf("Expected no empty fields in %+v", inbox)
 		}
 	})
@@ -30,7 +31,7 @@ func TestGenerateRequest(t *testing.T) {
 			t.Errorf("GenerateRequest(1).ID = %v, want %v", req.ID, 1)
 		}
 
-		if hasEmptyField(t, req) {
+		if hasEmptyField(t, req, []string{"Path"}) {
 			t.Errorf("Expected no empty fields in %+v", req)
 		}
 	})
@@ -42,7 +43,7 @@ func TestGenerateRequest(t *testing.T) {
 }
 
 // hasEmptyField does not check empty vars inside slices, maps or arrays
-func hasEmptyField(t *testing.T, structVar any) bool {
+func hasEmptyField(t *testing.T, structVar any, ignoreFields []string) bool {
 	t.Helper()
 
 	v := reflect.ValueOf(structVar)
@@ -57,6 +58,10 @@ func hasEmptyField(t *testing.T, structVar any) bool {
 
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Field(i)
+		fName := v.Type().Field(i).Name
+		if collection.SliceContains(ignoreFields, fName) {
+			continue
+		}
 
 		switch field.Kind() {
 		case reflect.Int, reflect.Int64:

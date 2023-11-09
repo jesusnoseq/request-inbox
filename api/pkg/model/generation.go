@@ -36,6 +36,7 @@ func GenerateRequest(id int) Request {
 			"Content-Type":  {"application/json"},
 			"Authorization": {"Bearer access_token"},
 		},
+		Path: "a/path",
 		Body: "This is the request body." + randomString(10),
 	}
 }
