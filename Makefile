@@ -33,6 +33,7 @@ download-tools:	## Download all required tools to validate and generate document
 	@echo "Installing tools on $(GO_PATH)/bin"
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.1
 	go install golang.org/x/tools/cmd/goimports@v0.14.0
+	go install github.com/golang/mock/mockgen
 	go install github.com/cosmtrek/air@v1.49.0
 
 .PHONY: build-api
@@ -52,6 +53,10 @@ tidy:	## Prune any no-longer-needed dependencies from go.mod and add any depende
 .PHONY: lint
 lint:	## Run static linting of source files. See .golangci.yml for options
 	cd $(CODE_DIR) && golangci-lint $(LINTER_ARGS)
+
+.PHONY: gen-mocks
+gen-mocks:	## Generate code for mocks
+	cd $(CODE_DIR) && go generate ./...
 
 .PHONY: test
 test:	## Run tests without required build tags
