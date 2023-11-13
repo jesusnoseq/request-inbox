@@ -74,3 +74,14 @@ run-api-hot:	## Run API with hot reloading
 show-version:	## Shows API version
 	@echo $(VERSION)
 
+
+WEB_DIR = front
+
+.PHONY: run-web
+run-web:	## Run web app
+	cd $(WEB_DIR) && npm start
+
+.PHONY: build-web
+build-web:	## Build web app
+	cd $(WEB_DIR) && npm run build
+
