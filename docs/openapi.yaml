@@ -170,6 +170,8 @@ components:
             type: string
         Body:
           type: string
+        Path:
+          type: string
     Error:
       type: object
       required:
