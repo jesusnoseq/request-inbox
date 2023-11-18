@@ -121,6 +121,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		return
 	}
 	request := model.Request{
+		ID:        len(inbox.Requests),
 		Timestamp: time.Now().UnixMilli(),
 		Path:      path,
 		Headers:   c.Request.Header,
