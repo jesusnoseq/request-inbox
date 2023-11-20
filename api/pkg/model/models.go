@@ -1,6 +1,9 @@
 package model
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -24,4 +27,14 @@ type Request struct {
 	Path      string
 	Headers   map[string][]string
 	Body      string
+}
+
+func NewInbox() Inbox {
+	return Inbox{
+		ID:                    uuid.New(),
+		Timestamp:             time.Now().UnixMilli(),
+		Response:              Response{Code: http.StatusOK, Body: "", Headers: map[string]string{}},
+		Requests:              []Request{},
+		ObfuscateHeaderFields: []string{},
+	}
 }
