@@ -42,3 +42,19 @@ export const newInbox = async () => {
     console.log(inbox);
     return inbox;
 }
+
+
+export const deleteInbox = async (id: string) => {
+    const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    return resp.status === 204;
+}
+
+
+export const buildInboxURL = (id: string) => {
+    return `${BASE_URL}/api/v1/inboxes/${id}/in`
+}
