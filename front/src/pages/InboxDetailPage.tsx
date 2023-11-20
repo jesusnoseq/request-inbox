@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Inbox } from '../types/inbox';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
+import { Typography, Paper, List, ListItem, Divider } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import RequestList from '../components/RequestList';
 import { getInbox } from '../services/inbox';
+import Header from '../components/Header';
+import InboxDetail from '../components/InboxDetail';
 
 const InboxDetailPage: React.FC = () => {
     const { inboxId } = useParams<'inboxId'>();
@@ -51,18 +53,26 @@ const InboxDetailPage: React.FC = () => {
             </Container>
         );
     }
+    const handleTestInboxClick = () => {
+        window.open("", '_blank', 'noopener,noreferrer');
+    };
 
     return (
         <Container>
+            <Header />
             {inbox && (
-                <>
-                    <Typography variant="h4" gutterBottom>
-                        Inbox ID: {inbox.ID}
+                <><InboxDetail inbox={inbox} />
+                    {/* <Typography variant="h4" gutterBottom>
+                        Inbox URL: {inbox.ID}
                     </Typography>
+                    <Button variant="contained" color="primary" onClick={handleTestInboxClick}>
+                        Test Inbox
+                    </Button>
                     <Typography variant="subtitle1" gutterBottom>
                         {`Created at ${new Date(inbox.Timestamp).toLocaleString()}`}
-                    </Typography>
+                    </Typography> */}
                     {/* ...Additional inbox details */}
+                    <Divider sx={{ my: 2 }} />
                     {inbox.Requests && inbox.Requests.length > 0 ? (
                         <RequestList requests={inbox.Requests} />
                     ) : (

@@ -21,7 +21,7 @@ func NewInboxHandler(dao database.InboxDAO) *InboxHandler {
 }
 
 func (ih *InboxHandler) CreateInbox(c *gin.Context) {
-	var newInbox model.Inbox
+	newInbox := model.NewInbox()
 	if err := c.ShouldBindJSON(&newInbox); err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox", err, http.StatusBadRequest))
 		return

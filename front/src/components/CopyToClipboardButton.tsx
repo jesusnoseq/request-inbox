@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -9,8 +9,9 @@ type CopyToClipboardButtonProps = {
 };
 
 const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({ textToCopy, tooltipTitle = 'Copy to Clipboard' }) => {
-    const handleCopyToClipboard = () => {
-        navigator.clipboard.writeText(textToCopy);
+
+    const handleCopyToClipboard = async () => {
+        await navigator.clipboard.writeText(textToCopy);
     };
 
     return (
