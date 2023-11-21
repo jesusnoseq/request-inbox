@@ -26,7 +26,8 @@ jobs:
           cache-dependency-path: api/go.sum
 
       - name: Build
-        run: cd api && go build -tags=jsoniter -v ./...
+        run: go build -tags=jsoniter -v ./...
+        working-directory: ./api
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
@@ -34,4 +35,5 @@ jobs:
           working-directory: api
 
       - name: Test
-        run: cd api && go test -v ./...
+        run: go test -v ./...
+        working-directory: ./api
