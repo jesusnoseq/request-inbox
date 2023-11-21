@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Inbox } from '../types/inbox';
 import Container from '@mui/material/Container';
-import { Typography, Paper, List, ListItem, Divider } from '@mui/material';
+import { Typography, Divider } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import RequestList from '../components/RequestList';
 import { getInbox } from '../services/inbox';
@@ -53,9 +53,9 @@ const InboxDetailPage: React.FC = () => {
             </Container>
         );
     }
-    const handleTestInboxClick = () => {
-        window.open("", '_blank', 'noopener,noreferrer');
-    };
+    // const handleTestInboxClick = () => {
+    //     window.open("", '_blank', 'noopener,noreferrer');
+    // };
 
     return (
         <Container>
