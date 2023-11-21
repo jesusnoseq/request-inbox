@@ -1,7 +1,6 @@
 import React from 'react';
 import { InboxRequest } from '../types/inbox';
 import Container from '@mui/material/Container';
-import Divider from '@mui/material/Divider';
 import RequestDetail from './RequestDetail';
 type Props = {
     requests: InboxRequest[];

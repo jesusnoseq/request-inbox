@@ -1,6 +1,6 @@
 import React from 'react';
 import { Inbox } from '../types/inbox';
-import { Typography, Paper, List, ListItem, Divider } from '@mui/material';
+import { Typography, Paper } from '@mui/material';
 import moment from 'moment';
 import CopyToClipboardButton from '../components/CopyToClipboardButton';
 import { buildInboxURL } from '../services/inbox';
