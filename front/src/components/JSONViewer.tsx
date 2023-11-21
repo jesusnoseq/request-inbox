@@ -1,14 +1,7 @@
 import React from 'react';
-import { Theme } from '@mui/material/styles';
-import { Typography, Paper, Grid, Box } from '@mui/material'
+import { Typography, Paper, Grid } from '@mui/material'
 import CopyToClipboardButton from './CopyToClipboardButton';
 
-// const useStyles = makeStyles((theme: Theme) => ({
-//     root: {
-//         margin: theme.spacing(2),
-//         padding: theme.spacing(2),
-//     },
-// }));
 
 interface JSONViewerProps {
     title?: string;
