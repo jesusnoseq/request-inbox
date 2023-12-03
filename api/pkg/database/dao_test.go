@@ -33,7 +33,7 @@ func MustCreateInbox(ctx context.Context, db database.InboxDAO, inbox model.Inbo
 	return created
 }
 
-func TestCreateInbox(t *testing.T) {
+func TestDBCreateInbox(t *testing.T) {
 	ctx := context.Background()
 	db, close := MustGetDB()
 	defer close(ctx)
@@ -44,6 +44,7 @@ func TestCreateInbox(t *testing.T) {
 	}
 	inboxWithID := inbox
 	inboxWithID.ID = created.ID
+	inboxWithID.Name = created.ID.String()
 	if diff := cmp.Diff(inboxWithID, created); diff != "" {
 		t.Errorf("GetInboxDAO(ctx, inbox) = created, want inboxWithID. Diff: %s", diff)
 	}

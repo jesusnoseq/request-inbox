@@ -38,6 +38,7 @@ func (ib *InboxBadger) Close(ctx context.Context) error {
 
 func (ib *InboxBadger) CreateInbox(ctx context.Context, inbox model.Inbox) (model.Inbox, error) {
 	inbox.ID = uuid.New()
+	inbox.Name = inbox.ID.String()
 	inbox.Timestamp = time.Now().UnixMilli()
 	data, err := encode(inbox)
 	if err != nil {
@@ -101,9 +102,8 @@ func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
 		prefix := []byte("")
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 			item := it.Item()
-			k := item.Key()
+			// k := item.Key()
 			err := item.Value(func(val []byte) error {
-				fmt.Printf("key=%s, value=%s\n", k, val)
 				valCopy := append([]byte{}, val...)
 				inbox, err := decode(valCopy)
 				if err != nil {
