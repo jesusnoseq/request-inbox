@@ -4,7 +4,6 @@ import { Typography, Card, CardContent, Button, List, ListItem, ListItemText, Co
 import moment from 'moment';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import BodyView from './BodyView';
-import { buildInboxURL } from '../services/inbox';
 
 type RequestDetailProps = {
     request: InboxRequest;
