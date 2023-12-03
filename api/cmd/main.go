@@ -21,7 +21,7 @@ func main() {
 	config.LoadConfig(config.API)
 	err := config.ConfigureLog()
 	if err != nil {
-		//slog.("configuring log", err)
+		log.Fatal("configuring log", err)
 	}
 
 	r := gin.Default()
