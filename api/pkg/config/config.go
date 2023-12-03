@@ -55,9 +55,9 @@ func ConfigureLog() error {
 	var handler slog.Handler
 	switch GetString(LogFormat) {
 	case LogFormatJSON:
-		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level})
-	case LogFormatText:
 		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: level})
+	case LogFormatText:
+		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level})
 	}
 	slog.SetDefault(slog.New(handler))
 	return nil

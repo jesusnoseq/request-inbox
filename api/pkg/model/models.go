@@ -9,6 +9,7 @@ import (
 
 type Inbox struct {
 	ID                    uuid.UUID
+	Name                  string
 	Timestamp             int64
 	Response              Response
 	Requests              []Request
@@ -22,16 +23,23 @@ type Response struct {
 }
 
 type Request struct {
-	ID        int
-	Timestamp int64
-	Path      string
-	Headers   map[string][]string
-	Body      string
+	ID            int
+	Timestamp     int64
+	URI           string
+	Host          string
+	RemoteAddr    string
+	Protocol      string
+	Headers       map[string][]string
+	Method        string
+	ContentLength int64
+	Body          string
 }
 
 func NewInbox() Inbox {
+	id := uuid.New()
 	return Inbox{
-		ID:                    uuid.New(),
+		ID:                    id,
+		Name:                  id.String(),
 		Timestamp:             time.Now().UnixMilli(),
 		Response:              Response{Code: http.StatusOK, Body: "", Headers: map[string]string{}},
 		Requests:              []Request{},
