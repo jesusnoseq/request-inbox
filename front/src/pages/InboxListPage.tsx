@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Grid, CircularProgress, Button, Box } from '@mui/material';
+import { Container, Typography, Grid, CircularProgress, Button, Box, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Inbox } from '../types/inbox';
 import { getInboxList, newInbox, deleteInbox } from '../services/inbox';
 import InboxListItem from '../components/InboxListItem';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 import SearchBar from '../components/SearchBar';
 
 const InboxListPage: React.FC = () => {
@@ -82,7 +83,10 @@ const InboxListPage: React.FC = () => {
     if (error) {
         return (
             <Container>
-                <Typography color="error">{error}</Typography>
+                <Header />
+                <Alert variant="outlined" severity="error">
+                    {error}
+                </Alert>
             </Container>
         );
     }
@@ -107,9 +111,11 @@ const InboxListPage: React.FC = () => {
                     <Grid item xs={12} sm={6} md={4} lg={4} key={inbox.ID}>
                         <InboxListItem inbox={inbox} onDelete={handleDeleteInbox} />
                     </Grid>
+
                 ))}
             </Grid>
-        </Container>
+            <Footer />
+        </Container >
     );
 };
 

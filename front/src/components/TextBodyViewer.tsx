@@ -3,12 +3,12 @@ import { Typography, Paper, Grid } from '@mui/material'
 import CopyToClipboardButton from './CopyToClipboardButton';
 
 
-interface JSONViewerProps {
+interface TextBodyViewerProps {
     title?: string;
     data: any;
 }
 
-const JSONViewer: React.FC<JSONViewerProps> = ({ data, title }) => {
+const TextBodyViewer: React.FC<TextBodyViewerProps> = ({ data, title }) => {
     const body = JSON.stringify(data, null, 2)
     return (
         <Grid item xs={12}>
@@ -28,4 +28,4 @@ const JSONViewer: React.FC<JSONViewerProps> = ({ data, title }) => {
     );
 };
 
-export default JSONViewer;
+export default TextBodyViewer;

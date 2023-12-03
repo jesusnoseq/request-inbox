@@ -12,7 +12,6 @@ const RequestList: React.FC<Props> = ({ requests }) => {
             {requests.map((request, index) => (
                 <React.Fragment key={request.ID}>
                     <RequestDetail request={request} />
-                    {/* {index < requests.length - 1 && <Divider variant="inset" component="li" />} */}
                 </React.Fragment>
             ))}
         </Container>
