@@ -3,7 +3,7 @@ import { InboxRequest } from '../types/inbox';
 import { Typography, Card, CardContent, Button, List, ListItem, ListItemText, Collapse } from '@mui/material';
 import moment from 'moment';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import JSONViewer from './JSONViewer';
+import BodyView from './BodyView';
 
 type RequestDetailProps = {
     request: InboxRequest;
@@ -22,38 +22,36 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
         <Card variant="outlined" sx={{ marginBottom: 2 }}>
             <CardContent>
                 <Typography color="textSecondary" gutterBottom>
-                    ID: {request.ID}
+                    Nº {request.ID + 1}
                 </Typography>
-                <Typography variant="h6">
-                    Path: {request.Path}
-                </Typography>
+                {request.Path &&
+                    <Typography variant="h6">
+                        Path: {request.Path}
+                    </Typography>
+                }
                 <Typography color="textSecondary">
-                    Timestamp: {moment(request.Timestamp).format('LLL')}
-                </Typography>
-                <Typography>
-                    Headers
-                    <Button onClick={handleCollapse}>
-                        {open ? <ExpandLess /> : <ExpandMore />}
-                        <Typography>Show headers</Typography>
-                    </Button>
+                    {moment(request.Timestamp).format('LLL')}
                 </Typography>
 
+                <Typography>
+                    <Button onClick={handleCollapse}>
+                        <Typography>Show headers</Typography>
+                        {open ? <ExpandLess /> : <ExpandMore />}
+                    </Button>
+                </Typography>
 
                 <Collapse in={open} timeout="auto" unmountOnExit>
                     <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                         {
-                            headerEntries.map((k) => (
-                                <ListItem alignItems="flex-start" sx={{ paddingBottom: 0, paddingTop: 0 }}>
+                            headerEntries.map((k, index) => (
+                                <ListItem key={index} alignItems="flex-start" sx={{ paddingBottom: 0, paddingTop: 0 }}>
                                     <ListItemText primary={k[0]} secondary={k[1]} />
                                 </ListItem>
                             ))
                         }
                     </List>
                 </Collapse>
-
-                <JSONViewer data={request.Body} title='Body' />
-
-
+                <BodyView data={request.Body} />
             </CardContent>
         </Card>
     );

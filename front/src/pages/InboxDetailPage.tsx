@@ -2,27 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Inbox } from '../types/inbox';
 import Container from '@mui/material/Container';
-import { Typography, Divider } from '@mui/material';
+import { Typography, Divider, Alert, Grid, Switch, Box, SvgIcon, Fab } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import RequestList from '../components/RequestList';
 import { getInbox } from '../services/inbox';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 import InboxDetail from '../components/InboxDetail';
+import UpdateIcon from '@mui/icons-material/Update';
+import UpdateDisabledIcon from '@mui/icons-material/UpdateDisabled';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+
 
 const InboxDetailPage: React.FC = () => {
     const { inboxId } = useParams<'inboxId'>();
     const [inbox, setInbox] = useState<Inbox | null>(null);
     const [isLoading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [autoUpdate, setAutoUpdate] = useState(false);
 
     useEffect(() => {
         const fetchInboxDetail = async () => {
-            console.log(inboxId);
             if (inboxId) {
                 try {
                     setLoading(true);
                     setError(null);
                     const data = await getInbox(inboxId);
+                    console.log("doping")
                     setInbox(data);
                 } catch (e) {
                     setError('Could not fetch inbox.');
@@ -34,14 +40,31 @@ const InboxDetailPage: React.FC = () => {
                 setLoading(false);
             }
         };
-
         fetchInboxDetail();
     }, [inboxId]);
+
+    const fetchInboxRequests = async () => {
+        if (inboxId && !isLoading && !error) {
+            const data = await getInbox(inboxId);
+            setInbox(data);
+        }
+    };
+
+    useEffect(() => {
+        const intervalId = autoUpdate ? setInterval(() => {
+            fetchInboxRequests();
+        }, 2000) : undefined;
+        return () => clearInterval(intervalId);
+    }, [autoUpdate])
 
     if (isLoading) {
         return (
             <Container>
-                <CircularProgress />
+                <Header />
+                <Grid container spacing={0}>
+                    <CircularProgress />
+                </Grid>
+                <Footer />
             </Container>
         );
     }
@@ -49,29 +72,46 @@ const InboxDetailPage: React.FC = () => {
     if (error) {
         return (
             <Container>
-                <Typography color="error">{error}</Typography>
+                <Header />
+                <Alert variant="outlined" severity="error">
+                    {error}
+                </Alert>
+                <Footer />
             </Container>
         );
     }
-    // const handleTestInboxClick = () => {
-    //     window.open("", '_blank', 'noopener,noreferrer');
-    // };
+
+    const iconStyle = {
+        borderRadius: '50%',
+        backgroundColor: "#eee",
+        color: "#ce93d8"
+    };
+
+    const scrollToBottom = () => {
+        window.scrollTo({
+            top: document.documentElement.scrollHeight || document.body.scrollHeight,
+            behavior: 'smooth',
+        });
+    };
+
 
     return (
         <Container>
             <Header />
             {inbox && (
                 <><InboxDetail inbox={inbox} />
-                    {/* <Typography variant="h4" gutterBottom>
-                        Inbox URL: {inbox.ID}
-                    </Typography>
-                    <Button variant="contained" color="primary" onClick={handleTestInboxClick}>
-                        Test Inbox
-                    </Button>
-                    <Typography variant="subtitle1" gutterBottom>
-                        {`Created at ${new Date(inbox.Timestamp).toLocaleString()}`}
-                    </Typography> */}
-                    {/* ...Additional inbox details */}
+                    <Box margin={1} padding={1} width="100%" display="flex" justifyContent="space-between">
+                        <Switch
+                            color="secondary"
+                            checked={autoUpdate}
+                            onChange={() => setAutoUpdate(!autoUpdate)}
+                            icon={<SvgIcon style={iconStyle}><UpdateDisabledIcon /></SvgIcon>}
+                            checkedIcon={<SvgIcon style={iconStyle}><UpdateIcon /></SvgIcon>}
+                        />
+                        <Fab size="small" color="secondary" aria-label="go down" onClick={scrollToBottom}>
+                            <ArrowDownwardIcon />
+                        </Fab>
+                    </Box>
                     <Divider sx={{ my: 2 }} />
                     {inbox.Requests && inbox.Requests.length > 0 ? (
                         <RequestList requests={inbox.Requests} />
@@ -79,8 +119,10 @@ const InboxDetailPage: React.FC = () => {
                         <Typography>No requests found for this inbox.</Typography>
                     )}
                 </>
-            )}
-        </Container>
+            )
+            }
+            <Footer />
+        </Container >
     );
 };
 
