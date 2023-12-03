@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const AboutPage: React.FC = () => {
     return (
@@ -27,6 +28,7 @@ const AboutPage: React.FC = () => {
                     RequestInbox is here to improve the way you work.
                 </Typography>
             </Box>
+            <Footer />
         </Container>
     );
 };
