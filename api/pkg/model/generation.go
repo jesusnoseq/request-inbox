@@ -17,6 +17,7 @@ func randomString(l int) string {
 
 func GenerateInbox() Inbox {
 	return Inbox{
+		Name:      randomString(10),
 		Timestamp: time.Now().UnixMilli(),
 		Response: Response{
 			Code:    200,
