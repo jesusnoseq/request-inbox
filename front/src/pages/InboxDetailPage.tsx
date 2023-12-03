@@ -28,7 +28,6 @@ const InboxDetailPage: React.FC = () => {
                     setLoading(true);
                     setError(null);
                     const data = await getInbox(inboxId);
-                    console.log("doping")
                     setInbox(data);
                 } catch (e) {
                     setError('Could not fetch inbox.');
@@ -43,25 +42,26 @@ const InboxDetailPage: React.FC = () => {
         fetchInboxDetail();
     }, [inboxId]);
 
-    const fetchInboxRequests = async () => {
-        if (inboxId && !isLoading && !error) {
-            const data = await getInbox(inboxId);
-            setInbox(data);
-        }
-    };
+
 
     useEffect(() => {
+        const fetchInboxRequests = async () => {
+            if (inboxId && !isLoading && !error) {
+                const data = await getInbox(inboxId);
+                setInbox(data);
+            }
+        };
         const intervalId = autoUpdate ? setInterval(() => {
             fetchInboxRequests();
         }, 2000) : undefined;
         return () => clearInterval(intervalId);
-    }, [autoUpdate])
+    }, [inboxId, inbox, isLoading, error, autoUpdate])
 
     if (isLoading) {
         return (
             <Container>
                 <Header />
-                <Grid container spacing={0}>
+                <Grid container spacing={0} justifyContent="center" alignItems="center" >
                     <CircularProgress />
                 </Grid>
                 <Footer />

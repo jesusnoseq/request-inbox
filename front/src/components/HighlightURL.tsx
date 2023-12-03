@@ -1,6 +1,5 @@
 import React from 'react';
-import { Link, Typography, IconButton, Box } from '@mui/material';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Link, Typography, Box } from '@mui/material';
 import CopyToClipboardButton from '../components/CopyToClipboardButton';
 
 interface HighlightURLProps {
