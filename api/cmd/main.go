@@ -4,6 +4,10 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -17,7 +21,7 @@ func main() {
 	config.LoadConfig(config.API)
 	err := config.ConfigureLog()
 	if err != nil {
-		log.Fatal("configuring log", err)
+		//slog.("configuring log", err)
 	}
 
 	r := gin.Default()
@@ -49,8 +53,26 @@ func main() {
 	ih := handler.NewInboxHandler(dao)
 	route.SetInboxRoutes(r, ih)
 
-	err = r.Run(":" + config.GetString(config.APIHTTPPort))
-	if err != nil {
-		log.Fatal("server was closed", err)
+	srv := &http.Server{
+		Addr:           ":" + config.GetString(config.APIHTTPPort),
+		Handler:        r,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
 	}
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal("server was closed", err)
+		}
+	}()
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown with error", err)
+	}
+	<-ctx.Done()
+	log.Println("Goodbye!")
 }
