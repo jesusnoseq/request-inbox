@@ -114,6 +114,7 @@ func TestCreateInbox(t *testing.T) {
 	newInbox := mustParseInbox(w.Body.Bytes())
 	inbox.ID = newInbox.ID
 	inbox.Timestamp = newInbox.Timestamp
+	inbox.Name = inbox.ID.String()
 	if !isUUID(newInbox.ID.String()) {
 		t.Errorf("Expected valid UUID, got %v", newInbox.ID)
 	}
