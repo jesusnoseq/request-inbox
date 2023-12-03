@@ -107,7 +107,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
 		return
 	}
-	path := c.Param("path")
+	//path := c.Param("path")
 
 	inbox, err := ih.dao.GetInbox(c, id)
 	if err != nil {
@@ -120,12 +120,18 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
 		return
 	}
+
 	request := model.Request{
-		ID:        len(inbox.Requests),
-		Timestamp: time.Now().UnixMilli(),
-		Path:      path,
-		Headers:   c.Request.Header,
-		Body:      string(body),
+		ID:            len(inbox.Requests),
+		Timestamp:     time.Now().UnixMilli(),
+		URI:           c.Request.RequestURI,
+		Headers:       c.Request.Header,
+		Method:        c.Request.Method,
+		Host:          c.Request.Host,
+		RemoteAddr:    c.Request.RemoteAddr,
+		Protocol:      c.Request.Proto,
+		ContentLength: c.Request.ContentLength,
+		Body:          string(body),
 	}
 	inbox.Requests = append(inbox.Requests, request)
 	_, err = ih.dao.UpdateInbox(c, inbox)

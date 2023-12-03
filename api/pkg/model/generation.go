@@ -29,6 +29,7 @@ func GenerateInbox() Inbox {
 }
 
 func GenerateRequest(id int) Request {
+	body := "This is the request body." + randomString(10)
 	return Request{
 		ID:        id,
 		Timestamp: time.Now().UnixMilli(),
@@ -36,7 +37,12 @@ func GenerateRequest(id int) Request {
 			"Content-Type":  {"application/json"},
 			"Authorization": {"Bearer access_token"},
 		},
-		Path: "a/path",
-		Body: "This is the request body." + randomString(10),
+		URI:           "http://host:80/a/path?query=param#fragment",
+		Body:          body,
+		Host:          "localhost:8080",
+		Protocol:      "HTTP/1.1",
+		ContentLength: int64(len(body)),
+		RemoteAddr:    "[::1]:61764",
+		Method:        "POST",
 	}
 }
