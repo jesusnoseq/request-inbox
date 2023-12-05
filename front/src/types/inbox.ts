@@ -5,6 +5,7 @@ export type InboxList = {
 
 export type Inbox = {
     ID: string;
+    Name: string;
     Timestamp: number;
     Response: InboxResponse;
     Requests: InboxRequest[];
@@ -14,9 +15,14 @@ export type Inbox = {
 export type InboxRequest = {
     ID: number;
     Timestamp: number;
-    Path: string;
+    URI: string;
     Headers: Record<string, string>;
     Body: string;
+    Host: string
+    RemoteAddr: string
+    Protocol: string
+    Method: string
+    ContentLength: number
 }
 
 export type InboxResponse = {
