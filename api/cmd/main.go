@@ -3,56 +3,62 @@ package main
 import (
 	"context"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/handler"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/route"
 )
 
 func main() {
 	config.LoadConfig(config.API)
-	err := config.ConfigureLog()
-	if err != nil {
-		log.Fatal("configuring log", err)
+	instrumentation.ConfigureLog()
+
+	mode := config.GetString(config.APIMode)
+	if mode == config.APIModeLambda {
+		lambda.Start(Handler)
+	} else {
+		startServer()
+	}
+}
+
+var ginLambda *ginadapter.GinLambda
+
+func Handler(
+	ctx context.Context,
+	req events.APIGatewayProxyRequest,
+) (events.APIGatewayProxyResponse, error) {
+	if ginLambda == nil {
+		slog.Debug("Gin cold start")
+		router, closer := getRouter()
+		ginLambda = ginadapter.New(router)
+		go func() {
+			quit := make(chan os.Signal, 1)
+			signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+			<-quit
+			closer()
+			log.Println("Goodbye!")
+		}()
 	}
 
-	r := gin.Default()
+	return ginLambda.ProxyWithContext(ctx, req)
+}
 
-	r.HandleMethodNotAllowed = true
-	r.NoMethod(handler.MethodNotAllowedHandler)
-	r.NoRoute(handler.NotFoundHandler)
-
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
-		AllowHeaders:     []string{"*"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	}))
-
-	ctx := context.Background()
-	dao, err := database.GetInboxDAO(ctx, database.GetDatabaseEngine(config.GetString(config.DBEngine)))
-	defer func() {
-		err := dao.Close(ctx)
-		if err != nil {
-			log.Fatal("error closing DB:", err)
-		}
-	}()
-	if err != nil {
-		log.Fatal("failed to obtain InboxDAO:", err)
-	}
-
-	ih := handler.NewInboxHandler(dao)
-	route.SetInboxRoutes(r, ih)
-
+func startServer() {
+	r, closer := getRouter()
+	defer closer()
 	srv := &http.Server{
 		Addr:           ":" + config.GetString(config.APIHTTPPort),
 		Handler:        r,
@@ -75,4 +81,36 @@ func main() {
 	}
 	<-ctx.Done()
 	log.Println("Goodbye!")
+}
+
+func getRouter() (*gin.Engine, func()) {
+	r := gin.Default()
+
+	r.HandleMethodNotAllowed = true
+	r.NoMethod(handler.MethodNotAllowedHandler)
+	r.NoRoute(handler.NotFoundHandler)
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+		AllowHeaders:     []string{"*"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
+	ctx := context.Background()
+	dao, err := database.GetInboxDAO(ctx, database.GetDatabaseEngine(config.GetString(config.DBEngine)))
+	closer := func() {
+		err := dao.Close(ctx)
+		if err != nil {
+			log.Fatal("error closing DB:", err)
+		}
+	}
+	if err != nil {
+		log.Fatal("failed to obtain InboxDAO:", err)
+	}
+
+	ih := handler.NewInboxHandler(dao)
+	route.SetInboxRoutes(r, ih)
+	return r, closer
 }
