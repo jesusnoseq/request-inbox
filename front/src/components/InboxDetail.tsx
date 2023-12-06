@@ -16,7 +16,7 @@ const InboxDetail: React.FC<InboxDetailProps> = ({ inbox }) => {
     return (
         <Paper sx={{ padding: 2 }}>
             <Typography variant="h4" gutterBottom>
-                Inbox  {inbox.ID}
+                Inbox  {inbox.Name}
             </Typography>
             <HighlightURL url={inboxURL} />
 

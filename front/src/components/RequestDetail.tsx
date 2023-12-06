@@ -22,16 +22,14 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
         <Card variant="outlined" sx={{ marginBottom: 2 }}>
             <CardContent>
                 <Typography color="textSecondary" gutterBottom>
-                    Nº {request.ID + 1}
-                </Typography>
-                {request.Path &&
-                    <Typography variant="h6">
-                        Path: {request.Path}
-                    </Typography>
-                }
-                <Typography color="textSecondary">
+                    Nº {request.ID + 1}<br />
                     {moment(request.Timestamp).format('LLL')}
                 </Typography>
+
+                <Typography variant="h6">
+                    <pre>{request.Protocol} {request.Method} {request.URI}</pre>
+                </Typography>
+
 
                 <Typography>
                     <Button onClick={handleCollapse}>
@@ -53,7 +51,7 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                 </Collapse>
                 <BodyView data={request.Body} />
             </CardContent>
-        </Card>
+        </Card >
     );
 };
 
