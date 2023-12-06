@@ -4,3 +4,5 @@
 !Makefile
 !go.mod
 !go.sum
+!front
+front/node_modules

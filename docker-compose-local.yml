@@ -4,7 +4,7 @@ services:
   api: 
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-api
     command: >
         sh -c "make run-api-hot"
     ports:
@@ -12,3 +12,11 @@ services:
     volumes:
       - ./api:/github.com/jesusnoseq/request-inbox/api
       - ./Makefile:/github.com/jesusnoseq/request-inbox/Makefile
+  front: 
+    build:
+      context: .
+      dockerfile: Dockerfile-front
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front:/usr/src/app
