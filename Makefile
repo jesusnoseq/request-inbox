@@ -33,7 +33,7 @@ download-tools:	## Download all required tools to validate and generate document
 	@echo "Installing tools on $(GO_PATH)/bin"
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.1
 	go install golang.org/x/tools/cmd/goimports@v0.14.0
-	go install github.com/golang/mock/mockgen
+	go install go.uber.org/mock/mockgen@v0.3.0
 	go install github.com/cosmtrek/air@v1.49.0
 
 .PHONY: build-api
@@ -76,6 +76,10 @@ show-version:	## Shows API version
 
 
 WEB_DIR = front
+
+.PHONY: install-web
+install-web:	## Install web app dependencies
+	cd $(WEB_DIR) && npm install
 
 .PHONY: run-web
 run-web:	## Run web app
