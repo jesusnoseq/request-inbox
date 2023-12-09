@@ -1,0 +1,52 @@
+name: "Lint and validate terraform code"
+on:
+  push:
+    branches: [main]
+    paths:
+      - "deploy/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "deploy/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - uses: terraform-linters/setup-tflint@v3
+        name: Setup TFLint
+        with:
+          tflint_version: v0.49.0
+
+      - name: Init TFLint
+        working-directory: ./deploy
+        run: tflint --init
+        env:
+          # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Run TFLint
+        working-directory: ./deploy
+        run: tflint -f compact
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.5
+
+      - name: Terraform Init
+        working-directory: ./deploy
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./deploy
+        run: terraform plan"
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
