@@ -42,6 +42,8 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
+        env:
+          TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
         id: plan
         working-directory: ./deploy
         run: terraform plan -detailed-exitcode -input=false
