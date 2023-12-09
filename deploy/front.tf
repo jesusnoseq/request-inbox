@@ -71,7 +71,7 @@ resource "aws_s3_object" "front_app_files" {
   key    = each.value
   source = "../front/build/${each.value}"
   etag   = filemd5("../front/build/${each.value}")
-  content_type = get(
+  content_type = lookup(
     tomap(local.mime_types),
     element(split(".", each.key), length(split(".", each.key)) - 1),
     "binary/octet-stream"
