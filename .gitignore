@@ -26,6 +26,8 @@ go.work
 
 # Terraform
 *.terraform
+*.tfstate
+*.tfstate.*
 
 # Node
 front/node_modules
