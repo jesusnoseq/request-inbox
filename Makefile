@@ -47,7 +47,7 @@ build-api:	## Build API go application
 build-api-linux:	## Build API go application for linux
 	set CGO_ENABLED=0
 	set GOOS=linux
-	cd $(API_DIR) && go build -tags=jsoniter -o $(BIN_OUTPUT) $(CMD_FILE)
+	cd $(API_DIR) && GOOS=linux CGO_ENABLED=0 go build -tags=jsoniter -o $(BIN_OUTPUT) $(CMD_FILE)
 
 
 .PHONY: fmt
@@ -99,8 +99,14 @@ build-web:	## Build web app
 build-package: build-web build-api-linux
 	zip back.zip main
 
+.PHONY: lint-deploy
+lint-deploy: 
+	cd $(DEPLOY_DIR) && tflint --init
+	cd $(DEPLOY_DIR) && tflint 
+
 .PHONY: deploy
 deploy: 
 	cd $(DEPLOY_DIR) && terraform init 
 	cd $(DEPLOY_DIR) && terraform plan
-	cd $(DEPLOY_DIR) && terraform apply
+	cd $(DEPLOY_DIR) && terraform apply -auto-approve
+
