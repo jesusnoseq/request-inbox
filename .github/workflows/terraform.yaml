@@ -44,7 +44,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         working-directory: ./deploy
-        run: terraform plan"
+        run: terraform plan -detailed-exitcode -input=false
         continue-on-error: true
 
       - name: Terraform Plan Status
