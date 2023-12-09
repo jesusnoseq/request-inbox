@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "front_app_bucket" {
-  bucket = "${var.web_domain_name}"
+  bucket = var.web_domain_name
 }
 
 
@@ -71,7 +71,11 @@ resource "aws_s3_object" "front_app_files" {
   key    = each.value
   source = "../front/build/${each.value}"
   etag   = filemd5("../front/build/${each.value}")
-  content_type = lookup(tomap(local.mime_types), element(split(".", each.key), length(split(".", each.key)) - 1))
+  content_type = get(
+    tomap(local.mime_types),
+    element(split(".", each.key), length(split(".", each.key)) - 1),
+    "binary/octet-stream"
+  )
 }
 
 

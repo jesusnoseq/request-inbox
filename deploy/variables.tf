@@ -10,27 +10,15 @@ variable "project_name" {
   description = "Project name"
 }
 
-variable "function_name" {
-  type    = string
-  default = "lambda"
-}
-
-variable "src_path" {
-  type = string
-  default = "api"
-}
-
 variable "root_domain_name" {
   type = string
   default = "request-inbox.com"
 }
 
-
 variable "api_domain_name" {
   type = string
   default = "api.request-inbox.com"
 }
-
 
 variable "web_domain_name" {
   type = string

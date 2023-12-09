@@ -24,7 +24,10 @@ import (
 
 func main() {
 	config.LoadConfig(config.API)
-	instrumentation.ConfigureLog()
+	err := instrumentation.ConfigureLog()
+	if err != nil {
+		log.Fatal("error configuring log", err)
+	}
 
 	mode := config.GetString(config.APIMode)
 	if mode == config.APIModeLambda {

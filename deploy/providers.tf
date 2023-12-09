@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.29.0"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.4"
+    }
   }
 }
 
@@ -24,3 +28,4 @@ provider "aws" {
   alias  = "acm_provider"
   region = "us-east-1"
 }
+
