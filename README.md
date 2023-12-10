@@ -26,7 +26,7 @@ make help
 
 * Back → Golang (Gin). Expose a simple REST API
 * Front → React + Material UI. UI for listing request inboxs and requests made to an inbox.
-* IaC → Terraform?
+* IaC → Terraform (AWS)
 
 ## API doc
 
@@ -48,6 +48,12 @@ request-inbox
 │  ├─ pkg → shared packages
 │  ├─ .golangci.yaml → golang linter configuration
 │  └─ go.mod → backend dependencies
+├─ deploy → terraform code to deploy infrastructure
+│  ├─ .tflint.hlc → tflint linter configuration
+│  ├─ back.tf → backend infra
+│  ├─ cert → certificates related infra
+│  ├─ front → frontend related infra
+│  └─ variables.tf → varaibles related to the deployment to customize
 ├─ Makefile → contains commands for back and front applications
 ├─ docker-compose.yml → run the working environment of the application
 └── Readme.md → this file. Contains basic documentation about the project
@@ -55,9 +61,12 @@ request-inbox
 
 ## TODO
 
-* Add DynamoDB
-* Add front
 * Search inbox
 * Edit inbox
-* Deployment
 * Authentication
+* private inboxes
+* Change response
+* Request on response
+* Request test
+* Request times
+* File viewer
