@@ -1,66 +1,60 @@
-name: "Terraform CI"
+name: Deploy app
+
 on:
   push:
-    branches: [main]
+    branches: ["*"]
     paths:
+      - "api/**"
+      - "front/**"
       - "deploy/**"
-  pull_request:
-    branches: [main]
-    paths:
-      - "deploy/**"
-
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20.x"
+      - name: Install front dependencies
+        run: npm ci
+        working-directory: ./front
+      - name: Build front
+        run: npm run build
+        working-directory: ./front
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+          cache-dependency-path: api/go.sum
+      - name: Build back
+        run: go build -tags=jsoniter -v ./...
+        working-directory: ./api
       - name: Connect to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-session-name: awssyncsession
           role-to-assume: ${{secrets.AWS_IAM_ROLE}}
           aws-region: ${{secrets.AWS_REGION}}
-
       - uses: terraform-linters/setup-tflint@v3
         name: Setup TFLint
         with:
           tflint_version: v0.49.0
-
-      - name: Init TFLint
-        working-directory: ./deploy
-        run: tflint --init
-        env:
-          # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Run TFLint
-        working-directory: ./deploy
-        run: tflint -f compact
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.6.5
-
       - name: Terraform Init
         working-directory: ./deploy
         run: terraform init
-
       - name: Terraform Plan
         env:
           TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
-        id: plan
         working-directory: ./deploy
-        run: |
-          touch ../main
-          terraform plan -detailed-exitcode -input=false
-        continue-on-error: true
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
+        run: terraform plan -input=false
+      - name: Terraform Plan
+        env:
+          TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
+        working-directory: ./deploy
+        run: terraform apply -auto-approve

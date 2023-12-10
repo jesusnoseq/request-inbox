@@ -5,13 +5,13 @@ resource "aws_s3_bucket" "lambda_bucket" {
 data "archive_file" "lambda-package" {
   type        = "zip"
   source_file = "../main"
-  output_path = "../api.zip"
+  output_path = "../main.zip"
 }
 
 
 resource "aws_s3_object" "lambda_object" {
   bucket = aws_s3_bucket.lambda_bucket.bucket
-  key    = "api.zip"
+  key    = "main.zip"
   source = data.archive_file.lambda-package.output_path
   etag   = filemd5(data.archive_file.lambda-package.output_path)
 }
