@@ -1,4 +1,5 @@
 name: "Terraform CI"
+
 on:
   push:
     branches: [main]
@@ -19,7 +20,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
       - name: Connect to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
