@@ -9,12 +9,23 @@ on:
     paths:
       - "deploy/**"
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+
+      - name: Connect to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-session-name: awssyncsession
+          role-to-assume: ${{secrets.AWS_IAM_ROLE}}
+          aws-region: ${{secrets.AWS_REGION}}
 
       - uses: terraform-linters/setup-tflint@v3
         name: Setup TFLint
