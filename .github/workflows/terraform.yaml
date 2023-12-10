@@ -57,9 +57,10 @@ jobs:
           TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
         id: plan
         working-directory: ./deploy
-        run: terraform plan -detailed-exitcode -input=false
+        run: |
+          touch ../main
+          terraform plan -detailed-exitcode -input=false
         continue-on-error: true
-
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
