@@ -1,9 +1,7 @@
 package config
 
 import (
-	"fmt"
 	"log/slog"
-	"os"
 
 	"github.com/spf13/viper"
 )
@@ -16,6 +14,10 @@ const (
 	API  App = "API"
 	Test App = "TEST"
 
+	APIMode       Key    = "API_MODE"
+	APIModeLambda string = "lambda"
+	APIModeServer string = "server"
+
 	Environment        Key    = "ENVIRONMENT"
 	EnvironmentDefault string = "local"
 	Version            Key    = "VERSION"
@@ -25,15 +27,19 @@ const (
 
 	DBEngine       Key    = "DB_ENGINE"
 	DBEngineBadger string = "badger"
+	DBEngineDynamo string = "dynamo"
 
 	DBBadgerPath        Key    = "DB_BADGER_PATH"
 	DBBadgerPathDefault string = "/tmp/inbox.db"
+
+	DBDynamoName        Key    = "DB_DYNAMO_NAME"
+	DBDynamoNameDefault string = "requestinbox"
 
 	APIHTTPPort        Key    = "API_HTTP_PORT"
 	APIHTTPPortDefault string = "8080"
 
 	HTTPClientTimeoutSeconds        Key = "API_HTTP_CLIENT_TIMEOUT_SECONDS"
-	HTTPClientTimeoutSecondsDefault int = 4
+	HTTPClientTimeoutSecondsDefault int = 20
 
 	LogLevel      Key    = "LOG_LEVEL"
 	LogFormat     Key    = "LOG_FORMATER"
@@ -46,31 +52,17 @@ func LoadConfig(app App) {
 	viper.AutomaticEnv()
 }
 
-func ConfigureLog() error {
-	level := new(slog.Level)
-	err := level.UnmarshalText([]byte(GetString(LogLevel)))
-	if err != nil {
-		return fmt.Errorf("error parsing log level %w", err)
-	}
-	var handler slog.Handler
-	switch GetString(LogFormat) {
-	case LogFormatJSON:
-		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: level})
-	case LogFormatText:
-		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level})
-	}
-	slog.SetDefault(slog.New(handler))
-	return nil
-}
-
 func setDefaults(app App) {
 	setDefault(Environment, EnvironmentDefault)
+	setDefault(APIMode, APIModeServer)
 	setDefault(ReleaseID, ReleaseIDDefault)
 	setDefault(Version, VersionDefault)
 	setDefault(APIHTTPPort, APIHTTPPortDefault)
 
 	setDefault(DBEngine, DBEngineBadger)
 	setDefault(DBBadgerPath, DBBadgerPathDefault)
+
+	setDefault(DBDynamoName, DBDynamoNameDefault)
 
 	setDefault(LogLevel, slog.LevelDebug.String())
 	setDefault(LogFormat, LogFormatText)

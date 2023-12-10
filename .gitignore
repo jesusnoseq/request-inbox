@@ -7,6 +7,7 @@
 *.dll
 *.so
 *.dylib
+*.zip
 
 # Test binary, built with `go test -c`
 *.test
@@ -22,6 +23,11 @@ go.work
 
 # Logs
 *.log
+
+# Terraform
+*.terraform
+*.tfstate
+*.tfstate.*
 
 # Node
 front/node_modules
