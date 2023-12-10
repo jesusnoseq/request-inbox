@@ -1,12 +1,6 @@
 name: Deploy app
 
-on:
-  push:
-    branches: ["*"]
-    paths:
-      - "api/**"
-      - "front/**"
-      - "deploy/**"
+on: [push]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -34,7 +28,7 @@ jobs:
       - name: Connect to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-session-name: awssyncsession
+          role-session-name: awssync_deploy_session
           role-to-assume: ${{secrets.AWS_IAM_ROLE}}
           aws-region: ${{secrets.AWS_REGION}}
       - uses: terraform-linters/setup-tflint@v3
