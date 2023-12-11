@@ -104,6 +104,31 @@ resource  "aws_s3_bucket_website_configuration" "redirect_bucket" {
   }
 }
 
+resource "aws_cloudfront_function" "redirect_path" {
+  name    = "always-serve-index"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  # code from https://github.com/aws-samples/amazon-cloudfront-functions/blob/main/url-rewrite-single-page-apps/index.js
+  code = <<-EOT
+function handler(event) {
+    var request = event.request;
+    var uri = request.uri;
+    
+    // Check whether the URI is missing a file name.
+    if (uri.endsWith('/')) {
+        request.uri += 'index.html';
+    } 
+    // Check whether the URI is missing a file extension.
+    else if (!uri.includes('.')) {
+        request.uri += '/index.html';
+    }
+
+    return request;
+}
+  EOT
+}
+
+
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = aws_s3_bucket.front_app_bucket.bucket_regional_domain_name
@@ -137,6 +162,11 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
+
+    function_association {
+      event_type = "viewer-request"
+      function_arn = aws_cloudfront_function.redirect_path.arn
+    }
   }
 
   restrictions {
@@ -145,6 +175,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
 }
+
 
 resource "aws_route53_record" "www" {
   zone_id = data.aws_route53_zone.public.zone_id
