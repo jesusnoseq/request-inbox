@@ -12,7 +12,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "20.x"
       - name: Install front dependencies
@@ -40,7 +40,7 @@ jobs:
         with:
           tflint_version: v0.49.0
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.5
       - name: Terraform Init
@@ -50,7 +50,12 @@ jobs:
         env:
           TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
         working-directory: ./deploy
-        run: terraform plan -input=false
+        run: |
+          echo checkparent
+          ls ..
+          echo checkfront
+          ls ../front/build
+          terraform plan -input=false
       - name: Terraform Plan
         env:
           TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
