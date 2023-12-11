@@ -13,9 +13,9 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "request-inbox-terraform-state"
+    bucket         = "request-inbox-terraform-state-bucket"
     key            = "terraform.tfstate"
-    region         = "eu-west-1"
+    region         = "eu-central-1"
     encrypt        = true
   }
 }
