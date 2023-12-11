@@ -11,6 +11,13 @@ terraform {
       version = "~> 2.4"
     }
   }
+
+  backend "s3" {
+    bucket         = "request-inbox-terraform-state-bucket"
+    key            = "terraform.tfstate"
+    region         = "eu-central-1"
+    encrypt        = true
+  }
 }
 
 provider "aws" {

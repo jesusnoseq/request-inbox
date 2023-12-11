@@ -104,6 +104,31 @@ resource  "aws_s3_bucket_website_configuration" "redirect_bucket" {
   }
 }
 
+resource "aws_cloudfront_function" "redirect_path" {
+  name    = "always-serve-index"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  # code from https://github.com/aws-samples/amazon-cloudfront-functions/blob/main/url-rewrite-single-page-apps/index.js
+  code = <<-EOT
+function handler(event) {
+    var request = event.request;
+    var uri = request.uri;
+    
+    // Check whether the URI is missing a file name.
+    if (uri.endsWith('/')) {
+        request.uri += 'index.html';
+    } 
+    // Check whether the URI is missing a file extension.
+    else if (!uri.includes('.')) {
+        request.uri += '/index.html';
+    }
+
+    return request;
+}
+  EOT
+}
+
+
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = aws_s3_bucket.front_app_bucket.bucket_regional_domain_name
@@ -112,6 +137,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   enabled             = true
   default_root_object = "index.html"
+  
+  retain_on_delete = true
 
   aliases = [var.web_domain_name, var.root_domain_name]
 
@@ -139,12 +166,48 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     max_ttl                = 86400
   }
 
+  ordered_cache_behavior {
+    path_pattern     = "/index.html"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = aws_s3_bucket.front_app_bucket.bucket
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
     }
   }
+
+  custom_error_response {
+    error_caching_min_ttl = 300
+    error_code            = 403
+    response_code         = 200
+    response_page_path    = "/index.html"
+  }
+
+  custom_error_response {
+    error_caching_min_ttl = 300
+    error_code            = 404
+    response_code         = 200
+    response_page_path    = "/index.html"
+  }
 }
+
 
 resource "aws_route53_record" "www" {
   zone_id = data.aws_route53_zone.public.zone_id
