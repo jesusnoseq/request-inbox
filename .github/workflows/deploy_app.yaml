@@ -27,7 +27,7 @@ jobs:
           go-version: "1.21"
           cache-dependency-path: api/go.sum
       - name: Build back
-        run: go build -tags=jsoniter -v ./...
+        run: GOOS=linux CGO_ENABLED=0 go build -tags=jsoniter -v -o .. ./...
         working-directory: ./api
       - name: Connect to AWS
         uses: aws-actions/configure-aws-credentials@v4
