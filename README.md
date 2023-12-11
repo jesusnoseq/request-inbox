@@ -4,6 +4,8 @@ Web Application to collects HTTP request for testing purposes.
 
 It tries to replace [webhookinbox.com](http://webhookinbox.com/)
 
+You can try it at [request-inbox.com](https://request-inbox.com/)
+
 ## Quick start
 
 ### Docker Compose
