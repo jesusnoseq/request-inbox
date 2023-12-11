@@ -2,13 +2,11 @@ name: "Terraform CI"
 
 on:
   push:
-    branches: [test]
+    branches: [main]
     paths:
       - "deploy/**"
-  pull_request:
-    branches: [test]
-    paths:
-      - "deploy/**"
+      - "front/**"
+      - "back/**"
 
 permissions:
   id-token: write
