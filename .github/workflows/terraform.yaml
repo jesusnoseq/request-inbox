@@ -1,13 +1,12 @@
-name: "Lint and validate terraform code"
+name: "Terraform CI"
+
 on:
   push:
     branches: [main]
     paths:
       - "deploy/**"
-  pull_request:
-    branches: [main]
-    paths:
-      - "deploy/**"
+      - "front/**"
+      - "back/**"
 
 permissions:
   id-token: write
@@ -18,8 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Connect to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:

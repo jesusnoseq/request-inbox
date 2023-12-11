@@ -1,9 +1,7 @@
 
 import { type InboxList, type Inbox } from "../types/inbox";
 
-//console.log(import.meta.env.MODE);
-//const BASE_URL = import.meta.env.PUBLIC_REQUEST_INBOX_API_URL
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = process.env.REACT_APP_REQUEST_INBOX_API_URL;
 
 export const getInboxList = async () => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes`, {
