@@ -27,11 +27,7 @@ jobs:
           go-version: "1.21"
           cache-dependency-path: api/go.sum
       - name: Build back
-        run: |
-          GOOS=linux CGO_ENABLED=0 go build -tags=jsoniter -v -o .. ./...
-          ls .
-          ls ..
-        working-directory: ./api
+        run: GOOS=linux CGO_ENABLED=0 go build -tags=jsoniter -v -o ../main ./cmd/main.go
       - name: Connect to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -53,9 +49,7 @@ jobs:
         env:
           TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
         working-directory: ./deploy
-        run: |
-          ls ..
-          terraform plan -input=false
+        run: terraform plan -input=false
       - name: Terraform Plan
         env:
           TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
