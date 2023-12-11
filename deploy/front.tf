@@ -170,7 +170,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     path_pattern     = "/index.html"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = local.s3_origin_id
+    target_origin_id = aws_s3_bucket.front_app_bucket.bucket
 
     forwarded_values {
       query_string = false
