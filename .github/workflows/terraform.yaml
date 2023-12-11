@@ -2,11 +2,11 @@ name: "Terraform CI"
 
 on:
   push:
-    branches: [main]
+    branches: [test]
     paths:
       - "deploy/**"
   pull_request:
-    branches: [main]
+    branches: [test]
     paths:
       - "deploy/**"
 
