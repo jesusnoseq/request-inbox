@@ -4,7 +4,14 @@ permissions:
   id-token: write
   contents: read
 
-on: [push]
+on:
+  push:
+    branches: [main]
+    paths:
+      - "deploy/**"
+      - "front/**"
+      - "back/**"
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
