@@ -12,6 +12,7 @@ const InboxListPage: React.FC = () => {
     const [inboxes, setInboxes] = useState<Inbox[]>([]);
     const [isLoading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [filter, setFilter] = useState<string>("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -71,6 +72,10 @@ const InboxListPage: React.FC = () => {
         deleteData();
     };
 
+    const handleSearch = ((searchTerm: string) => {
+        setFilter(searchTerm);
+    });
+
 
     if (isLoading) {
         return (
@@ -102,16 +107,14 @@ const InboxListPage: React.FC = () => {
                 <Button variant="contained" color="primary" onClick={handleCreateInbox} sx={{ marginBottom: 2 }}>
                     Create New Inbox
                 </Button>
-
-                <SearchBar />
+                <SearchBar onChange={handleSearch} />
             </Box>
 
             <Grid container spacing={2}>
-                {inboxes.map((inbox) => (
+                {inboxes.filter((inbox) => inbox.ID.includes(filter)).map((inbox) => (
                     <Grid item xs={12} sm={6} md={4} lg={4} key={inbox.ID}>
                         <InboxListItem inbox={inbox} onDelete={handleDeleteInbox} />
                     </Grid>
-
                 ))}
             </Grid>
             <Footer />
