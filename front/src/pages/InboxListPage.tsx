@@ -99,7 +99,7 @@ const InboxListPage: React.FC = () => {
     return (
         <Container>
             <Header />
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h2" fontSize={'2.5rem'} gutterBottom>
                 Inbox List
             </Typography>
 

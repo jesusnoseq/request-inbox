@@ -1,46 +1,50 @@
-import React from 'react';
-import { Inbox } from '../types/inbox';
+import React, { useState } from 'react';
+import { Inbox, InboxResponse } from '../types/inbox';
 import { Typography, Paper } from '@mui/material';
 import moment from 'moment';
 import HighlightURL from '../components/HighlightURL';
-import { buildInboxURL } from '../services/inbox';
+import { buildInboxURL, UpdateInbox } from '../services/inbox';
+import ResponseInlineEditor from '../components/ResponseInlineEditor';
+import TextInlineEditor from '../components/TextInlineEditor';
+
 
 type InboxDetailProps = {
     inbox: Inbox;
 };
 
 
-const InboxDetail: React.FC<InboxDetailProps> = ({ inbox }) => {
-    const inboxURL = buildInboxURL(inbox.ID);
-    const headerEntries: [string, string][] = Object.entries(inbox.Response.Headers);
+const InboxDetail: React.FC<InboxDetailProps> = (props) => {
+    const [inbox, setInbox] = useState<Inbox>(props.inbox);
+    const inboxURL = buildInboxURL(props.inbox.ID);
+
+    const handleSaveInboxName = async (name: string) => {
+        const updatedInbox = {
+            ...inbox,
+            Name: name
+        };
+        const resp = await UpdateInbox(updatedInbox)
+        setInbox(resp);
+    }
+
+    const handleSaveResponse = async (ir: InboxResponse) => {
+        const updatedInbox = {
+            ...inbox,
+            Response: ir
+        };
+        const resp = await UpdateInbox(updatedInbox)
+        setInbox(resp);
+    };
+
     return (
         <Paper sx={{ padding: 2 }}>
-            <Typography variant="h4" gutterBottom>
-                Inbox  {inbox.Name}
-            </Typography>
-            <HighlightURL url={inboxURL} />
+            <TextInlineEditor initialValue={inbox.Name} label='Inbox' onSave={handleSaveInboxName} />
 
             <Typography color="textSecondary">
                 Open since {moment(inbox.Timestamp).format('LLL')}
             </Typography>
-            <Typography color="textSecondary">
-                {
-                    headerEntries.map((k) => (
-                        <li>
-                            {k[0]}: {k[1]}
-                        </li>
-                    ))
-                }
-            </Typography>
-            <Typography color="textSecondary">
-                Response: {inbox.Response.Body}
-            </Typography>
-            <Typography color="textSecondary">
-                Status code: {inbox.Response.Code}
-            </Typography>
-            <Typography color="textSecondary">
-                Obfuscate headers: {inbox.ObfuscateHeaderFields}
-            </Typography>
+            <HighlightURL url={inboxURL} />
+
+            <ResponseInlineEditor response={inbox.Response} onSave={handleSaveResponse} />
         </Paper>
     );
 };
