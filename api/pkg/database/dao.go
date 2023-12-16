@@ -13,5 +13,6 @@ type InboxDAO interface {
 	GetInbox(context.Context, uuid.UUID) (model.Inbox, error)
 	DeleteInbox(context.Context, uuid.UUID) error
 	ListInbox(context.Context) ([]model.Inbox, error)
+	AddRequestToInbox(context.Context, uuid.UUID, model.Request) error
 	Close(context.Context) error
 }

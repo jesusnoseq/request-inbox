@@ -72,7 +72,7 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 	}
 	var updatedInbox model.Inbox
 	if err := c.ShouldBindJSON(&updatedInbox); err != nil {
-		c.AbortWithStatusJSON(model.ErrorResponseWithError("inbox not found", err, http.StatusNotFound))
+		c.AbortWithStatusJSON(model.ErrorResponseWithError("inbox not valid", err, http.StatusBadRequest))
 		return
 	}
 
@@ -83,6 +83,7 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 	}
 	updatedInbox.ID = id
 	updatedInbox.Timestamp = inbox.Timestamp
+	updatedInbox.Requests = inbox.Requests
 	updatedInbox, err = ih.dao.UpdateInbox(c, updatedInbox)
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
@@ -107,7 +108,6 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
 		return
 	}
-	//path := c.Param("path")
 
 	inbox, err := ih.dao.GetInbox(c, id)
 	if err != nil {
@@ -133,8 +133,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		ContentLength: c.Request.ContentLength,
 		Body:          string(body),
 	}
-	inbox.Requests = append(inbox.Requests, request)
-	_, err = ih.dao.UpdateInbox(c, inbox)
+	err = ih.dao.AddRequestToInbox(c, id, request)
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
 		return
@@ -147,5 +146,12 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
 		return
 	}
-	c.JSON(inbox.Response.Code, inbox.Response.Body)
+	contentType := ""
+	for k, v := range inbox.Response.Headers {
+		if k == model.ContentTypeHeader {
+			contentType = v
+		}
+		c.Header(k, v)
+	}
+	c.Data(inbox.Response.Code, contentType, []byte(inbox.Response.Body))
 }
