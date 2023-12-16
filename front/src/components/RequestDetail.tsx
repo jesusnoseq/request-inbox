@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { InboxRequest } from '../types/inbox';
-import { Typography, Card, CardContent, Button, List, ListItem, ListItemText, Collapse } from '@mui/material';
+import { Typography, Card, CardContent, Button, List, ListItem, ListItemText, Collapse, Box } from '@mui/material';
 import moment from 'moment';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import BodyView from './BodyView';
@@ -17,6 +17,13 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
         setOpen(!open);
     };
 
+    function splitPath(url: string) {
+        const regex = /(\/inboxes\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\/in)(.*)/;
+        const matches = url.match(regex);
+        return matches && matches[2] ? [matches[1], matches[2]] : [url, ''];
+    }
+
+    const [URIDefaulPath, URICustomPath] = splitPath(request.URI)
 
     return (
         <Card variant="outlined" sx={{ marginBottom: 2 }}>
@@ -25,9 +32,15 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                     Nº {request.ID + 1}<br />
                     {moment(request.Timestamp).format('LLL')}
                 </Typography>
-
                 <Typography variant="h6">
-                    <pre>{request.Protocol} {request.Method} {request.URI}</pre>
+                    <code>{request.Protocol} {request.Method} </code>
+                    <Box component="code"
+                        sx={{
+                            opacity: '0.5',
+                            fontSize: '1rem',
+                            letterSpacing: '-0.5px',
+                        }}>{URIDefaulPath}</Box>
+                    <code>{URICustomPath}</code>
                 </Typography>
 
 

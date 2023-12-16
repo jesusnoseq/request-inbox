@@ -28,7 +28,7 @@ const BodyView: React.FC<BodyViewProps> = ({ data, title }) => {
     }
     return (data &&
         <Grid item xs={12}>
-            <Paper sx={{ p: 2 }}>
+            <Paper sx={{ p: 2, mt: 2 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={11}>
                         <Typography variant="h6">{title}</Typography>
