@@ -237,6 +237,7 @@ func TestUpdateInbox(t *testing.T) {
 	modInbox := model.GenerateInbox()
 	modInbox.ID = inbox.ID
 	modInbox.Timestamp = inbox.Timestamp
+	modInbox.Requests = inbox.Requests
 	body := mustJson(modInbox)
 	req, err := http.NewRequest(
 		"PUT",

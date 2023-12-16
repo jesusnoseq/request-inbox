@@ -20,9 +20,12 @@ func GenerateInbox() Inbox {
 		Name:      randomString(10),
 		Timestamp: time.Now().UnixMilli(),
 		Response: Response{
-			Code:    200,
-			Body:    "response body" + randomString(5),
-			Headers: map[string]string{randomString(5): randomString(5)},
+			Code: 200,
+			Body: "response body" + randomString(5),
+			Headers: map[string]string{
+				"Content-Type":  "application/json; charset=utf-8",
+				randomString(5): randomString(5),
+			},
 		},
 		Requests:              []Request{GenerateRequest(1), GenerateRequest(2)},
 		ObfuscateHeaderFields: []string{"Authorization"},
