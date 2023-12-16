@@ -22,10 +22,15 @@ const InboxListItem: React.FC<InboxListItemProps> = ({ inbox, onDelete }) => {
     return (
         <Card variant="outlined" sx={{ marginBottom: 2 }}>
             <CardContent>
+                {inbox.Name !== inbox.ID &&
+                    <Typography variant="h3" fontSize={'2rem'}>
+                        {inbox.Name}
+                    </Typography>
+                }
                 <Typography color="textSecondary" gutterBottom>
                     {inbox.ID}
                 </Typography>
-                <Typography variant="h5" component="h2">
+                <Typography color="">
                     Requests: {requestsCount}
                 </Typography>
                 <Typography color="textSecondary">
@@ -34,7 +39,6 @@ const InboxListItem: React.FC<InboxListItemProps> = ({ inbox, onDelete }) => {
                 <Typography component="p">
                     Response Code: {inbox.Response.Code}
                 </Typography>
-
             </CardContent>
             <CardActions>
                 <Box width="100%" display="flex" justifyContent="space-between">
@@ -44,7 +48,7 @@ const InboxListItem: React.FC<InboxListItemProps> = ({ inbox, onDelete }) => {
                     </IconButton>
                 </Box>
             </CardActions>
-        </Card>
+        </Card >
     );
 };
 
