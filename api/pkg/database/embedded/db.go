@@ -59,10 +59,21 @@ func (ib *InboxBadger) UpdateInbox(ctx context.Context, inbox model.Inbox) (mode
 	if err != nil {
 		return inbox, err
 	}
+
 	err = ib.db.Update(func(txn *badger.Txn) error {
 		return txn.Set(inbox.ID[:], data)
 	})
 	return inbox, err
+}
+
+func (ib *InboxBadger) AddRequestToInbox(ctx context.Context, ID uuid.UUID, req model.Request) error {
+	inbox, err := ib.GetInbox(ctx, ID)
+	if err != nil {
+		return err
+	}
+	inbox.Requests = append(inbox.Requests, req)
+	_, err = ib.UpdateInbox(ctx, inbox)
+	return err
 }
 
 func (ib *InboxBadger) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox, error) {
@@ -102,7 +113,6 @@ func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
 		prefix := []byte("")
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 			item := it.Item()
-			// k := item.Key()
 			err := item.Value(func(val []byte) error {
 				valCopy := append([]byte{}, val...)
 				inbox, err := decode(valCopy)

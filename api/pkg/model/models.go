@@ -7,6 +7,12 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	ContentTypeHeader        = "Content-Type"
+	DefaultContentTypeHeader = "application/json; charset=utf-8"
+	DefaultBody              = "{}"
+)
+
 type Inbox struct {
 	ID                    uuid.UUID
 	Name                  string
@@ -38,10 +44,14 @@ type Request struct {
 func NewInbox() Inbox {
 	id := uuid.New()
 	return Inbox{
-		ID:                    id,
-		Name:                  id.String(),
-		Timestamp:             time.Now().UnixMilli(),
-		Response:              Response{Code: http.StatusOK, Body: "", Headers: map[string]string{}},
+		ID:        id,
+		Name:      id.String(),
+		Timestamp: time.Now().UnixMilli(),
+		Response: Response{
+			Code:    http.StatusOK,
+			Headers: map[string]string{ContentTypeHeader: DefaultContentTypeHeader},
+			Body:    DefaultBody,
+		},
 		Requests:              []Request{},
 		ObfuscateHeaderFields: []string{},
 	}
