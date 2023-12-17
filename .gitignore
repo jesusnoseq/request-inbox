@@ -31,3 +31,4 @@ go.work
 
 # Node
 front/node_modules
+front/public/openapi.yaml

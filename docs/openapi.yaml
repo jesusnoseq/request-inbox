@@ -1,11 +1,13 @@
 openapi: "3.1.0"
 info:
   version: "1.0.0"
-  title: "RequestInbox"
-  description: Register requests
+  title: "Request inbox"
+  description: Register HTTP requests and allows to configure a custom response.
 servers:
   - url: http://localhost:8080/api/v1
     description: Local server
+  - url: https://api.request-inbox.com/api/v1
+    description: Production server
 paths:
   /inboxes/{inboxID}:
     parameters:

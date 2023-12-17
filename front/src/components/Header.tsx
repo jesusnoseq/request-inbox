@@ -16,6 +16,7 @@ export default function Header() {
 
                 <Box>
                     <Button color="inherit" component={LinkDOM} to="/">Inbox</Button>
+                    <Button color="inherit" component={LinkDOM} to="/api-doc">API doc</Button>
                     <Button color="inherit" component={LinkDOM} to="/about">About</Button>
                 </Box>
                 <ThemeSwitch />
