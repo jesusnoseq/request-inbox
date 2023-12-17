@@ -1,7 +1,5 @@
 import React from 'react';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
+import { Container, Box } from '@mui/material';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SwaggerUI from "swagger-ui-react"
