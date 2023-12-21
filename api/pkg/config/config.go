@@ -45,6 +45,10 @@ const (
 	LogFormat     Key    = "LOG_FORMATER"
 	LogFormatJSON string = "json"
 	LogFormatText string = "text"
+
+	// Features
+	EnableListingInbox        = "ENABLE_LISTING_INBOX"
+	EnableListingInboxDefault = true
 )
 
 func LoadConfig(app App) {
@@ -66,6 +70,8 @@ func setDefaults(app App) {
 
 	setDefault(LogLevel, slog.LevelDebug.String())
 	setDefault(LogFormat, LogFormatText)
+
+	setDefault(EnableListingInbox, EnableListingInboxDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {
