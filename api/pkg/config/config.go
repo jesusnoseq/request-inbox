@@ -48,7 +48,7 @@ const (
 
 	// Features
 	EnableListingInbox        = "ENABLE_LISTING_INBOX"
-	EnableListingInboxDefault = false
+	EnableListingInboxDefault = true
 )
 
 func LoadConfig(app App) {
