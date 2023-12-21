@@ -2,6 +2,7 @@ import React from 'react';
 import { Link as LinkDOM } from "react-router-dom";
 import { Link, Typography, Box, Button, Toolbar, AppBar } from '@mui/material';
 import ThemeSwitch from '../components/ThemeSwitch';
+import UserHeader from '../components/UserHeader';
 
 export default function Header() {
     return (
@@ -18,6 +19,9 @@ export default function Header() {
                     <Button color="inherit" component={LinkDOM} to="/">Inbox</Button>
                     <Button color="inherit" component={LinkDOM} to="/api-doc">API doc</Button>
                     <Button color="inherit" component={LinkDOM} to="/about">About</Button>
+                </Box>
+                <Box>
+                    <UserHeader />
                 </Box>
                 <ThemeSwitch />
             </Toolbar>

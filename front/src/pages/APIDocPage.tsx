@@ -4,8 +4,15 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import SwaggerUI from "swagger-ui-react"
 import "swagger-ui-react/swagger-ui.css"
-
+import { ThemeContext } from '../theme';
+import { useContext } from 'react';
 const APIDocPage: React.FC = () => {
+    const theme = useContext(ThemeContext);
+
+    if (theme.isDarkMode) {
+        require('../SwaggerDark.css');
+    }
+
     return (
         <Container>
             <Header />
