@@ -48,6 +48,10 @@ const (
 
 	AWSRegion        Key    = "AWS_REGION"
 	AWSRegionDefault string = "eu-central-1"
+
+	// Features
+	EnableListingInbox        = "ENABLE_LISTING_INBOX"
+	EnableListingInboxDefault = true
 )
 
 func LoadConfig(app App) {
@@ -71,6 +75,7 @@ func setDefaults(app App) {
 	setDefault(LogFormat, LogFormatText)
 
 	setDefault(AWSRegion, AWSRegionDefault)
+	setDefault(EnableListingInbox, EnableListingInboxDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {

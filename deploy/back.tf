@@ -74,6 +74,7 @@ resource "aws_lambda_function" "api_lambda" {
   environment {
     variables = {
       API_MODE = "lambda"
+      ENABLE_LISTING_INBOX = "false"
     }
   }
 }
