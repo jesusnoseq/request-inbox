@@ -4,20 +4,20 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/google/uuid"
 	"github.com/jesusnoseq/request-inbox/pkg/database/errors"
 	"github.com/jesusnoseq/request-inbox/pkg/database/option"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-const inboxIDAnnotationKey = "InboxID"
+//const inboxIDAnnotationKey = "InboxID"
 
 type InboxDAO struct {
 	tableName string
@@ -40,30 +40,43 @@ func NewInboxDAO(
 func (d *InboxDAO) GetInbox(ctx context.Context, id uuid.UUID) (model.Inbox, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
-
-	getItemInput := &dynamodb.GetItemInput{
-		Key: map[string]types.AttributeValue{
-			"id": &types.AttributeValueMemberB{Value: MustMarshallUUID(id)},
+	pk, _ := GenInboxKey(id)
+	getItemInput := &dynamodb.QueryInput{
+		TableName: aws.String(d.tableName),
+		//ConsistentRead:         aws.Bool(true),
+		KeyConditionExpression: aws.String("PK = :PK"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":PK": &types.AttributeValueMemberS{Value: pk},
 		},
-		TableName:            aws.String(d.tableName),
-		ConsistentRead:       aws.Bool(true),
-		ProjectionExpression: aws.String(inProjectionExpression),
 	}
-	getItemResponse, err := d.dbclient.GetItem(ctx, getItemInput)
+	getItemResponse, err := d.dbclient.Query(ctx, getItemInput)
 	if err != nil {
 		return model.Inbox{}, fmt.Errorf("get inbox failed: %w", err)
 	}
-	if getItemResponse.Item == nil {
+	if getItemResponse.Items == nil {
 		return model.Inbox{}, fmt.Errorf("%w: %q", errors.ErrNotFound, id)
 	}
-
-	opi := InboxItem{}
-	err = attributevalue.UnmarshalMap(getItemResponse.Item, &opi)
-	if err != nil {
-		return model.Inbox{}, fmt.Errorf("unmarshal failed: %w", err)
+	in := InboxItem{}
+	requests := []model.Request{}
+	for _, item := range getItemResponse.Items {
+		sk := item["SK"].(*types.AttributeValueMemberS).Value
+		if strings.HasPrefix(sk, InboxKey) {
+			err = attributevalue.UnmarshalMap(item, &in)
+			if err != nil {
+				return model.Inbox{}, fmt.Errorf("unmarshal inbox failed: %w", err)
+			}
+		} else if strings.HasPrefix(sk, RequestKey) {
+			requestItem := RequestItem{}
+			err = attributevalue.UnmarshalMap(item, &requestItem)
+			if err != nil {
+				return model.Inbox{}, fmt.Errorf("unmarshal request failed: %w", err)
+			}
+			requests = append(requests, requestItem.Request)
+		}
 	}
+	in.Inbox.Requests = requests
 
-	return toInboxModel(opi), nil
+	return toInboxModel(in), nil
 }
 
 func (d *InboxDAO) CreateInbox(
@@ -90,64 +103,74 @@ func (d *InboxDAO) CreateInbox(
 	}
 	createdOp := model.Inbox{}
 	err = attributevalue.UnmarshalMap(out.Attributes, &createdOp)
-	xray.AddAnnotation(ctx, inboxIDAnnotationKey, in.ID.String())
+	//xray.AddAnnotation(ctx, inboxIDAnnotationKey, in.ID.String())
 	return in, err
+}
+
+func (d *InboxDAO) AddRequestToInbox(ctx context.Context, id uuid.UUID, req model.Request) error {
+	ctx, cancel := context.WithTimeout(ctx, d.timeout)
+	defer cancel()
+	reqItem := toRequestItem(id, req)
+
+	item, err := attributevalue.MarshalMap(reqItem)
+	if err != nil {
+		return fmt.Errorf("error marshaling request to db: %w", err)
+	}
+
+	_, err = d.dbclient.PutItem(ctx, &dynamodb.PutItemInput{
+		TableName:    aws.String(d.tableName),
+		Item:         item,
+		ReturnValues: types.ReturnValueAllOld,
+	})
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (d *InboxDAO) Close(context.Context) error {
+	return nil
 }
 
 func (d *InboxDAO) UpdateInbox(
 	ctx context.Context,
-	op model.Inbox,
+	in model.Inbox,
 ) (model.Inbox, error) {
-	opi := toInboxItem(op)
 
-	// meta, err := attributevalue.MarshalMap(op.Metadata)
-	// if err != nil {
-	// 	return op, fmt.Errorf("can not marshal metadata: %w", err)
-	// }
-	// resp, err := attributevalue.MarshalMap(op.Response)
-	// if err != nil {
-	// 	return op, fmt.Errorf("can not marshal Response: %w", err)
-	// }
-
-	attrs := map[string]types.AttributeValue{
-		":id": &types.AttributeValueMemberB{Value: MustMarshallUUID(op.ID)},
-		// ":meta": &types.AttributeValueMemberM{Value: meta},
-		// ":resp": &types.AttributeValueMemberM{Value: resp},
-		// ":done": &types.AttributeValueMemberBOOL{Value: opi.Done},
+	inboxAttr, err := attributevalue.MarshalMap(in)
+	if err != nil {
+		return in, fmt.Errorf("can not marshal inbox: %w", err)
 	}
-	updateExpr := inUpdateExpresion
+	pk, sk := GenInboxKey(in.ID)
+	attrs := map[string]types.AttributeValue{
+		":PK":  &types.AttributeValueMemberS{Value: pk},
+		":SK":  &types.AttributeValueMemberS{Value: sk},
+		":doc": &types.AttributeValueMemberM{Value: inboxAttr},
+	}
 
-	// if op.Error != nil {
-	// 	erro, marshalErr := attributevalue.MarshalMap(op.Error)
-	// 	if marshalErr != nil {
-	// 		return op, fmt.Errorf("can not marshal error: %w", marshalErr)
-	// 	}
-	// 	attrs[":erro"] = &types.AttributeValueMemberM{Value: erro}
-	// 	updateExpr = opUpdateExpresionWithErr
-	// }
-
-	_, err := d.dbclient.UpdateItem(ctx, &dynamodb.UpdateItemInput{
+	_, err = d.dbclient.UpdateItem(ctx, &dynamodb.UpdateItemInput{
 		TableName: aws.String(d.tableName),
 		Key: map[string]types.AttributeValue{
-			"id": &types.AttributeValueMemberB{Value: MustMarshallUUID(opi.ID)},
+			"PK": &types.AttributeValueMemberS{Value: pk},
+			"SK": &types.AttributeValueMemberS{Value: sk},
 		},
 		ConditionExpression:       aws.String(inUpdateConditionExpresion),
-		UpdateExpression:          aws.String(updateExpr),
+		UpdateExpression:          aws.String(inUpdateExpresion),
 		ExpressionAttributeValues: attrs,
 		ReturnValues:              types.ReturnValueAllNew,
 	})
-
 	if err != nil {
-		return op, fmt.Errorf("error updating inbox: %w", err)
+		return in, fmt.Errorf("error updating inbox: %w", err)
 	}
 
-	return op, nil
+	return in, nil
 }
 
-func (d *InboxDAO) ListInboxs(
+func (d *InboxDAO) ListInbox(
 	ctx context.Context,
-	options ...option.ListInboxOption,
+	//	options ...option.ListInboxOption,
 ) ([]model.Inbox, error) {
+	options := []option.ListInboxOption{}
 	opts := &option.ListInboxOptions{
 		Projection: nil,
 	}
@@ -160,27 +183,32 @@ func (d *InboxDAO) ListInboxs(
 	out, err := d.dbclient.Scan(ctx, &dynamodb.ScanInput{
 		TableName:            aws.String(d.tableName),
 		ProjectionExpression: opts.Projection,
+		FilterExpression:     aws.String("begins_with(SK, :SK)"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":SK": &types.AttributeValueMemberS{Value: InboxKey},
+		},
 	})
 	if err != nil {
 		return nil, err
 	}
 	items := make([]InboxItem, out.Count)
-	ops := make([]model.Inbox, out.Count)
+	inboxes := make([]model.Inbox, out.Count)
 	err = attributevalue.UnmarshalListOfMaps(out.Items, &items)
 	for i, item := range items {
-		ops[i] = toInboxModel(item)
+		inboxes[i] = toInboxModel(item)
 	}
-	return ops, err
+	return inboxes, err
 }
 
 func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
-
+	pk, sk := GenInboxKey(id)
 	out, err := d.dbclient.DeleteItem(ctx, &dynamodb.DeleteItemInput{
 		TableName: aws.String(d.tableName),
 		Key: map[string]types.AttributeValue{
-			"id": &types.AttributeValueMemberB{Value: MustMarshallUUID(id)},
+			"PK": &types.AttributeValueMemberS{Value: pk},
+			"SK": &types.AttributeValueMemberS{Value: sk},
 		},
 		ReturnValues: types.ReturnValueAllOld,
 	})
