@@ -10,14 +10,6 @@ variable "project_name" {
   description = "Project name"
 }
 
-
-variable "backend_bucket" {
-  type        = string
-  default     = "request-inbox-terraform-state-bucket"
-  description = "backend bucket to save tf state"
-}
-
-
 variable "root_domain_name" {
   type = string
   default = "request-inbox.com"
