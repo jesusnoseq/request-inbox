@@ -32,15 +32,3 @@ variable "web_domain_name" {
   type = string
   default = "www.request-inbox.com"
 }
-
-# variable "hosted_zone_id" {
-#   type = string
-#   default = "Z07918491NGXTA3IZKH6T"
-# }
-
-
-variable "db_name" {
-  type        = string
-  default     = "inbox_requests"
-  description = "dynamo db table name"
-}
