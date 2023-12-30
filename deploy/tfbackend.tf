@@ -1,8 +1,7 @@
 terraform {
   backend "s3" {
-    bucket         = var.backend_bucket
+    bucket         = "request-inbox-terraform-state-bucket"
     key            = "terraform.tfstate"
-    region         = var.region
     encrypt        = true
   }
 }
