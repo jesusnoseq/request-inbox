@@ -9,7 +9,7 @@ type Props = {
 const RequestList: React.FC<Props> = ({ requests }) => {
     return (
         <Container>
-            {requests.map((request, index) => (
+            {requests.slice().reverse().map((request, index) => (
                 <React.Fragment key={request.ID}>
                     <RequestDetail request={request} />
                 </React.Fragment>

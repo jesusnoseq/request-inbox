@@ -25,10 +25,6 @@ variable "web_domain_name" {
   default = "www.request-inbox.com"
 }
 
-variable "hosted_zone_id" {
-  type = string
-}
-
 variable "db_name" {
   type = string
   default = "inbox_requests"

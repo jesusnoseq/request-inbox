@@ -13,7 +13,7 @@ type InboxListItemProps = {
 
 const InboxListItem: React.FC<InboxListItemProps> = ({ inbox, onDelete }) => {
     const navigate = useNavigate();
-    const requestsCount = Array.isArray(inbox.Requests) ? inbox.Requests.length : 0;
+    // const requestsCount = Array.isArray(inbox.Requests) ? inbox.Requests.length : 0;
 
     const handleClick = () => {
         navigate(`/inbox/${inbox.ID}`);
@@ -30,9 +30,9 @@ const InboxListItem: React.FC<InboxListItemProps> = ({ inbox, onDelete }) => {
                 <Typography color="textSecondary" gutterBottom>
                     {inbox.ID}
                 </Typography>
-                <Typography color="">
+                {/* <Typography color="">
                     Requests: {requestsCount}
-                </Typography>
+                </Typography> */}
                 <Typography color="textSecondary">
                     Last Updated: {moment(inbox.Timestamp).fromNow()}
                 </Typography>
