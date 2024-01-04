@@ -11,4 +11,5 @@ type IInboxHandler interface {
 	UpdateInbox(c *gin.Context)
 	ListInbox(c *gin.Context)
 	RegisterInboxRequest(c *gin.Context)
+	Health(c *gin.Context)
 }
