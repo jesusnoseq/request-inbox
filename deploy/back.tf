@@ -1,6 +1,4 @@
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "request-inbox-lambda-bucket"
-}
+
 
 data "archive_file" "lambda-package" {
   type        = "zip"
@@ -29,7 +27,7 @@ resource "aws_lambda_function" "api_lambda" {
   function_name = "request-inbox-api"
   filename = data.archive_file.lambda-package.output_path
 
-  handler = "main"
+  handler = "bootstrap"
   runtime = "provided.al2"
 
   role = aws_iam_role.lambda_exec_role.arn
