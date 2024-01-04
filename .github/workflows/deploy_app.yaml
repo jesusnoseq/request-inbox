@@ -58,7 +58,7 @@ jobs:
           TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
         working-directory: ./deploy
         run: terraform plan -input=false
-      - name: Terraform Plan
+      - name: Terraform Apply
         env:
           TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
         working-directory: ./deploy
