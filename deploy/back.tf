@@ -29,7 +29,6 @@ resource "aws_lambda_function" "api_lambda" {
   function_name = "request-inbox-api"
   filename = data.archive_file.lambda-package.output_path
   s3_bucket = aws_s3_bucket.lambda_bucket.bucket
-  s3_key    = aws_s3_object.lambda_object.key
 
   handler = "main"
   runtime = "provided.al2"
