@@ -161,3 +161,20 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 	}
 	c.Data(inbox.Response.Code, contentType, []byte(inbox.Response.Body))
 }
+
+type State string
+
+const (
+	Pass State = "pass" // up
+	Fail State = "fail" // down
+	Warn State = "warn" // healthy, with some concerns
+)
+
+func (ih *InboxHandler) Health(c *gin.Context) {
+	c.Header("Content-Type", "application/health+json; charset=utf-8")
+	c.JSON(200, gin.H{
+		"status":    Pass,
+		"version":   "0.1",
+		"embededDB": (config.GetString(config.DBEngine) == config.DBEngineBadger),
+	})
+}

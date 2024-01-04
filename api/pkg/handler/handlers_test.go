@@ -293,6 +293,29 @@ func TestUpdateInbox(t *testing.T) {
 	}
 }
 
-func TestInboxRequest(t *testing.T) {
-	// Implement test cases for InboxRequest handler
+func TestInboxHealth(t *testing.T) {
+	config.LoadConfig(config.Test)
+	ih, closer := mustGetInboxHandler()
+	defer closer()
+
+	w := httptest.NewRecorder()
+	ginCtx, _ := gin.CreateTestContext(w)
+	req, err := http.NewRequest(
+		"GET",
+		"",
+		nil,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	ginCtx.Request = req
+	ih.Health(ginCtx)
+	resp := w.Result()
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Expected StatusOK, got %v", resp.StatusCode)
+	}
+	if w.Body.String() != `{"embededDB":true,"status":"pass","version":"0.1"}` {
+		t.Errorf("Expected response ...., got %v", w.Body.String())
+	}
 }
