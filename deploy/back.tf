@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "lambda_bucket" {
 
 data "archive_file" "lambda-package" {
   type        = "zip"
-  source_file = "../main"
+  source_file = "../bootstrap"
   output_path = "../main.zip"
 }
 
@@ -32,7 +32,7 @@ resource "aws_lambda_function" "api_lambda" {
   s3_key    = aws_s3_object.lambda_object.key
 
   handler = "main"
-  runtime = "go1.x"
+  runtime = "provided.al2"
 
   role = aws_iam_role.lambda_exec_role.arn
 
