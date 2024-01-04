@@ -54,7 +54,7 @@ jobs:
         id: plan
         working-directory: ./deploy
         run: |
-          touch ../main
+          touch ../bootstrap
           terraform plan -detailed-exitcode -input=false
         continue-on-error: true
       - name: Terraform Plan Status
