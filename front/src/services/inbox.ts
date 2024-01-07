@@ -74,6 +74,18 @@ export const deleteInbox = async (id: string) => {
     return resp.status === 204;
 }
 
+export const health = async () => {
+    const resp = await fetch(`${BASE_URL}/api/v1/inboxes/health`, {
+        method: "GET",
+        headers: defaultHeaders,
+    });
+    if (!resp.ok) {
+        throw new Error('API response error ', await resp.json());
+    }
+    return await resp.json()
+}
+
+
 
 export const buildInboxURL = (id: string) => {
     return `${BASE_URL}/api/v1/inboxes/${id}/in`

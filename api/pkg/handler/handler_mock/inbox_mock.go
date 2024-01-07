@@ -70,6 +70,18 @@ func (mr *MockIInboxHandlerMockRecorder) GetInbox(arg0 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInbox", reflect.TypeOf((*MockIInboxHandler)(nil).GetInbox), arg0)
 }
 
+// Health mocks base method.
+func (m *MockIInboxHandler) Health(arg0 *gin.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Health", arg0)
+}
+
+// Health indicates an expected call of Health.
+func (mr *MockIInboxHandlerMockRecorder) Health(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockIInboxHandler)(nil).Health), arg0)
+}
+
 // ListInbox mocks base method.
 func (m *MockIInboxHandler) ListInbox(arg0 *gin.Context) {
 	m.ctrl.T.Helper()
