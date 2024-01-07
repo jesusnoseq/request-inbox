@@ -295,6 +295,7 @@ func TestUpdateInbox(t *testing.T) {
 
 func TestInboxHealth(t *testing.T) {
 	config.LoadConfig(config.Test)
+	config.Set(config.DBEngine, config.DBEngineBadger)
 	ih, closer := mustGetInboxHandler()
 	defer closer()
 
@@ -315,7 +316,8 @@ func TestInboxHealth(t *testing.T) {
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected StatusOK, got %v", resp.StatusCode)
 	}
-	if w.Body.String() != `{"embededDB":true,"status":"pass","version":"0.1"}` {
-		t.Errorf("Expected response ...., got %v", w.Body.String())
+	want := `{"embededDB":true,"status":"pass","version":"0.1"}`
+	if w.Body.String() != want {
+		t.Errorf("Expected response %q, got %q", want, w.Body.String())
 	}
 }
