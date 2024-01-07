@@ -24,3 +24,8 @@ variable "web_domain_name" {
   type = string
   default = "www.request-inbox.com"
 }
+
+variable "db_name" {
+  type = string
+  default = "inbox_requests"
+}

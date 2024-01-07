@@ -23,6 +23,33 @@ resource "aws_iam_role" "lambda_exec_role" {
   })
 }
 
+resource "aws_iam_policy" "dynamodb_access" {
+  name        = "DynamoDBAccessPolicy"
+  description = "Policy to allow access to DynamoDB"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
+        ],
+        Resource = "arn:aws:dynamodb:${var.region}:*:table/${var.db_name}"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_dynamodb_access" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = aws_iam_policy.dynamodb_access.arn
+}
+
 resource "aws_lambda_function" "api_lambda" {
   function_name = "request-inbox-api"
   filename = data.archive_file.lambda-package.output_path

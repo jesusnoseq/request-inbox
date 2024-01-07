@@ -15,10 +15,10 @@ const (
 
 type Inbox struct {
 	ID                    uuid.UUID
-	Name                  string
-	Timestamp             int64
-	Response              Response
-	Requests              []Request
+	Name                  string    `dynamodbav:"alias"`
+	Timestamp             int64     `dynamodbav:"unixTimestamp"`
+	Response              Response  `dynamodbav:"resp"`
+	Requests              []Request `dynamodbav:"req"`
 	ObfuscateHeaderFields []string
 }
 
@@ -30,13 +30,13 @@ type Response struct {
 
 type Request struct {
 	ID            int
-	Timestamp     int64
+	Timestamp     int64 `dynamodbav:"unixTimestamp"`
 	URI           string
 	Host          string
 	RemoteAddr    string
 	Protocol      string
 	Headers       map[string][]string
-	Method        string
+	Method        string `dynamodbav:"httpMethod"`
 	ContentLength int64
 	Body          string
 }
