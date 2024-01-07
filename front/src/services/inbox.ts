@@ -75,7 +75,7 @@ export const deleteInbox = async (id: string) => {
 }
 
 export const health = async () => {
-    const resp = await fetch(`${BASE_URL}/api/v1/inboxes/health`, {
+    const resp = await fetch(`${BASE_URL}/api/v1/health`, {
         method: "GET",
         headers: defaultHeaders,
     });
