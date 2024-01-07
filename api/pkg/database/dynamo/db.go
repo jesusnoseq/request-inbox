@@ -136,7 +136,7 @@ func (d *InboxDAO) UpdateInbox(
 	ctx context.Context,
 	in model.Inbox,
 ) (model.Inbox, error) {
-
+	in.Requests = []model.Request{}
 	inboxAttr, err := attributevalue.MarshalMap(in)
 	if err != nil {
 		return in, fmt.Errorf("can not marshal inbox: %w", err)
@@ -203,22 +203,43 @@ func (d *InboxDAO) ListInbox(
 func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
-	pk, sk := GenInboxKey(id)
-	out, err := d.dbclient.DeleteItem(ctx, &dynamodb.DeleteItemInput{
+	pk, _ := GenInboxKey(id)
+
+	query, err := d.dbclient.Query(ctx, &dynamodb.QueryInput{
 		TableName: aws.String(d.tableName),
-		Key: map[string]types.AttributeValue{
-			"PK": &types.AttributeValueMemberS{Value: pk},
-			"SK": &types.AttributeValueMemberS{Value: sk},
+		KeyConditions: map[string]types.Condition{
+			"PK": {
+				ComparisonOperator: types.ComparisonOperatorEq,
+				AttributeValueList: []types.AttributeValue{
+					&types.AttributeValueMemberS{Value: pk},
+				},
+			},
 		},
-		ReturnValues: types.ReturnValueAllOld,
+	})
+	if err != nil {
+		return fmt.Errorf("error deleting inbox(query): %w", err)
+	}
+	if query.Count == 0 {
+		return nil
+	}
+	deleteRequests := []types.WriteRequest{}
+	for _, item := range query.Items {
+		deleteRequests = append(deleteRequests, types.WriteRequest{
+			DeleteRequest: &types.DeleteRequest{Key: map[string]types.AttributeValue{
+				"PK": item["PK"],
+				"SK": item["SK"],
+			}},
+		})
+	}
+
+	_, err = d.dbclient.BatchWriteItem(ctx, &dynamodb.BatchWriteItemInput{
+		RequestItems: map[string][]types.WriteRequest{
+			d.tableName: deleteRequests,
+		},
 	})
 
 	if err != nil {
 		return fmt.Errorf("error deleting inbox: %w", err)
-	}
-
-	if len(out.Attributes) == 0 {
-		return fmt.Errorf("inbox %q not found", id)
 	}
 
 	return nil
