@@ -33,7 +33,7 @@ const (
 	DBBadgerPathDefault string = "/tmp/inbox.db"
 
 	DBDynamoName        Key    = "DB_DYNAMO_NAME"
-	DBDynamoNameDefault string = "requestinbox"
+	DBDynamoNameDefault string = "inbox_requests"
 
 	APIHTTPPort        Key    = "API_HTTP_PORT"
 	APIHTTPPortDefault string = "8080"
@@ -45,6 +45,9 @@ const (
 	LogFormat     Key    = "LOG_FORMATER"
 	LogFormatJSON string = "json"
 	LogFormatText string = "text"
+
+	AWSRegion        Key    = "AWS_REGION"
+	AWSRegionDefault string = "eu-central-1"
 
 	// Features
 	EnableListingInbox        = "ENABLE_LISTING_INBOX"
@@ -63,7 +66,7 @@ func setDefaults(app App) {
 	setDefault(Version, VersionDefault)
 	setDefault(APIHTTPPort, APIHTTPPortDefault)
 
-	setDefault(DBEngine, DBEngineBadger)
+	setDefault(DBEngine, DBEngineDynamo)
 	setDefault(DBBadgerPath, DBBadgerPathDefault)
 
 	setDefault(DBDynamoName, DBDynamoNameDefault)
@@ -71,6 +74,7 @@ func setDefaults(app App) {
 	setDefault(LogLevel, slog.LevelDebug.String())
 	setDefault(LogFormat, LogFormatText)
 
+	setDefault(AWSRegion, AWSRegionDefault)
 	setDefault(EnableListingInbox, EnableListingInboxDefault)
 }
 
