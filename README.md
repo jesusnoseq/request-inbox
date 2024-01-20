@@ -63,12 +63,9 @@ request-inbox
 
 ## TODO
 
-* Search inbox
-* Edit inbox
 * Authentication
 * private inboxes
-* Change response
-* Request on response
-* Request test
 * Request times
 * File viewer
+* Disable inbox
+* Add request evaluator
