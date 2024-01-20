@@ -12,7 +12,7 @@ DEPLOY_DIR = deploy
 LINTER_ARGS = run -c .golangci.yml --timeout 5m
 CGO_CFLAGS = ""
 CMD_FILE=$(CURDIR)/$(API_DIR)/cmd/main.go
-BIN_OUTPUT=..
+BIN_OUTPUT=../bootstrap
 AIR_FILE=cmd/air.toml
 
 
@@ -97,16 +97,20 @@ build-web:	## Build web app
 
 .PHONY: build-package
 build-package: build-web build-api-linux
-	zip back.zip main
+	zip back.zip bootstrap
 
 .PHONY: lint-deploy
 lint-deploy: 
 	cd $(DEPLOY_DIR) && tflint --init
-	cd $(DEPLOY_DIR) && tflint 
+	cd $(DEPLOY_DIR) && tflint
+
+.PHONY: build-all
+build-all: build-api-linux build-package build-web
+
 
 .PHONY: deploy
 deploy: 
-	cd $(DEPLOY_DIR) && terraform init 
-	cd $(DEPLOY_DIR) && terraform plan
-	cd $(DEPLOY_DIR) && terraform apply -auto-approve
+	cd $(DEPLOY_DIR) && AWS_REGION=eu-central-1 terraform init 
+	cd $(DEPLOY_DIR) && AWS_REGION=eu-central-1 terraform plan
+	cd $(DEPLOY_DIR) && AWS_REGION=eu-central-1 terraform apply -auto-approve
 
