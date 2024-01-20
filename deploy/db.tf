@@ -1,5 +1,5 @@
 resource "aws_dynamodb_table" "inbox_requests" {
-  name           = "InboxRequests"
+  name           = var.db_name
   billing_mode   = "PAY_PER_REQUEST"
   read_capacity  = 0
   write_capacity = 0
@@ -34,7 +34,6 @@ resource "aws_dynamodb_table" "inbox_requests" {
     read_capacity      = 0
     projection_type    = "ALL"
   }
-
   tags = {
     Project = "InboxRequests"
   }

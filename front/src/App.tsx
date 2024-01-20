@@ -8,6 +8,8 @@ import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import SignUpConfirmationPage from './pages/SignUpConfirmationPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import HealthPage from './pages/HealthPage';
+
 
 
 function App() {
@@ -23,6 +25,8 @@ function App() {
         <Route path="/sign-up-confirmation" element={<SignUpConfirmationPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/inbox/:inboxId" element={<InboxDetailPage />} />
+        <Route path="/health" element={<HealthPage />} />
+
       </Routes>
     </Router>
   );

@@ -9,6 +9,7 @@ func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
 	// Define the routes and their handlers
 	v1 := r.Group("/api/v1")
 	{
+		v1.GET("/health", ih.Health)
 		inboxes := v1.Group("/inboxes")
 		{
 			inboxes.GET("", ih.ListInbox)

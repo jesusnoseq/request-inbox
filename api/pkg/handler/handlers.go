@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
@@ -94,6 +95,11 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 }
 
 func (ih *InboxHandler) ListInbox(c *gin.Context) {
+	if !config.GetBool(config.EnableListingInbox) {
+		c.JSON(http.StatusOK, model.NewItemList([]model.Inbox{}))
+		return
+	}
+
 	inboxes, err := ih.dao.ListInbox(c)
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
@@ -154,4 +160,21 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		c.Header(k, v)
 	}
 	c.Data(inbox.Response.Code, contentType, []byte(inbox.Response.Body))
+}
+
+type State string
+
+const (
+	Pass State = "pass" // up
+	Fail State = "fail" // down
+	Warn State = "warn" // healthy, with some concerns
+)
+
+func (ih *InboxHandler) Health(c *gin.Context) {
+	c.Header("Content-Type", "application/health+json; charset=utf-8")
+	c.JSON(200, gin.H{
+		"status":    Pass,
+		"version":   "0.1",
+		"embededDB": (config.GetString(config.DBEngine) == config.DBEngineBadger),
+	})
 }

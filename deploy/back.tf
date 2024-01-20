@@ -1,19 +1,9 @@
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "request-inbox-lambda-bucket"
-}
+
 
 data "archive_file" "lambda-package" {
   type        = "zip"
-  source_file = "../main"
+  source_file = "../bootstrap"
   output_path = "../main.zip"
-}
-
-
-resource "aws_s3_object" "lambda_object" {
-  bucket = aws_s3_bucket.lambda_bucket.bucket
-  key    = "main.zip"
-  source = data.archive_file.lambda-package.output_path
-  etag   = filemd5(data.archive_file.lambda-package.output_path)
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
@@ -33,20 +23,47 @@ resource "aws_iam_role" "lambda_exec_role" {
   })
 }
 
+resource "aws_iam_policy" "dynamodb_access" {
+  name        = "DynamoDBAccessPolicy"
+  description = "Policy to allow access to DynamoDB"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
+        ],
+        Resource = "arn:aws:dynamodb:${var.region}:*:table/${var.db_name}"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_dynamodb_access" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = aws_iam_policy.dynamodb_access.arn
+}
+
 resource "aws_lambda_function" "api_lambda" {
   function_name = "request-inbox-api"
+  filename = data.archive_file.lambda-package.output_path
 
-  s3_bucket = aws_s3_bucket.lambda_bucket.bucket
-  s3_key    = aws_s3_object.lambda_object.key
-
-  handler = "main"
-  runtime = "go1.x"
+  handler = "bootstrap"
+  runtime = "provided.al2"
 
   role = aws_iam_role.lambda_exec_role.arn
 
   environment {
     variables = {
       API_MODE = "lambda"
+      DB_ENGINE = "dynamo"
+      ENABLE_LISTING_INBOX = "false"
     }
   }
 }

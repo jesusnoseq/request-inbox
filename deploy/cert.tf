@@ -1,6 +1,11 @@
 data "aws_route53_zone" "public" {
-  zone_id=var.hosted_zone_id
+  name         = var.root_domain_name
+  private_zone = false
 }
+
+# data "aws_route53_zone" "public" {
+#   zone_id = data.zone_id
+# }
 
 
 resource "aws_acm_certificate" "front_cert" {
