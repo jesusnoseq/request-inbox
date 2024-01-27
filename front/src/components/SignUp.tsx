@@ -28,7 +28,7 @@ const SignUpForm: React.FC = () => {
                 //navigate(`/sign-up-confirmation`);
             } else {
                 setError(true);
-                setHelperText("" + result.success);
+                setHelperText(result.error);
             }
         } catch (error) {
             setError(true);

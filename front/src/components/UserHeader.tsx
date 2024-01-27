@@ -10,7 +10,12 @@ const UserHeader: React.FC = () => {
     const checkUser = async () => {
         try {
             const userData = await queryUserData();
-            setUser(userData);
+            console.log(userData);
+            if (userData.success) {
+                setUser(userData);
+            } else {
+                setUser(null);
+            }
         } catch (error) {
             console.log('Not signed in', error);
             setUser(null);

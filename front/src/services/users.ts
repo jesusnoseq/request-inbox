@@ -7,13 +7,20 @@ type SignUpParameters = {
     autoSignIn: boolean;
 };
 
-const handleError = (error: any) => {
+type UserOperationResult = {
+    success: boolean,
+    next: any
+    error: string
+}
+
+
+const handleError = (error: any): UserOperationResult => {
     if (error instanceof Error) {
         console.log(`error handled in ${getCallerName()}: ${error.name}`);
-        return { success: false, error }
+        return { success: false, error: "" + error, next: "error" }
     }
     console.log(`unknown error in ${getCallerName()} : ${error}`);
-    return { success: false, error: ("" + error) }
+    return { success: false, error: ("" + error), next: "error" }
 }
 
 function getCallerName() {
@@ -34,7 +41,7 @@ export const doSignUp = async ({
     password,
     email,
     autoSignIn,
-}: SignUpParameters) => {
+}: SignUpParameters): Promise<UserOperationResult> => {
     try {
         const { isSignUpComplete, userId, nextStep } = await signUp({
             username,
@@ -47,7 +54,7 @@ export const doSignUp = async ({
             }
         });
         console.log("doSignUp", userId, isSignUpComplete, nextStep);
-        return { success: isSignUpComplete, next: nextStep };
+        return { success: isSignUpComplete, next: nextStep, error: "" };
     } catch (error) {
         return handleError(error);
     }
@@ -58,7 +65,7 @@ export const doSignUp = async ({
 export const doSignUpConfirmation = async ({
     username,
     confirmationCode
-}: ConfirmSignUpInput) => {
+}: ConfirmSignUpInput): Promise<UserOperationResult> => {
     try {
         const { isSignUpComplete, nextStep } = await confirmSignUp({
             username,
@@ -66,7 +73,7 @@ export const doSignUpConfirmation = async ({
         });
 
         console.log("doSignUpConfirmation ", isSignUpComplete, nextStep);
-        return { success: isSignUpComplete, next: nextStep };
+        return { success: isSignUpComplete, next: nextStep, error: "" };
     } catch (error) {
         return handleError(error);
     }
@@ -75,11 +82,11 @@ export const doSignUpConfirmation = async ({
 
 
 
-export const doSignIn = async ({ username, password }: SignInInput) => {
+export const doSignIn = async ({ username, password }: SignInInput): Promise<UserOperationResult> => {
     try {
         const { isSignedIn, nextStep } = await signIn({ username, password });
         console.log("handleSignIn", isSignedIn, nextStep);
-        return { success: isSignedIn, next: nextStep };
+        return { success: isSignedIn, next: nextStep, error: "" };
     } catch (error) {
         return handleError(error);
     };
@@ -105,10 +112,11 @@ export const doSignOut = async () => {
     }
 }
 
-export const queryUserData = async () => {
+export const queryUserData = async (): Promise<UserOperationResult> => {
     try {
         const userData = await getCurrentUser();
-        return userData;
+        console.log(userData);
+        return { success: true, next: userData, error: "" };
     } catch (error) {
         return handleError(error);
     }

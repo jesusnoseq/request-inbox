@@ -24,7 +24,7 @@ const SignInForm: React.FC = () => {
                 navigate(`/`);
             } else {
                 setError(true);
-                //setHelperText("" + result.error);
+                setHelperText(result.error);
             }
         } catch (error) {
             setError(true);

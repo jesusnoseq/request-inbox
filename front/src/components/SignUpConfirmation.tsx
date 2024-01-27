@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Button, TextField, Container, Typography, FormControl } from '@mui/material';
+import { Button, TextField, Container, Typography, FormControl, FormHelperText } from '@mui/material';
 import { doSignUpConfirmation } from '../services/users';
 import { useNavigate } from 'react-router-dom';
+import { ResetTvOutlined } from '@mui/icons-material';
 
 
 const SignUpConfirmationForm: React.FC = () => {
@@ -14,9 +15,17 @@ const SignUpConfirmationForm: React.FC = () => {
 
     const handleSignUpConfirmation = async (event: React.FormEvent) => {
         event.preventDefault();
+        setError(false);
+        setHelperText('');
         console.log('Sign up confirmation:', { username, confirmationCode });
-        doSignUpConfirmation({ username, confirmationCode });
-        navigate(`/sign-in`);
+        const result = await doSignUpConfirmation({ username, confirmationCode });
+        if (result.success) {
+            navigate(`/sign-in`);
+        } else {
+            setError(true);
+            setHelperText(result.error);
+        }
+
     };
 
     return (
@@ -44,6 +53,9 @@ const SignUpConfirmationForm: React.FC = () => {
                         value={confirmationCode}
                         onChange={(e) => setConfirmationCode(e.target.value)}
                     />
+
+                    <FormHelperText sx={{ fontSize: "1rem" }}>{helperText}</FormHelperText>
+
                     <Button
                         sx={{ mt: 1 }}
                         type="submit"
