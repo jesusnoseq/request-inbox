@@ -10,7 +10,7 @@ export default function Header() {
 
                 <Typography variant="h3" component="h1" sx={{ flexGrow: 1 }}>
                     <Link to="/" component={LinkDOM} color="inherit" underline="none">
-                        Request inbox
+                        Request Inbox
                     </Link>
                 </Typography>
 
