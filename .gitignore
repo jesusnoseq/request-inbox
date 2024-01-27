@@ -8,6 +8,7 @@
 *.so
 *.dylib
 *.zip
+bootstrap
 
 # Test binary, built with `go test -c`
 *.test
@@ -32,3 +33,6 @@ go.work
 # Node
 front/node_modules
 front/public/openapi.yaml
+
+# IDEs
+.idea

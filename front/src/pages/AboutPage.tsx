@@ -11,21 +11,20 @@ const AboutPage: React.FC = () => {
             <Header />
             <Box my={4}>
                 <Typography variant="h4" component="h2" gutterBottom>
-                    About
+                    About Request Inbox
                 </Typography>
-                <Typography variant="body1">
-                    RequestInbox is a platform designed to streamline the way you manage your inbound requests.
-                    Whether it's customer inquiries, internal requests, or personal reminders,
-                    RequestInbox makes it easy to keep track of everything in one centralized location.
+                {/* <Typography variant="body1">
+                    RequestInbox is a platform designed to improve the way you manage webhooks and test API clients.
+                    It easy to keep track of everything in one centralized location.
                 </Typography>
                 <Typography variant="body1" mt={2}>
                     Our mission is to help individuals and teams stay organized, work more efficiently,
-                    and save time by automating the request management process. With RequestInbox,
-                    you can ensure that every request is accounted for and handled.
-                </Typography>
+                    and save time by automating the request management process. With Request Inbox,
+                    you can ensure that every request is handled and saved.
+                </Typography> */}
                 <Typography variant="body1" mt={2}>
-                    Built with the latest web technologies and a focus on user experience,
-                    RequestInbox is here to improve the way you work.
+                    It is built with the latest web technologies and a focus on user experience. <br />
+                    Request Inbox is here to make your life a little easier by always providing a reliable URL to check your webhooks.
                 </Typography>
             </Box>
             <Footer />
