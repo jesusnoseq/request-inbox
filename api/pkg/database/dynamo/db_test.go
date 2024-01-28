@@ -49,7 +49,7 @@ func TestCreateInbox(t *testing.T) {
 			},
 			wantErr: "",
 		}, {
-			name: "Create inbox",
+			name: "Create inbox with data",
 			in: func() model.Inbox {
 				inbox := model.GenerateInbox()
 				inbox.Requests = []model.Request{}
@@ -83,6 +83,9 @@ func TestCreateInbox(t *testing.T) {
 			var emptyUUID uuid.UUID
 			if createdInbox.ID == emptyUUID {
 				t.Errorf("Expected createdInbox.ID to have a value")
+			}
+			if inbox.Name == inbox.ID.String() {
+				inbox.Name = createdInbox.ID.String()
 			}
 			inbox.ID = createdInbox.ID
 			expectJSONEquals(t, inbox, createdInbox)
