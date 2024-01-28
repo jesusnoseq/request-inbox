@@ -53,6 +53,7 @@ resource "aws_iam_role_policy_attachment" "attach_dynamodb_access" {
 resource "aws_lambda_function" "api_lambda" {
   function_name = "request-inbox-api"
   filename = data.archive_file.lambda-package.output_path
+  source_code_hash = data.archive_file.lambda-package.output_base64sha256
 
   handler = "bootstrap"
   runtime = "provided.al2"
