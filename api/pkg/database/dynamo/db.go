@@ -86,7 +86,7 @@ func (d *InboxDAO) CreateInbox(
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	id := uuid.New()
-	if in.Name == in.ID.String() {
+	if in.Name == "" || in.Name == in.ID.String() {
 		in.Name = id.String()
 	}
 	in.ID = id
