@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
+	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
@@ -44,6 +46,10 @@ func (ih *InboxHandler) DeleteInbox(c *gin.Context) {
 	}
 	err = ih.dao.DeleteInbox(c, id)
 	if err != nil {
+		if errors.Is(err, dberrors.ErrItemNotFound) {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
+			return
+		}
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
 		return
 	}
@@ -59,7 +65,15 @@ func (ih *InboxHandler) GetInbox(c *gin.Context) {
 	}
 	inbox, err := ih.dao.GetInbox(c, id)
 	if err != nil {
-		c.AbortWithStatusJSON(model.ErrorResponseWithError("inbox not found", err, http.StatusNotFound))
+		if errors.Is(err, dberrors.ErrItemNotFound) {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
+			return
+		}
+		code, errResp := model.ErrorResponseWithError(
+			"error getting inbox "+id.String(),
+			err,
+			http.StatusInternalServerError)
+		c.AbortWithStatusJSON(code, errResp)
 		return
 	}
 	c.JSON(http.StatusOK, inbox)
@@ -79,7 +93,15 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 
 	inbox, err := ih.dao.GetInbox(c, id)
 	if err != nil {
-		c.AbortWithStatusJSON(model.ErrorResponseWithError("inbox not found", err, http.StatusNotFound))
+		if errors.Is(err, dberrors.ErrItemNotFound) {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
+			return
+		}
+		code, errResp := model.ErrorResponseWithError(
+			"error getting inbox "+id.String(),
+			err,
+			http.StatusInternalServerError)
+		c.AbortWithStatusJSON(code, errResp)
 		return
 	}
 	updatedInbox.ID = id
@@ -117,7 +139,15 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 
 	inbox, err := ih.dao.GetInbox(c, id)
 	if err != nil {
-		c.AbortWithStatusJSON(model.ErrorResponseWithError("inbox not found", err, http.StatusNotFound))
+		if errors.Is(err, dberrors.ErrItemNotFound) {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
+			return
+		}
+		code, errResp := model.ErrorResponseWithError(
+			"error getting inbox "+id.String(),
+			err,
+			http.StatusInternalServerError)
+		c.AbortWithStatusJSON(code, errResp)
 		return
 	}
 

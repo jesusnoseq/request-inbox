@@ -12,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
-	"github.com/jesusnoseq/request-inbox/pkg/database/errors"
+	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
 	"github.com/jesusnoseq/request-inbox/pkg/database/option"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
@@ -42,8 +42,8 @@ func (d *InboxDAO) GetInbox(ctx context.Context, id uuid.UUID) (model.Inbox, err
 	defer cancel()
 	pk, _ := GenInboxKey(id)
 	getItemInput := &dynamodb.QueryInput{
-		TableName: aws.String(d.tableName),
-		//ConsistentRead:         aws.Bool(true),
+		TableName:              aws.String(d.tableName),
+		ConsistentRead:         aws.Bool(true),
 		KeyConditionExpression: aws.String("PK = :PK"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
 			":PK": &types.AttributeValueMemberS{Value: pk},
@@ -53,8 +53,8 @@ func (d *InboxDAO) GetInbox(ctx context.Context, id uuid.UUID) (model.Inbox, err
 	if err != nil {
 		return model.Inbox{}, fmt.Errorf("get inbox failed: %w", err)
 	}
-	if getItemResponse.Items == nil {
-		return model.Inbox{}, fmt.Errorf("%w: %q", errors.ErrNotFound, id)
+	if getItemResponse.Items == nil || getItemResponse.Count == 0 {
+		return model.Inbox{}, dberrors.ErrItemNotFound
 	}
 	in := InboxItem{}
 	requests := []model.Request{}
@@ -86,6 +86,7 @@ func (d *InboxDAO) CreateInbox(
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	in.ID = uuid.New()
+	in.Requests = []model.Request{}
 
 	inI := toInboxItem(in)
 	item, err := attributevalue.MarshalMap(inI)
@@ -220,7 +221,7 @@ func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
 		return fmt.Errorf("error deleting inbox(query): %w", err)
 	}
 	if query.Count == 0 {
-		return nil
+		return dberrors.ErrItemNotFound
 	}
 	deleteRequests := []types.WriteRequest{}
 	for _, item := range query.Items {
