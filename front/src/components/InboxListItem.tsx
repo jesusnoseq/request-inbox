@@ -22,14 +22,18 @@ const InboxListItem: React.FC<InboxListItemProps> = ({ inbox, onDelete }) => {
     return (
         <Card variant="outlined" sx={{ marginBottom: 2 }}>
             <CardContent>
-                {inbox.Name !== inbox.ID &&
-                    <Typography variant="h3" fontSize={'2rem'}>
-                        {inbox.Name}
-                    </Typography>
-                }
                 <Typography color="textSecondary" gutterBottom>
                     {inbox.ID}
                 </Typography>
+                {inbox.Name !== inbox.ID &&
+                    <Typography variant="h3" fontSize={'2rem'} sx={{
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word'
+                    }}>
+                        {inbox.Name}
+                    </Typography>
+                }
+
                 {/* <Typography color="">
                     Requests: {requestsCount}
                 </Typography> */}
