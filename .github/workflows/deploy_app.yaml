@@ -10,7 +10,7 @@ on:
     paths:
       - "deploy/**"
       - "front/**"
-      - "back/**"
+      - "api/**"
 
 jobs:
   build-and-deploy:
