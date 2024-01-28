@@ -29,3 +29,10 @@ variable "db_name" {
   type = string
   default = "inbox_requests"
 }
+
+variable "API_SNAPSHOT_VERSION" {
+  type = string
+  default = "TF_SNAPSHOT_VERSION"
+}
+
+

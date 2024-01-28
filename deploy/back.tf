@@ -64,6 +64,7 @@ resource "aws_lambda_function" "api_lambda" {
       API_MODE = "lambda"
       DB_ENGINE = "dynamo"
       ENABLE_LISTING_INBOX = "false"
+      SNAPSHOT_VERSION = var.API_SNAPSHOT_VERSION
     }
   }
 }

@@ -205,6 +205,7 @@ func (ih *InboxHandler) Health(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status":    Pass,
 		"version":   "0.1",
+		"snapshot":  config.GetString(config.SnapshotVersion),
 		"embededDB": (config.GetString(config.DBEngine) == config.DBEngineBadger),
 	})
 }
