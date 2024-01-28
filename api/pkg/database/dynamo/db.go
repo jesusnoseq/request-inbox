@@ -85,7 +85,11 @@ func (d *InboxDAO) CreateInbox(
 ) (model.Inbox, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
-	in.ID = uuid.New()
+	id := uuid.New()
+	if in.Name == "" || in.Name == in.ID.String() {
+		in.Name = id.String()
+	}
+	in.ID = id
 	in.Requests = []model.Request{}
 
 	inI := toInboxItem(in)
@@ -192,6 +196,9 @@ func (d *InboxDAO) ListInbox(
 	if err != nil {
 		return nil, err
 	}
+	// TODO continue scan in order to get all items
+	// log.Printf("got out.LastEvaluatedKey: %v\n", out.LastEvaluatedKey)
+
 	items := make([]InboxItem, out.Count)
 	inboxes := make([]model.Inbox, out.Count)
 	err = attributevalue.UnmarshalListOfMaps(out.Items, &items)
