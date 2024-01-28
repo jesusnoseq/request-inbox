@@ -16,7 +16,8 @@ export const getInboxList = async () => {
         throw new Error('API response error ', await resp.json());
     }
     const { results: inboxes } = (await resp.json()) as InboxList
-    return inboxes
+    const sortedInboxes = inboxes.sort((a, b) => b.Timestamp - a.Timestamp);
+    return sortedInboxes
 }
 
 

@@ -45,15 +45,19 @@ const TextInlineEditor: React.FC<TextInlineEditorProps> = ({ initialValue, label
         <>
             {!editMode &&
                 <Box display="flex" alignItems="start" gap={1}>
-                    <Typography variant="h4" gutterBottom>
+                    <Typography variant="h4" gutterBottom sx={{
+                        overflowWrap: 'break-word',
+                        wordBreak: 'break-word'
+                    }}>
                         {label}  {value}
                     </Typography>
                     <IconButton aria-label="edit inbox name" size="small" onClick={enableEditMode}>
                         <ModeEditIcon fontSize="large" />
                     </IconButton>
-                </Box>
+                </Box >
             }
-            {editMode &&
+            {
+                editMode &&
                 <TextField
                     size="medium"
                     value={value}
@@ -63,7 +67,12 @@ const TextInlineEditor: React.FC<TextInlineEditorProps> = ({ initialValue, label
                     required
                     error={error}
                     InputProps={{
-                        sx: { fontSize: '2rem', pl: 1, m: 0, height: '1.68em' },
+                        sx: {
+                            fontSize: '2rem',
+                            pl: 1,
+                            m: 0,
+                            height: '1.68em'
+                        },
                         startAdornment: (
                             <InputAdornment position="start">
                                 <span style={{ fontSize: '2rem' }}>Inbox</span>
