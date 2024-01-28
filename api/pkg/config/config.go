@@ -49,6 +49,9 @@ const (
 	AWSRegion        Key    = "AWS_REGION"
 	AWSRegionDefault string = "eu-central-1"
 
+	SnapshotVersion        Key    = "SNAPSHOT_VERSION"
+	SnapshotVersionDefault string = "local"
+
 	// Features
 	EnableListingInbox        = "ENABLE_LISTING_INBOX"
 	EnableListingInboxDefault = true
@@ -75,6 +78,9 @@ func setDefaults(app App) {
 	setDefault(LogFormat, LogFormatText)
 
 	setDefault(AWSRegion, AWSRegionDefault)
+
+	setDefault(SnapshotVersion, SnapshotVersionDefault)
+
 	setDefault(EnableListingInbox, EnableListingInboxDefault)
 }
 

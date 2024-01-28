@@ -12,6 +12,9 @@ on:
       - "front/**"
       - "api/**"
 
+env:
+  TF_VAR_API_SNAPSHOT_VERSION: ${{ github.run_number }}
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
