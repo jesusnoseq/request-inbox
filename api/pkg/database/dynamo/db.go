@@ -17,7 +17,8 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-//const inboxIDAnnotationKey = "InboxID"
+// const inboxIDAnnotationKey = "InboxID"
+const MaxBatchItems = 25
 
 type InboxDAO struct {
 	tableName string
@@ -41,39 +42,43 @@ func (d *InboxDAO) GetInbox(ctx context.Context, id uuid.UUID) (model.Inbox, err
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	pk, _ := GenInboxKey(id)
-	getItemInput := &dynamodb.QueryInput{
+
+	queryPaginator := dynamodb.NewQueryPaginator(d.dbclient, &dynamodb.QueryInput{
 		TableName:              aws.String(d.tableName),
 		ConsistentRead:         aws.Bool(true),
 		KeyConditionExpression: aws.String("PK = :PK"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
 			":PK": &types.AttributeValueMemberS{Value: pk},
 		},
-	}
-	getItemResponse, err := d.dbclient.Query(ctx, getItemInput)
-	if err != nil {
-		return model.Inbox{}, fmt.Errorf("get inbox failed: %w", err)
-	}
-	if getItemResponse.Items == nil || getItemResponse.Count == 0 {
-		return model.Inbox{}, dberrors.ErrItemNotFound
-	}
+	})
 	in := InboxItem{}
 	requests := []model.Request{}
-	for _, item := range getItemResponse.Items {
-		sk := item["SK"].(*types.AttributeValueMemberS).Value
-		if strings.HasPrefix(sk, InboxKey) {
-			err = attributevalue.UnmarshalMap(item, &in)
-			if err != nil {
-				return model.Inbox{}, fmt.Errorf("unmarshal inbox failed: %w", err)
+	for queryPaginator.HasMorePages() {
+		response, err := queryPaginator.NextPage(ctx)
+		if err != nil {
+			return model.Inbox{}, fmt.Errorf("get inbox failed: %w", err)
+		}
+		for _, item := range response.Items {
+			sk := item["SK"].(*types.AttributeValueMemberS).Value
+			if strings.HasPrefix(sk, InboxKey) {
+				err = attributevalue.UnmarshalMap(item, &in)
+				if err != nil {
+					return model.Inbox{}, fmt.Errorf("unmarshal inbox failed: %w", err)
+				}
+			} else if strings.HasPrefix(sk, RequestKey) {
+				requestItem := RequestItem{}
+				err = attributevalue.UnmarshalMap(item, &requestItem)
+				if err != nil {
+					return model.Inbox{}, fmt.Errorf("unmarshal request failed: %w", err)
+				}
+				requests = append(requests, requestItem.Request)
 			}
-		} else if strings.HasPrefix(sk, RequestKey) {
-			requestItem := RequestItem{}
-			err = attributevalue.UnmarshalMap(item, &requestItem)
-			if err != nil {
-				return model.Inbox{}, fmt.Errorf("unmarshal request failed: %w", err)
-			}
-			requests = append(requests, requestItem.Request)
 		}
 	}
+	if in.PK == "" {
+		return model.Inbox{}, dberrors.ErrItemNotFound
+	}
+
 	in.Inbox.Requests = requests
 
 	return toInboxModel(in), nil
@@ -196,7 +201,7 @@ func (d *InboxDAO) ListInbox(
 	if err != nil {
 		return nil, err
 	}
-	// TODO continue scan in order to get all items
+	// TODO continue scan in order to get all items // Use scanpaginator
 	// log.Printf("got out.LastEvaluatedKey: %v\n", out.LastEvaluatedKey)
 
 	items := make([]InboxItem, out.Count)
@@ -213,7 +218,7 @@ func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
 	defer cancel()
 	pk, _ := GenInboxKey(id)
 
-	query, err := d.dbclient.Query(ctx, &dynamodb.QueryInput{
+	queryPaginator := dynamodb.NewQueryPaginator(d.dbclient, &dynamodb.QueryInput{
 		TableName: aws.String(d.tableName),
 		KeyConditions: map[string]types.Condition{
 			"PK": {
@@ -224,30 +229,40 @@ func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
 			},
 		},
 	})
-	if err != nil {
-		return fmt.Errorf("error deleting inbox(query): %w", err)
+	deleteRequests := []types.WriteRequest{}
+	for queryPaginator.HasMorePages() {
+		response, err := queryPaginator.NextPage(ctx)
+		if err != nil {
+			// TODO improve logging and error handling from API view
+			return fmt.Errorf("error deleting inbox(query): %w", err)
+		}
+		for _, item := range response.Items {
+			deleteRequests = append(deleteRequests, types.WriteRequest{
+				DeleteRequest: &types.DeleteRequest{Key: map[string]types.AttributeValue{
+					"PK": item["PK"],
+					"SK": item["SK"],
+				}},
+			})
+		}
 	}
-	if query.Count == 0 {
+	lenDeleteRequests := len(deleteRequests)
+	if lenDeleteRequests == 0 {
 		return dberrors.ErrItemNotFound
 	}
-	deleteRequests := []types.WriteRequest{}
-	for _, item := range query.Items {
-		deleteRequests = append(deleteRequests, types.WriteRequest{
-			DeleteRequest: &types.DeleteRequest{Key: map[string]types.AttributeValue{
-				"PK": item["PK"],
-				"SK": item["SK"],
-			}},
+
+	for i := 0; i < lenDeleteRequests; i += MaxBatchItems {
+		end := i + MaxBatchItems
+		if end > lenDeleteRequests {
+			end = lenDeleteRequests
+		}
+		_, err := d.dbclient.BatchWriteItem(ctx, &dynamodb.BatchWriteItemInput{
+			RequestItems: map[string][]types.WriteRequest{
+				d.tableName: deleteRequests[i:end],
+			},
 		})
-	}
-
-	_, err = d.dbclient.BatchWriteItem(ctx, &dynamodb.BatchWriteItemInput{
-		RequestItems: map[string][]types.WriteRequest{
-			d.tableName: deleteRequests,
-		},
-	})
-
-	if err != nil {
-		return fmt.Errorf("error deleting inbox: %w", err)
+		if err != nil {
+			return fmt.Errorf("error deleting inbox: %w", err)
+		}
 	}
 
 	return nil
