@@ -189,6 +189,32 @@ func TestDeleteInbox(t *testing.T) {
 	}
 }
 
+func TestDeleteInboxRequests(t *testing.T) {
+	config.LoadConfig(config.Test)
+	ih, closer := mustGetInboxHandler()
+	defer closer()
+	inbox := shoudlExistsInbox(ih, model.GenerateInbox())
+
+	w := httptest.NewRecorder()
+	ginCtx, _ := gin.CreateTestContext(w)
+	ginCtx.AddParam("id", inbox.ID.String())
+	req, err := http.NewRequest(
+		"DELETE",
+		"",
+		nil,
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	ginCtx.Request = req
+	ih.DeleteInboxRequests(ginCtx)
+	resp := w.Result()
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusNoContent {
+		t.Errorf("Expected StatusNoContent, got %v with body %s", resp.StatusCode, w.Body.String())
+	}
+}
+
 func TestGetInbox(t *testing.T) {
 	config.LoadConfig(config.Test)
 	ih, closer := mustGetInboxHandler()

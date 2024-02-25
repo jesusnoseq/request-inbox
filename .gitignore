@@ -34,5 +34,9 @@ go.work
 front/node_modules
 front/public/openapi.yaml
 
+# E2E
+e2e/node_modules
+e2e/*report
+
 # IDEs
 .idea
