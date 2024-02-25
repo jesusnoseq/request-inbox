@@ -57,6 +57,25 @@ func (ih *InboxHandler) DeleteInbox(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
+func (ih *InboxHandler) DeleteInboxRequests(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
+		return
+	}
+	err = ih.dao.DeleteInboxRequests(c, id)
+	if err != nil {
+		if errors.Is(err, dberrors.ErrItemNotFound) {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
+			return
+		}
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+		return
+	}
+
+	c.JSON(http.StatusNoContent, nil)
+}
+
 func (ih *InboxHandler) GetInbox(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {

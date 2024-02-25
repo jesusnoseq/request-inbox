@@ -6,7 +6,6 @@ import (
 )
 
 func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
-	// Define the routes and their handlers
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/health", ih.Health)
@@ -17,6 +16,7 @@ func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
 			inboxes.DELETE("/:id", ih.DeleteInbox)
 			inboxes.GET("/:id", ih.GetInbox)
 			inboxes.PUT("/:id", ih.UpdateInbox)
+			inboxes.DELETE("/:id/requests", ih.DeleteInboxRequests)
 			inboxes.Any("/:id/in", ih.RegisterInboxRequest)
 			inboxes.Any("/:id/in/*path", ih.RegisterInboxRequest)
 		}
