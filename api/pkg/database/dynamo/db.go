@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -60,12 +59,12 @@ func (d *InboxDAO) GetInbox(ctx context.Context, id uuid.UUID) (model.Inbox, err
 		}
 		for _, item := range response.Items {
 			sk := item["SK"].(*types.AttributeValueMemberS).Value
-			if strings.HasPrefix(sk, InboxKey) {
+			if isInboxSK(sk) {
 				err = attributevalue.UnmarshalMap(item, &in)
 				if err != nil {
 					return model.Inbox{}, fmt.Errorf("unmarshal inbox failed: %w", err)
 				}
-			} else if strings.HasPrefix(sk, RequestKey) {
+			} else if isRequestSK(sk) {
 				requestItem := RequestItem{}
 				err = attributevalue.UnmarshalMap(item, &requestItem)
 				if err != nil {
@@ -213,9 +212,7 @@ func (d *InboxDAO) ListInbox(
 	return inboxes, err
 }
 
-func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
-	ctx, cancel := context.WithTimeout(ctx, d.timeout)
-	defer cancel()
+func (d *InboxDAO) deleteInboxWithFilter(ctx context.Context, id uuid.UUID, toDeletefilter func(pk, sk string) bool) error {
 	pk, _ := GenInboxKey(id)
 
 	queryPaginator := dynamodb.NewQueryPaginator(d.dbclient, &dynamodb.QueryInput{
@@ -230,13 +227,20 @@ func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
 		},
 	})
 	deleteRequests := []types.WriteRequest{}
+	itemsCount := 0
 	for queryPaginator.HasMorePages() {
 		response, err := queryPaginator.NextPage(ctx)
 		if err != nil {
 			// TODO improve logging and error handling from API view
 			return fmt.Errorf("error deleting inbox(query): %w", err)
 		}
+		itemsCount += len(response.Items)
 		for _, item := range response.Items {
+			pk = item["PK"].(*types.AttributeValueMemberS).Value
+			sk := item["SK"].(*types.AttributeValueMemberS).Value
+			if !toDeletefilter(pk, sk) {
+				continue
+			}
 			deleteRequests = append(deleteRequests, types.WriteRequest{
 				DeleteRequest: &types.DeleteRequest{Key: map[string]types.AttributeValue{
 					"PK": item["PK"],
@@ -245,11 +249,11 @@ func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
 			})
 		}
 	}
-	lenDeleteRequests := len(deleteRequests)
-	if lenDeleteRequests == 0 {
+	if itemsCount == 0 {
 		return dberrors.ErrItemNotFound
 	}
 
+	lenDeleteRequests := len(deleteRequests)
 	for i := 0; i < lenDeleteRequests; i += MaxBatchItems {
 		end := i + MaxBatchItems
 		if end > lenDeleteRequests {
@@ -266,6 +270,18 @@ func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
+	ctx, cancel := context.WithTimeout(ctx, d.timeout)
+	defer cancel()
+	return d.deleteInboxWithFilter(ctx, id, func(pk, sk string) bool { return true })
+}
+
+func (d *InboxDAO) DeleteInboxRequests(ctx context.Context, id uuid.UUID) error {
+	ctx, cancel := context.WithTimeout(ctx, d.timeout)
+	defer cancel()
+	return d.deleteInboxWithFilter(ctx, id, func(pk, sk string) bool { return isRequestSK(sk) })
 }
 
 func MustMarshallUUID(id uuid.UUID) []byte {

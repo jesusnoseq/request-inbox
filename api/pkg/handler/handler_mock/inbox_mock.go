@@ -58,6 +58,18 @@ func (mr *MockIInboxHandlerMockRecorder) DeleteInbox(arg0 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteInbox", reflect.TypeOf((*MockIInboxHandler)(nil).DeleteInbox), arg0)
 }
 
+// DeleteInboxRequests mocks base method.
+func (m *MockIInboxHandler) DeleteInboxRequests(arg0 *gin.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "DeleteInboxRequests", arg0)
+}
+
+// DeleteInboxRequests indicates an expected call of DeleteInboxRequests.
+func (mr *MockIInboxHandlerMockRecorder) DeleteInboxRequests(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteInboxRequests", reflect.TypeOf((*MockIInboxHandler)(nil).DeleteInboxRequests), arg0)
+}
+
 // GetInbox mocks base method.
 func (m *MockIInboxHandler) GetInbox(arg0 *gin.Context) {
 	m.ctrl.T.Helper()

@@ -105,6 +105,19 @@ func (ib *InboxBadger) DeleteInbox(ctx context.Context, ID uuid.UUID) error {
 	return nil
 }
 
+func (ib *InboxBadger) DeleteInboxRequests(ctx context.Context, ID uuid.UUID) error {
+	inbox, err := ib.GetInbox(ctx, ID)
+	if err != nil {
+		return err
+	}
+	inbox.Requests = []model.Request{}
+	_, err = ib.UpdateInbox(ctx, inbox)
+	if err != nil {
+		return fmt.Errorf("error deleting request of inbox %v: %w", ID, err)
+	}
+	return nil
+}
+
 func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
 	inboxList := []model.Inbox{}
 	err := ib.db.View(func(txn *badger.Txn) error {

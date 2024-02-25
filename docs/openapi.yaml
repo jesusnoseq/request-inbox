@@ -117,6 +117,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /inboxes/{inboxID}/requests/:
+    delete:
+      summary: Delete all request for a specific Inbox
+      parameters:
+        - name: inboxID
+          description: The unique identifier of the inbox
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/InboxID"
+      responses:
+        204:
+          description: delete the provided `inboxID` requests
+        404:
+          description: No inbox found for the provided `inboxID`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /inboxes/{inboxID}/in:
     summary: Collect request in a specific Inbox
     parameters:

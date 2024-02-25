@@ -2,7 +2,7 @@
 
 Web Application to collects HTTP request for testing purposes.
 
-It tries to replace [webhookinbox.com](http://webhookinbox.com/)
+It tries to replace [webhookinbox.com](http://webhookinbox.com/) and be a simpler alternative to [webhook.site](http://webhook.site)
 
 You can try it at [request-inbox.com](https://request-inbox.com/)
 
@@ -63,11 +63,8 @@ request-inbox
 
 ## TODO
 
-* Search inbox
-* Edit inbox
-* Authentication
+* Users & Authentication
 * private inboxes
-* Change response
 * Request on response
 * Request test
 * Request times

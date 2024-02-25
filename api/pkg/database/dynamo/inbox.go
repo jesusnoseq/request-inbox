@@ -2,6 +2,7 @@ package dynamo
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -40,6 +41,14 @@ func GenRequestKey(id uuid.UUID) (string, string) {
 
 func toInboxModel(inI InboxItem) model.Inbox {
 	return inI.Inbox
+}
+
+func isInboxSK(sk string) bool {
+	return strings.HasPrefix(sk, InboxKey)
+}
+
+func isRequestSK(sk string) bool {
+	return strings.HasPrefix(sk, RequestKey)
 }
 
 func toInboxItem(in model.Inbox) InboxItem {

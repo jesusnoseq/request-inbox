@@ -10,6 +10,7 @@ type IInboxHandler interface {
 	GetInbox(c *gin.Context)
 	UpdateInbox(c *gin.Context)
 	ListInbox(c *gin.Context)
+	DeleteInboxRequests(c *gin.Context)
 	RegisterInboxRequest(c *gin.Context)
 	Health(c *gin.Context)
 }
