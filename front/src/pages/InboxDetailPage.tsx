@@ -5,14 +5,20 @@ import Container from '@mui/material/Container';
 import { Typography, Divider, Alert, Grid, Switch, Box, SvgIcon, Fab } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import RequestList from '../components/RequestList';
-import { getInbox } from '../services/inbox';
+import { getInbox, deleteInboxRequests } from '../services/inbox';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import InboxDetail from '../components/InboxDetail';
 import UpdateIcon from '@mui/icons-material/Update';
 import UpdateDisabledIcon from '@mui/icons-material/UpdateDisabled';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
 const InboxDetailPage: React.FC = () => {
     const { inboxId } = useParams<'inboxId'>();
@@ -20,6 +26,7 @@ const InboxDetailPage: React.FC = () => {
     const [isLoading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [autoUpdate, setAutoUpdate] = useState(false);
+    const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
 
     useEffect(() => {
         const fetchInboxDetail = async () => {
@@ -41,7 +48,6 @@ const InboxDetailPage: React.FC = () => {
         };
         fetchInboxDetail();
     }, [inboxId]);
-
 
 
     useEffect(() => {
@@ -94,10 +100,56 @@ const InboxDetailPage: React.FC = () => {
         });
     };
 
+    const openDeleteRequestsDialog = () => {
+        console.log("deleting requests");
+        setConfirmDialogOpen(true);
+    };
+
+    const onDeleteRequestsConfirm = async () => {
+        setConfirmDialogOpen(false);
+        if (!inboxId) {
+            return;
+        }
+        console.log("deleting requests confirm");
+        setLoading(true);
+        const ok = await deleteInboxRequests(inboxId);
+        if (ok) {
+            const updatedInbox = {
+                ...inbox,
+                Requests: []
+            };
+            setInbox(updatedInbox as Inbox);
+        } else {
+            setError("Error deleting inbox requests");
+        }
+        setLoading(false);
+    };
+
+    const handleCloseDeleteRequestsDialog = () => {
+        setConfirmDialogOpen(false);
+    };
 
     return (
         <Container>
             <Header />
+            <Dialog
+                open={confirmDialogOpen}
+                onClose={handleCloseDeleteRequestsDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">
+                    Delete Requests Confirmation
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to delete all requests?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteRequestsDialog}>Cancel</Button>
+                    <Button onClick={onDeleteRequestsConfirm}>Delete</Button>
+                </DialogActions>
+            </Dialog>
             {inbox && (
                 <><InboxDetail inbox={inbox} />
                     <Box margin={1} padding={1} width="100%" display="flex" justifyContent="space-between">
@@ -108,6 +160,10 @@ const InboxDetailPage: React.FC = () => {
                             icon={<SvgIcon style={iconStyle}><UpdateDisabledIcon /></SvgIcon>}
                             checkedIcon={<SvgIcon style={iconStyle}><UpdateIcon /></SvgIcon>}
                         />
+                        <Fab size="small" color="secondary" aria-label="Delete requests" onClick={openDeleteRequestsDialog}
+                            style={{ marginLeft: 'auto', marginRight: '20px' }}>
+                            <DeleteSweepIcon />
+                        </Fab>
                         <Fab size="small" color="secondary" aria-label="go down" onClick={scrollToBottom}>
                             <ArrowDownwardIcon />
                         </Fab>

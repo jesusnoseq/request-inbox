@@ -47,7 +47,7 @@ export const newInbox = async () => {
     return inbox;
 }
 
-export const UpdateInbox = async (inbox: Inbox) => {
+export const updateInbox = async (inbox: Inbox) => {
     const reqInbox = {
         ...inbox,
         Requests: []
@@ -66,9 +66,17 @@ export const UpdateInbox = async (inbox: Inbox) => {
 }
 
 
-
 export const deleteInbox = async (id: string) => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}`, {
+        method: "DELETE",
+        headers: defaultHeaders,
+    });
+    return resp.status === 204;
+}
+
+
+export const deleteInboxRequests = async (id: string) => {
+    const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}/requests`, {
         method: "DELETE",
         headers: defaultHeaders,
     });

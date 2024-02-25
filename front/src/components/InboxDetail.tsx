@@ -3,7 +3,7 @@ import { Inbox, InboxResponse } from '../types/inbox';
 import { Typography, Paper } from '@mui/material';
 import moment from 'moment';
 import HighlightURL from '../components/HighlightURL';
-import { buildInboxURL, UpdateInbox } from '../services/inbox';
+import { buildInboxURL, updateInbox } from '../services/inbox';
 import ResponseInlineEditor from '../components/ResponseInlineEditor';
 import TextInlineEditor from '../components/TextInlineEditor';
 
@@ -22,7 +22,7 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
             ...inbox,
             Name: name
         };
-        const resp = await UpdateInbox(updatedInbox)
+        const resp = await updateInbox(updatedInbox)
         setInbox(resp);
     }
 
@@ -31,7 +31,7 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
             ...inbox,
             Response: ir
         };
-        const resp = await UpdateInbox(updatedInbox)
+        const resp = await updateInbox(updatedInbox)
         setInbox(resp);
     };
 
