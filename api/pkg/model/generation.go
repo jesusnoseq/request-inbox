@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"math"
 	"time"
+
+	"github.com/jesusnoseq/request-inbox/pkg/collection"
 )
 
 // Generates a Base16 random string
@@ -49,4 +51,24 @@ func GenerateRequest(id int) Request {
 		RemoteAddr:    "[::1]:61764",
 		Method:        "POST",
 	}
+}
+
+func CopyInbox(inbox Inbox) Inbox {
+	copy := inbox
+
+	copy.Response.Headers = collection.CopySimpleMap(inbox.Response.Headers)
+
+	copy.Requests = make([]Request, len(inbox.Requests))
+	for _, req := range inbox.Requests {
+		copy.Requests = append(copy.Requests, CopyRequest(req))
+	}
+
+	copy.ObfuscateHeaderFields = collection.CopySlice(inbox.ObfuscateHeaderFields)
+	return copy
+}
+
+func CopyRequest(request Request) Request {
+	copy := request
+	copy.Headers = collection.CopySliceMap(request.Headers)
+	return copy
 }

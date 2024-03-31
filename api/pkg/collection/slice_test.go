@@ -1,6 +1,7 @@
 package collection
 
 import (
+	"reflect"
 	"slices"
 	"testing"
 )
@@ -86,6 +87,50 @@ func TestSliceFormat(t *testing.T) {
 			got := SliceFormat(tc.in, tc.format)
 			if !slices.Equal(tc.expectOut, got) {
 				t.Errorf("SliceFormat(%v, %v) = %v, want %v", tc.in, tc.format, got, tc.expectOut)
+			}
+		})
+	}
+}
+
+func TestCopySlice(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []int
+		modifyFn func(*[]int)
+		want     []int
+	}{
+		{
+			name:  "Int slice unchanged after modify the copy",
+			input: []int{1, 2, 3, 4},
+			modifyFn: func(copy *[]int) {
+				(*copy)[0] = 999
+			},
+			want: []int{1, 2, 3, 4},
+		},
+		{
+			name:  "Empty slice",
+			input: []int{},
+			modifyFn: func(copy *[]int) {
+				if len(*copy) > 0 {
+					(*copy)[0] = 999
+				}
+			},
+			want: []int{},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := CopySlice(tc.input)
+			if !reflect.DeepEqual(tc.input, got) {
+				t.Errorf("Slice copy is equal, want %v, got %v", tc.input, got)
+			}
+			tc.modifyFn(&got)
+			if !reflect.DeepEqual(tc.input, tc.want) {
+				t.Errorf("Original slice was modified, want %v, got %v", tc.want, tc.input)
+			}
+			if len(tc.input) != len(got) {
+				t.Errorf("Copied slice length differs, want %v, got %v", len(tc.input), len(got))
 			}
 		})
 	}
