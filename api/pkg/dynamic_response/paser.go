@@ -16,8 +16,8 @@ var templateFuncMap = template.FuncMap{
 	"join":                    strings.Join,
 	"split":                   strings.Split,
 	"trimSpace":               strings.TrimSpace,
-	"jsonPath":                jsonPath,
-	"jsonPathOrDefault":       jsonPathOrDefault,
+	"gjsonPath":               gjsonPath,
+	"gjsonPathOrDefault":      gjsonPathOrDefault,
 	"currentTimestampSeconds": currentTimestampSeconds,
 	"now":                     now,
 	"today":                   today,
@@ -26,8 +26,8 @@ var templateFuncMap = template.FuncMap{
 func ParseInbox(c context.Context, inbox model.Inbox, req model.Request) (model.Inbox, error) {
 	inCopy := model.CopyInbox(inbox)
 	values := map[string]any{
-		"request": req,
-		"inbox":   inbox,
+		"Request": req,
+		"Inbox":   inbox,
 	}
 	body, err := parse(inCopy.Response.Body, values)
 	if err != nil {

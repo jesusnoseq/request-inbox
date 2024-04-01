@@ -41,7 +41,7 @@ func TestParse(t *testing.T) {
 			desc: "Response body with inbox info",
 			inbox: func() model.Inbox {
 				in := model.CopyInbox(orgInbox)
-				in.Response.Body = "The inbox name is {{.inbox.Name}}"
+				in.Response.Body = "The inbox name is {{.Inbox.Name}}"
 				return in
 			}(),
 			req: model.CopyRequest(orgReq),
@@ -56,7 +56,7 @@ func TestParse(t *testing.T) {
 			desc: "Response body with request info",
 			inbox: func() model.Inbox {
 				in := model.CopyInbox(orgInbox)
-				in.Response.Body = "Your IP is {{.request.RemoteAddr}}"
+				in.Response.Body = "Your IP is {{.Request.RemoteAddr}}"
 				return in
 			}(),
 			req: model.CopyRequest(orgReq),
@@ -71,7 +71,7 @@ func TestParse(t *testing.T) {
 			desc: "Response body with request json body info",
 			inbox: func() model.Inbox {
 				in := model.CopyInbox(orgInbox)
-				in.Response.Body = `{ "reqValue": "{{jsonPath .request.Body "example"}}"}`
+				in.Response.Body = `{ "reqValue": "{{gjsonPath .Request.Body "example"}}"}`
 				return in
 			}(),
 			req: func() model.Request {
