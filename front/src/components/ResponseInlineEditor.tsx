@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { InboxResponse } from '../types/inbox';
-import { Container, TextField, Box, FormControl, IconButton, Typography, Grid, Button, ButtonGroup, InputAdornment, TextareaAutosize } from '@mui/material';
+import {
+    Container, TextField, Box, FormControl, FormControlLabel, FormGroup, IconButton, Typography, Grid, Button,
+    ButtonGroup, InputAdornment, TextareaAutosize, Switch, Tooltip
+} from '@mui/material';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DoneIcon from '@mui/icons-material/Done';
 import ClearIcon from '@mui/icons-material/Clear';
+import InfoIcon from '@mui/icons-material/Info';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -22,9 +27,11 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
     const [editMode, setEditMode] = useState<boolean>(false);
     const [headers, setHeaders] = useState<Header[]>(convertRecordToHeaders(response.Headers));
     const [body, setBody] = useState<string>(response.Body);
+    const [isDynamic, setIsDynamic] = useState<boolean>(response.IsDynamic);
     const [statusCode, setStatusCode] = useState<number>(response.Code);
     const [statusCodeError, setStatusCodeError] = useState<boolean>(false);
     const [errors, setErrors] = useState<boolean>(false);
+    const navigate = useNavigate();
 
     const enableEditMode = () => {
         setEditMode(true);
@@ -36,6 +43,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
             Body: body,
             Code: statusCode,
             Headers: convertHeadersToRecord(headers),
+            IsDynamic: isDynamic
         }
         onSave(resp);
     };
@@ -44,11 +52,20 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
         setStatusCode(response.Code);
         setHeaders(convertRecordToHeaders(response.Headers))
         setBody(response.Body);
+        setIsDynamic(response.IsDynamic);
         setEditMode(false);
     };
 
     const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setBody(event.target.value);
+    };
+
+    const handleIsDynamicToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setIsDynamic(event.target.checked);
+    };
+
+    const handleOpenDynamicResponseDoc = async () => {
+        navigate(`/users-manual`);
     };
 
     const handleStatusCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,6 +191,22 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                                     ),
                                 }}
                             />
+                            <FormGroup row sx={{ mt: 1 }}>
+                                <FormControlLabel
+                                    control={<Switch checked={isDynamic} onChange={handleIsDynamicToggle} />}
+                                    label="Dynamic response"
+                                />
+                                <Tooltip
+                                    title="Go to user's manual page and check how dynamic reponses works"
+                                    arrow
+                                    enterDelay={200}
+                                    leaveDelay={300}
+                                >
+                                    <IconButton onClick={handleOpenDynamicResponseDoc} aria-label="info about dynamic mode">
+                                        <InfoIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </FormGroup>
                         </FormControl>
 
 
@@ -188,7 +221,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                             </ButtonGroup>
                         </Grid>
                     </Container>
-                </Box>
+                </Box >
             }
         </>
     );

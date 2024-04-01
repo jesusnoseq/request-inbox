@@ -29,4 +29,5 @@ export type InboxResponse = {
     Code: number;
     Body: string;
     Headers: Record<string, string>;
+    IsDynamic: boolean;
 }
