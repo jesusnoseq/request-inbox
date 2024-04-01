@@ -5,6 +5,7 @@ import InboxDetailPage from './pages/InboxDetailPage';
 import AboutPage from './pages/AboutPage';
 import APIDocPage from './pages/APIDocPage';
 import HealthPage from './pages/HealthPage';
+import UsersManualPage from './pages/UsersManualPage';
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/inbox" element={<InboxListPage />} />
         <Route path="/api-doc" element={<APIDocPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/users-manual" element={<UsersManualPage />} />
         <Route path="/inbox/:inboxId" element={<InboxDetailPage />} />
         <Route path="/health" element={<HealthPage />} />
 
