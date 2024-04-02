@@ -179,12 +179,17 @@ components:
     Response:
       type: object
       properties:
-        ResponseBody:
+        Code:
+          type: integer
+          format: int64
+        Body:
           type: string
-        ResponseHeaders:
+        Headers:
           type: object
           additionalProperties:
             type: string
+        IsDynamic:
+          type: bool
     Request:
       type: object
       properties:

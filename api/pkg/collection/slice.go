@@ -37,3 +37,9 @@ func SliceFormat[T any](s []T, format string) []string {
 	}
 	return sf
 }
+
+func CopySlice[T any](s []T) []T {
+	copiedSlice := make([]T, len(s))
+	copy(copiedSlice, s)
+	return copiedSlice
+}

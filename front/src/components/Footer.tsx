@@ -1,5 +1,5 @@
 import { Typography, Container, Box } from '@mui/material';
-import ExternalLink from '../components/ExternalLink'
+import ExternalLink from '../components/ExternalLink';
 
 export default function Footer() {
     return (
