@@ -32,7 +32,7 @@ func TestInboxHealth(t *testing.T) {
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected StatusOK, got %v", resp.StatusCode)
 	}
-	want := `{"embededDB":true,"snapshot":"local","status":"pass","version":"0.1"}`
+	want := `{"embededDB":true,"snapshot":"local","status":"pass","version":"0.2"}`
 	if w.Body.String() != want {
 		t.Errorf("Expected response %q, got %q", want, w.Body.String())
 	}
