@@ -61,11 +61,27 @@ request-inbox
 └── Readme.md → this file. Contains basic documentation about the project
 ```
 
+## Features
+
+* Create, list and delete inboxes
+* Endpoint that collects request
+* Change respose header and body
+* List request of an inbox
+* Remove request of an inbox
+* Request body viewer
+* Light and dark themes
+* Open API documentation
+* Inbox search
+* Request auto refresh
+
 ## TODO
 
 * Users & Authentication
-* private inboxes
+  * private inboxes
 * Request on response
+  * Measure time
 * Request test
-* Request times
+* Response time
+* Dynamic response
+* Response conditions
 * File viewer

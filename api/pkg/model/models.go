@@ -23,9 +23,10 @@ type Inbox struct {
 }
 
 type Response struct {
-	Code    int
-	Body    string
-	Headers map[string]string
+	Code      int
+	Body      string
+	Headers   map[string]string
+	IsDynamic bool
 }
 
 type Request struct {
