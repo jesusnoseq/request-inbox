@@ -21,6 +21,11 @@ var templateFuncMap = template.FuncMap{
 	"currentTimestampSeconds": currentTimestampSeconds,
 	"now":                     now,
 	"today":                   today,
+	"randomString":            randomString,
+	"randomInt":               randomInt,
+	"randomFloat":             randomFloat,
+	"randomBool":              randomBool,
+	"randomUUID":              randomUUID,
 }
 
 func ParseInbox(c context.Context, inbox model.Inbox, req model.Request) (model.Inbox, error) {

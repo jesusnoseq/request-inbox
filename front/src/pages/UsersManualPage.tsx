@@ -70,7 +70,7 @@ const UsersManualPage: React.FC = () => {
                                     } />
                                 </ListItem>
                                 <ListItem>
-                                    <ListItemText primary="jsonPathOrDefault" secondary={
+                                    <ListItemText primary="gjsonPathOrDefault" secondary={
                                         <React.Fragment>
                                             <Typography
                                                 sx={{ display: 'inline' }}
@@ -254,10 +254,127 @@ const UsersManualPage: React.FC = () => {
                                         </React.Fragment>
                                     } />
                                 </ListItem>
+
+                                <ListItem>
+                                    <ListItemText primary="randomString" secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                Generates a random string of the specified length
+                                            </Typography>
+                                            <Typography sx={{ mt: 0.1 }}>
+                                                Example
+                                                <Paper >
+                                                    <code>
+                                                        {'{{ randomString 10 }}'}
+                                                    </code>
+                                                </Paper >
+                                            </Typography>
+                                        </React.Fragment>
+                                    } />
+                                </ListItem>
+
+                                <ListItem>
+                                    <ListItemText primary="randomInt" secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                Generates a random integer within the specified range
+                                            </Typography>
+                                            <Typography sx={{ mt: 0.1 }}>
+                                                Example
+                                                <Paper >
+                                                    <code>
+                                                        {'{{ randomInt 0 10 }}'}
+                                                    </code>
+                                                </Paper >
+                                            </Typography>
+                                        </React.Fragment>
+                                    } />
+                                </ListItem>
+
+
+                                <ListItem>
+                                    <ListItemText primary="randomFloat" secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                Generates a random float within the specified range
+                                            </Typography>
+                                            <Typography sx={{ mt: 0.1 }}>
+                                                Example
+                                                <Paper >
+                                                    <code>
+                                                        {'{{ randomFloat 0 1 }}'}
+                                                    </code>
+                                                </Paper >
+                                            </Typography>
+                                        </React.Fragment>
+                                    } />
+                                </ListItem>
+
+                                <ListItem>
+                                    <ListItemText primary="randomBool" secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                Generates a random boolean value, either true or false
+                                            </Typography>
+                                            <Typography sx={{ mt: 0.1 }}>
+                                                Example
+                                                <Paper >
+                                                    <code>
+                                                        {'{{ randomBool }}'}
+                                                    </code>
+                                                </Paper >
+                                            </Typography>
+                                        </React.Fragment>
+                                    } />
+                                </ListItem>
+
+                                <ListItem>
+                                    <ListItemText primary="randomUUID" secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                This function generates a random UUID as string
+                                            </Typography>
+                                            <Typography sx={{ mt: 0.1 }}>
+                                                Example
+                                                <Paper >
+                                                    <code>
+                                                        {'{{ randomUUID }}'}
+                                                    </code>
+                                                </Paper >
+                                            </Typography>
+                                        </React.Fragment>
+                                    } />
+                                </ListItem>
+
                             </List>
                         </Typography>
                         <Typography>
-                            More functions can be aded in the future.
+                            More functions can be added in the future.
                         </Typography>
 
 
