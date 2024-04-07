@@ -29,6 +29,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
     const [body, setBody] = useState<string>(response.Body);
     const [isDynamic, setIsDynamic] = useState<boolean>(response.IsDynamic);
     const [statusCode, setStatusCode] = useState<number>(response.Code);
+    const [statusCodeTemplate, setStatusCodeTemplate] = useState<string>(response.CodeTemplate);
     const [statusCodeError, setStatusCodeError] = useState<boolean>(false);
     const [errors, setErrors] = useState<boolean>(false);
     const navigate = useNavigate();
@@ -42,6 +43,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
         const resp: InboxResponse = {
             Body: body,
             Code: statusCode,
+            CodeTemplate: statusCodeTemplate,
             Headers: convertHeadersToRecord(headers),
             IsDynamic: isDynamic
         }
@@ -50,6 +52,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
 
     const handleCancel = () => {
         setStatusCode(response.Code);
+        setStatusCodeTemplate(response.CodeTemplate);
         setHeaders(convertRecordToHeaders(response.Headers))
         setBody(response.Body);
         setIsDynamic(response.IsDynamic);
@@ -59,6 +62,11 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
     const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setBody(event.target.value);
     };
+
+    const handleStatusCodeTemplateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setStatusCodeTemplate(event.target.value);
+    };
+
 
     const handleIsDynamicToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsDynamic(event.target.checked);
@@ -105,9 +113,24 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                         </IconButton>
                     </Box>
                     <Container>
-                        <Typography color="textSecondary">
-                            Status code: {statusCode}
-                        </Typography>
+                        <Box sx={{ display: 'flex', flexGrow: 1 }}>
+                            <Box sx={{ width: "12ch", mr: 5 }}>
+                                <Typography color="textSecondary">
+                                    Status code
+                                </Typography>
+                                {statusCode}
+                            </Box>
+
+                            {isDynamic &&
+                                <Box sx={{ mb: 2, minWidth: "30ch", flexGrow: 1 }}>
+                                    <Typography color="textSecondary">
+                                        Status code template
+                                    </Typography>
+                                    {statusCodeTemplate}
+                                </Box>
+                            }
+                        </Box>
+
                         {headers.length !== 0 &&
                             <>
                                 <Typography color="textSecondary">
@@ -140,9 +163,9 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                     Response
                     <Container>
                         <FormControl fullWidth sx={{ m: 1 }}>
-                            <div>
+                            <Box sx={{ display: 'flex', flexGrow: 1 }}>
                                 <TextField
-                                    sx={{ mb: 2, width: "15ch" }}
+                                    sx={{ mb: 2, mr: 5, width: "12ch" }}
                                     required
                                     id="status-code"
                                     label="Status code"
@@ -162,7 +185,32 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                                         sx: { fontSize: '1.25rem' },
                                     }}
                                 />
-                            </div>
+                                {
+                                    isDynamic &&
+
+                                    <TextField
+                                        sx={{ mb: 2, minWidth: "30ch", flexGrow: 1 }}
+                                        required
+                                        id="status-code-template"
+                                        label="Status code template"
+                                        variant="standard"
+                                        value={statusCodeTemplate.toString()}
+                                        onChange={handleStatusCodeTemplateChange}
+                                        size='medium'
+                                        InputProps={{
+                                            inputComponent: TextareaAutosize,
+                                            inputProps: {
+                                                minRows: 1,
+                                                style: { resize: 'none' }, // Prevent manual resizing
+                                            },
+                                        }}
+                                        InputLabelProps={{
+                                            color: "primary",
+                                            sx: { fontSize: '1.25rem' },
+                                        }}
+                                    />
+                                }
+                            </Box>
                             Headers
                             <HeadersEditor initialHeaders={headers} onHeadersChange={setHeaders} />
 
