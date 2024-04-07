@@ -33,6 +33,16 @@ const UsersManualPage: React.FC = () => {
                             Once enabled, headers values and response body are threated as templates.
                         </Typography>
                         <Typography paragraph>
+                            Status code template is a optional special field that can be filled once dynamic response is activated.
+                            It allows setup a template to calculate the status code of a response. The template should output an integer between 100 and 999.
+                            If the template renders a number successfully, it will rewrite the status code.
+                            Status code value will be use as fallback when renders status code template does not result in a valid HTTP status code number
+                        </Typography>
+                        <Typography paragraph>
+                            The rendering order of the response templates is: status code template, body and headers.
+                            In this way, for example, headers and body could use the result of rendering the status code template in status code field and headers cloud use a rendered response body.
+                        </Typography>
+                        <Typography paragraph>
                             Request inbox templates are based on <ExternalLink href="https://pkg.go.dev/text/template">Golang templates</ExternalLink>.
                             The documentation is wide and this manual will provide some examples.
                         </Typography>
@@ -64,7 +74,7 @@ const UsersManualPage: React.FC = () => {
                                                 </Paper >
                                             </Typography>
                                             <Typography>
-                                                For more information about GJSON Path syntax expresions check <ExternalLink href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md">jsonpath sintax</ExternalLink>
+                                                For more information about GJSON Path syntax expresions check <ExternalLink href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md">gjsonpath sintax</ExternalLink>
                                             </Typography>
                                         </React.Fragment>
                                     } />
@@ -357,7 +367,7 @@ const UsersManualPage: React.FC = () => {
                                                 variant="body2"
                                                 color="text.primary"
                                             >
-                                                This function generates a random UUID as string
+                                                Generates a random UUID as string
                                             </Typography>
                                             <Typography sx={{ mt: 0.1 }}>
                                                 Example
@@ -370,6 +380,77 @@ const UsersManualPage: React.FC = () => {
                                         </React.Fragment>
                                     } />
                                 </ListItem>
+
+                                <ListItem>
+                                    <ListItemText primary="intAdd" secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                Sum two integers values
+                                            </Typography>
+                                            <Typography sx={{ mt: 0.1 }}>
+                                                Example
+                                                <Paper >
+                                                    <code>
+                                                        {'{{ intAdd 2 2 }}'}
+                                                    </code>
+                                                </Paper >
+                                            </Typography>
+                                        </React.Fragment>
+                                    } />
+                                </ListItem>
+
+                                <ListItem>
+                                    <ListItemText primary="intSubtract" secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                It performs subtraction on two integer values
+                                            </Typography>
+                                            <Typography sx={{ mt: 0.1 }}>
+                                                Example
+                                                <Paper >
+                                                    <code>
+                                                        {'{{ intSubtract 2 2 }}'}
+                                                    </code>
+                                                </Paper >
+                                            </Typography>
+                                        </React.Fragment>
+                                    } />
+                                </ListItem>
+
+                                <ListItem>
+                                    <ListItemText primary="stringToInt" secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                Converts a string representing an integer into an actual integer value.
+                                                It if fails return 0 as intenger
+                                            </Typography>
+                                            <Typography sx={{ mt: 0.1 }}>
+                                                Example
+                                                <Paper >
+                                                    <code>
+                                                        {'{{ $n:= stringToInt .Inbox.Response.Body }}'}
+                                                    </code>
+                                                </Paper >
+                                            </Typography>
+                                        </React.Fragment>
+                                    } />
+                                </ListItem>
+
 
                             </List>
                         </Typography>
