@@ -101,7 +101,8 @@ func TestParse(t *testing.T) {
 			}(),
 			expectErr: false,
 		},
-		{desc: "Response header with date info",
+		{
+			desc: "Response header with date info",
 			inbox: func() model.Inbox {
 				in := model.CopyInbox(orgInbox)
 				in.Response.Headers["test"] = "template test {{today}}"
@@ -129,6 +130,75 @@ func TestParse(t *testing.T) {
 				return in
 			}(),
 			expectErr: true,
+		},
+		{
+			desc: "Parsing status code template",
+			inbox: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Response.CodeTemplate = `{{ intAdd 300 100 }}`
+				return in
+			}(),
+			req: model.CopyRequest(orgReq),
+			expect: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Response.CodeTemplate = `{{ intAdd 300 100 }}`
+				in.Response.Code = 400
+				return in
+			}(),
+			expectErr: false,
+		},
+		{
+			desc: "error Parsing status code template",
+			inbox: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Response.CodeTemplate = `{{wrong}}`
+				return in
+			}(),
+			req: model.CopyRequest(orgReq),
+			expect: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Response.CodeTemplate = `{{wrong}}`
+				in.Response.Code = 200
+				return in
+			}(),
+			expectErr: true,
+		},
+		{
+			desc: "template result is not a valid number",
+			inbox: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Response.CodeTemplate = `{{ intAdd 0 1 }}`
+				return in
+			}(),
+			req: model.CopyRequest(orgReq),
+			expect: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Response.CodeTemplate = `{{ intAdd 0 1 }}`
+				in.Response.Code = 200
+				return in
+			}(),
+			expectErr: false,
+		},
+
+		{
+			desc: "Check parse order",
+			inbox: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Response.CodeTemplate = `{{ intAdd 100 1 }}`
+				in.Response.Body = `{{ intAdd .Inbox.Response.Code 1 }}`
+				in.Response.Headers["testHeader"] = `{{ $n:= stringToInt .Inbox.Response.Body }}{{ intAdd $n 1 }}`
+				return in
+			}(),
+			req: model.CopyRequest(orgReq),
+			expect: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Response.CodeTemplate = `{{ intAdd 100 1 }}`
+				in.Response.Code = 101
+				in.Response.Body = `102`
+				in.Response.Headers["testHeader"] = `103`
+				return in
+			}(),
+			expectErr: false,
 		},
 	}
 

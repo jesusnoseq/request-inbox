@@ -27,6 +27,7 @@ export type InboxRequest = {
 
 export type InboxResponse = {
     Code: number;
+    CodeTemplate: string;
     Body: string;
     Headers: Record<string, string>;
     IsDynamic: boolean;
