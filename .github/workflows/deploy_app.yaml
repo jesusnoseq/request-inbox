@@ -6,11 +6,11 @@ permissions:
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "feat-move-deploy-code"]
     paths:
-      - "deploy/**"
       - "front/**"
       - "api/**"
+      - ".github/**"
 
 env:
   TF_VAR_API_SNAPSHOT_VERSION: ${{ github.run_number }}
@@ -19,50 +19,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Trigger deploy workflow
+        uses: peter-evans/repository-dispatch@v2
         with:
-          node-version: "20.x"
-      - name: Install front dependencies
-        run: npm ci
-        working-directory: ./front
-      - name: Build front
-        run: npm run build
-        working-directory: ./front
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: "1.21"
-          cache-dependency-path: api/go.sum
-      - name: Build back
-        working-directory: ./api
-        run: GOOS=linux CGO_ENABLED=0 go build -tags=jsoniter -v -o ../bootstrap ./cmd/main.go
-      - name: Connect to AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-session-name: awssync_deploy_session
-          role-to-assume: ${{secrets.AWS_IAM_ROLE}}
-          aws-region: ${{secrets.AWS_REGION}}
-      - uses: terraform-linters/setup-tflint@v3
-        name: Setup TFLint
-        with:
-          tflint_version: v0.49.0
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.5
-      - name: Terraform Init
-        working-directory: ./deploy
-        run: terraform init
-      - name: Terraform Plan
-        env:
-          TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
-        working-directory: ./deploy
-        run: terraform plan -input=false
-      - name: Terraform Apply
-        env:
-          TF_VAR_hosted_zone_id: ${{ secrets.AWS_DNS_ZONE }}
-        working-directory: ./deploy
-        run: terraform apply -auto-approve
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: jesusnoseq/request-inbox-deploy
+          event-type: deploy
