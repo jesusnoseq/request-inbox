@@ -40,3 +40,4 @@ e2e/*report
 
 # IDEs
 .idea
+deploy/
