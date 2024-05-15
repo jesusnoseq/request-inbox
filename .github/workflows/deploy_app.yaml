@@ -6,11 +6,10 @@ permissions:
 
 on:
   push:
-    branches: ["main", "feat-move-deploy-code"]
+    branches: ["main"]
     paths:
       - "front/**"
       - "api/**"
-      - ".github/**"
 
 env:
   TF_VAR_API_SNAPSHOT_VERSION: ${{ github.run_number }}
