@@ -36,3 +36,10 @@ variable "API_SNAPSHOT_VERSION" {
 }
 
 
+variable "FAKE_API_SNAPSHOT_VERSION" {
+  type = string
+  default = "TF_SNAPSHOT_VERSION"
+}
+
+
+
