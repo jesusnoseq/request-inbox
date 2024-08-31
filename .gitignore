@@ -22,6 +22,8 @@ bootstrap
 # Go workspace file
 go.work
 
+tmp/*
+
 # Logs
 *.log
 
