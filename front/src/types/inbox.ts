@@ -32,3 +32,12 @@ export type InboxResponse = {
     Headers: Record<string, string>;
     IsDynamic: boolean;
 }
+
+export type User = {
+    IsLogged: boolean;
+    ID: number;
+    Name: string;
+    Email: string;
+    Organization: string;
+    AvatarUrl: string;
+}
