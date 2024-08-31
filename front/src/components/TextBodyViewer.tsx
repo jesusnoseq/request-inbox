@@ -21,7 +21,6 @@ const TextBodyViewer: React.FC<TextBodyViewerProps> = ({ data, title }) => {
                         <CopyToClipboardButton textToCopy={body} />
                     </Grid>
                 </Grid>
-
                 <pre>{body}</pre>
             </Paper >
         </Grid>
