@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Inbox } from '../types/inbox';
 import { getInboxList, newInbox, deleteInbox } from '../services/inbox';
 import InboxListItem from '../components/InboxListItem';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import SearchBar from '../components/SearchBar';
 
 const InboxListPage: React.FC = () => {
@@ -33,7 +31,6 @@ const InboxListPage: React.FC = () => {
     }, []);
 
     const handleCreateInbox = async () => {
-
         const fetchData = async () => {
             try {
                 setLoading(true);
@@ -88,7 +85,6 @@ const InboxListPage: React.FC = () => {
     if (error) {
         return (
             <Container>
-                <Header />
                 <Alert variant="outlined" severity="error">
                     {error}
                 </Alert>
@@ -98,7 +94,7 @@ const InboxListPage: React.FC = () => {
 
     return (
         <Container>
-            <Header />
+
             <Typography variant="h2" fontSize={'2.5rem'} gutterBottom>
                 Inbox List
             </Typography>
@@ -117,7 +113,6 @@ const InboxListPage: React.FC = () => {
                     </Grid>
                 ))}
             </Grid>
-            <Footer />
         </Container >
     );
 };

@@ -10,13 +10,11 @@ import "swagger-ui-react/swagger-ui.css"
 const APIDocPage: React.FC = () => {
     return (
         <Container>
-            <Header />
             <Box my={4}>
                 <ErrorBoundary>
                     <SwaggerUI url="openapi.yaml" />
                 </ErrorBoundary>
             </Box>
-            <Footer />
         </Container>
     );
 };
