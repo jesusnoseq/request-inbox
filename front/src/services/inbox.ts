@@ -134,11 +134,6 @@ export const buildLoginURL = (provider: string) => {
     return `${BASE_URL}/api/v1/auth/${provider}/login/`;
 }
 
-export const buildLogoutURL = (provider: string) => {
-    return `${BASE_URL}/api/v1/auth/${provider}/login/`;
-}
-
-
 
 export const buildInboxURL = (id: string) => {
     return `${BASE_URL}/api/v1/inboxes/${id}/in`
