@@ -12,6 +12,7 @@ import UserProfilePage from './pages/UserProfilePage';
 import ScrollConsistencyLayout from './components/ScrollConsistencyLayout';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import CookieBanner from './components/CookieBanner';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/profile" element={<UserProfilePage />} />
             <Route path="/health" element={<HealthPage />} />
           </Routes>
+          <CookieBanner />
           <Footer />
         </Container>
       </Router>
