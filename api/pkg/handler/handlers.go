@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
 	"github.com/jesusnoseq/request-inbox/pkg/dynamic_response"
+	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
@@ -96,6 +98,7 @@ func (ih *InboxHandler) GetInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(code, errResp)
 		return
 	}
+
 	c.JSON(http.StatusOK, inbox)
 }
 
@@ -189,6 +192,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		ContentLength: c.Request.ContentLength,
 		Body:          string(body),
 	}
+	filterRequestData(&request)
 
 	err = ih.dao.AddRequestToInbox(c, id, request)
 	if err != nil {
@@ -220,4 +224,21 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		c.Header(k, v)
 	}
 	c.Data(inbox.Response.Code, contentType, []byte(inbox.Response.Body))
+}
+
+func filterRequestData(req *model.Request) {
+	cookies := req.Headers["Cookie"]
+	if len(cookies) == 0 {
+		return
+	}
+	cookieSeparator := "; "
+	cs := strings.Split(cookies[0], cookieSeparator)
+	fc := []string{}
+	for _, c := range cs {
+		if strings.HasPrefix(c, login.AuthTokenCookieName+"=") || strings.HasPrefix(c, login.OauthStateCookieName+"=") {
+			continue
+		}
+		fc = append(fc, c)
+	}
+	cookies[0] = strings.Join(fc, cookieSeparator)
 }

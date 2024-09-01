@@ -29,7 +29,16 @@ type RequestItem struct {
 
 const InboxKey = "INBOX"
 const RequestKey = "REQUEST"
+const UserKey = "USER"
 const KS = "#" // Key Separator
+
+func GenUserKey(id uuid.UUID) (string, string) {
+	return UserKey + KS + id.String(), UserKey
+}
+
+func IsUserSK(sk string) bool {
+	return strings.HasPrefix(sk, UserKey)
+}
 
 func GenInboxKey(id uuid.UUID) (string, string) {
 	return InboxKey + KS + id.String(), InboxKey

@@ -10,6 +10,9 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
+const inboxPrefix = "inbox#"
+const userPrefix = "user#"
+
 type InboxBadger struct {
 	db *badger.DB
 }
@@ -36,6 +39,10 @@ func (ib *InboxBadger) Close(ctx context.Context) error {
 	return nil
 }
 
+func (ib *InboxBadger) getInboxKey(id uuid.UUID) []byte {
+	return append([]byte(inboxPrefix), id[:]...)
+}
+
 func (ib *InboxBadger) CreateInbox(ctx context.Context, inbox model.Inbox) (model.Inbox, error) {
 	inbox.ID = uuid.New()
 	inbox.Name = inbox.ID.String()
@@ -44,7 +51,7 @@ func (ib *InboxBadger) CreateInbox(ctx context.Context, inbox model.Inbox) (mode
 	if err != nil {
 		return model.Inbox{}, err
 	}
-	e := badger.NewEntry(inbox.ID[:], data)
+	e := badger.NewEntry(ib.getInboxKey(inbox.ID), data)
 	err = ib.db.Update(func(txn *badger.Txn) error {
 		return txn.SetEntry(e)
 	})
@@ -61,7 +68,7 @@ func (ib *InboxBadger) UpdateInbox(ctx context.Context, inbox model.Inbox) (mode
 	}
 
 	err = ib.db.Update(func(txn *badger.Txn) error {
-		return txn.Set(inbox.ID[:], data)
+		return txn.Set(ib.getInboxKey(inbox.ID), data)
 	})
 	return inbox, err
 }
@@ -79,7 +86,7 @@ func (ib *InboxBadger) AddRequestToInbox(ctx context.Context, ID uuid.UUID, req 
 func (ib *InboxBadger) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox, error) {
 	var valCopy []byte
 	err := ib.db.View(func(txn *badger.Txn) error {
-		item, err := txn.Get(ID[:])
+		item, err := txn.Get(ib.getInboxKey(ID))
 		if err != nil {
 			return err
 		}
@@ -97,7 +104,7 @@ func (ib *InboxBadger) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox,
 
 func (ib *InboxBadger) DeleteInbox(ctx context.Context, ID uuid.UUID) error {
 	err := ib.db.Update(func(txn *badger.Txn) error {
-		return txn.Delete(ID[:])
+		return txn.Delete(ib.getInboxKey(ID))
 	})
 	if err != nil {
 		return fmt.Errorf("error deleting %v: %w", ID, err)
@@ -123,7 +130,7 @@ func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
 	err := ib.db.View(func(txn *badger.Txn) error {
 		it := txn.NewIterator(badger.DefaultIteratorOptions)
 		defer it.Close()
-		prefix := []byte("")
+		prefix := []byte(inboxPrefix)
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 			item := it.Item()
 			err := item.Value(func(val []byte) error {
@@ -142,4 +149,8 @@ func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
 		return nil
 	})
 	return inboxList, err
+}
+
+func (ib *InboxBadger) UpsertUser(context.Context, model.User) error {
+	return nil
 }

@@ -284,6 +284,10 @@ func (d *InboxDAO) DeleteInboxRequests(ctx context.Context, id uuid.UUID) error 
 	return d.deleteInboxWithFilter(ctx, id, func(pk, sk string) bool { return isRequestSK(sk) })
 }
 
+func (d *InboxDAO) UpsertUser(context.Context, model.User) error {
+	return nil
+}
+
 func MustMarshallUUID(id uuid.UUID) []byte {
 	bin, err := id.MarshalBinary()
 	if err != nil {

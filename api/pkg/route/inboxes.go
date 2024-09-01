@@ -3,10 +3,13 @@ package route
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/handler"
+	"github.com/jesusnoseq/request-inbox/pkg/login"
 )
 
+const APIBasePath = "/api/v1"
+
 func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
-	v1 := r.Group("/api/v1")
+	v1 := r.Group(APIBasePath)
 	{
 		v1.GET("/health", ih.Health)
 		inboxes := v1.Group("/inboxes")
@@ -21,5 +24,17 @@ func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
 			inboxes.Any("/:id/in/*path", ih.RegisterInboxRequest)
 		}
 	}
+}
 
+func SetLoginRoutes(r gin.IRouter, lh login.ILoginHandler) {
+	v1 := r.Group(APIBasePath)
+	{
+		auth := v1.Group("/auth")
+		{
+			auth.GET("/:provider/login", lh.HandleLogin)
+			auth.GET("/user", lh.HandleLoginUser)
+			auth.GET("/logout", lh.HandleLogout)
+			auth.GET("/:provider/callback", lh.HandleCallback)
+		}
+	}
 }

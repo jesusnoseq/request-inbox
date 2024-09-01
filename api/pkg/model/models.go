@@ -19,7 +19,7 @@ type Inbox struct {
 	Timestamp             int64     `dynamodbav:"unixTimestamp"`
 	Response              Response  `dynamodbav:"resp"`
 	Requests              []Request `dynamodbav:"req"`
-	ObfuscateHeaderFields []string
+	ObfuscateHeaderFields []string  `dynamodbav:"ofuscate"`
 }
 
 type Response struct {
