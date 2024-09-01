@@ -288,6 +288,10 @@ func (d *InboxDAO) UpsertUser(context.Context, model.User) error {
 	return nil
 }
 
+func (d *InboxDAO) GetUser(context.Context, uuid.UUID) (model.User, error) {
+	return model.User{}, nil
+}
+
 func MustMarshallUUID(id uuid.UUID) []byte {
 	bin, err := id.MarshalBinary()
 	if err != nil {

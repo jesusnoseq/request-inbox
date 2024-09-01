@@ -43,6 +43,10 @@ func (ib *InboxBadger) getInboxKey(id uuid.UUID) []byte {
 	return append([]byte(inboxPrefix), id[:]...)
 }
 
+func (ib *InboxBadger) getUserKey(id uuid.UUID) []byte {
+	return append([]byte(userPrefix), id[:]...)
+}
+
 func (ib *InboxBadger) CreateInbox(ctx context.Context, inbox model.Inbox) (model.Inbox, error) {
 	inbox.ID = uuid.New()
 	inbox.Name = inbox.ID.String()
@@ -99,7 +103,7 @@ func (ib *InboxBadger) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox,
 	if err != nil {
 		return model.Inbox{}, err
 	}
-	return decode(valCopy)
+	return decode[model.Inbox](valCopy)
 }
 
 func (ib *InboxBadger) DeleteInbox(ctx context.Context, ID uuid.UUID) error {
@@ -135,7 +139,7 @@ func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
 			item := it.Item()
 			err := item.Value(func(val []byte) error {
 				valCopy := append([]byte{}, val...)
-				inbox, err := decode(valCopy)
+				inbox, err := decode[model.Inbox](valCopy)
 				if err != nil {
 					return err
 				}
@@ -151,6 +155,33 @@ func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
 	return inboxList, err
 }
 
-func (ib *InboxBadger) UpsertUser(context.Context, model.User) error {
-	return nil
+func (ib *InboxBadger) UpsertUser(ctx context.Context, user model.User) error {
+	data, err := encode(user)
+	if err != nil {
+		return err
+	}
+
+	err = ib.db.Update(func(txn *badger.Txn) error {
+		return txn.Set(ib.getUserKey(user.ID), data)
+	})
+	return err
+}
+
+func (ib *InboxBadger) GetUser(ctx context.Context, ID uuid.UUID) (model.User, error) {
+	var valCopy []byte
+	err := ib.db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get(ib.getUserKey(ID))
+		if err != nil {
+			return err
+		}
+		err = item.Value(func(val []byte) error {
+			valCopy = append([]byte{}, val...)
+			return nil
+		})
+		return err
+	})
+	if err != nil {
+		return model.User{}, err
+	}
+	return decode[model.User](valCopy)
 }
