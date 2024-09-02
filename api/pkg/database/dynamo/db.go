@@ -284,12 +284,53 @@ func (d *InboxDAO) DeleteInboxRequests(ctx context.Context, id uuid.UUID) error 
 	return d.deleteInboxWithFilter(ctx, id, func(pk, sk string) bool { return isRequestSK(sk) })
 }
 
-func (d *InboxDAO) UpsertUser(context.Context, model.User) error {
-	return nil
+func (d *InboxDAO) UpsertUser(ctx context.Context, user model.User) error {
+	ctx, cancel := context.WithTimeout(ctx, d.timeout)
+	defer cancel()
+	userItem := toUserItem(user)
+
+	item, err := attributevalue.MarshalMap(userItem)
+	if err != nil {
+		return fmt.Errorf("error marshaling request to db: %w", err)
+	}
+
+	_, err = d.dbclient.PutItem(ctx, &dynamodb.PutItemInput{
+		TableName:    aws.String(d.tableName),
+		Item:         item,
+		ReturnValues: types.ReturnValueAllOld,
+	})
+	if err != nil {
+		return err
+	}
+	return err
 }
 
-func (d *InboxDAO) GetUser(context.Context, uuid.UUID) (model.User, error) {
-	return model.User{}, nil
+func (d *InboxDAO) GetUser(ctx context.Context, ID uuid.UUID) (model.User, error) {
+	pk, sk := GenUserKey(ID)
+	input := &dynamodb.GetItemInput{
+		TableName: aws.String(d.tableName),
+		Key: map[string]types.AttributeValue{
+			"PK": &types.AttributeValueMemberS{Value: pk},
+			"SK": &types.AttributeValueMemberS{Value: sk},
+		},
+	}
+
+	result, err := d.dbclient.GetItem(ctx, input)
+	if err != nil {
+		return model.User{}, fmt.Errorf("failed to get item from DynamoDB: %w", err)
+	}
+
+	if result.Item == nil {
+		return model.User{}, fmt.Errorf("user with ID %s not found", ID.String())
+	}
+
+	var userItem UserItem
+	err = attributevalue.UnmarshalMap(result.Item, &userItem)
+	if err != nil {
+		return model.User{}, fmt.Errorf("failed to unmarshal DynamoDB item: %w", err)
+	}
+
+	return userItem.User, nil
 }
 
 func MustMarshallUUID(id uuid.UUID) []byte {

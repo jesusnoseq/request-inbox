@@ -27,6 +27,12 @@ type RequestItem struct {
 	Request model.Request `dynamodbav:"doc"`
 }
 
+type UserItem struct {
+	PK   string     `dynamodbav:"PK"`
+	SK   string     `dynamodbav:"SK"`
+	User model.User `dynamodbav:"doc"`
+}
+
 const InboxKey = "INBOX"
 const RequestKey = "REQUEST"
 const UserKey = "USER"
@@ -76,5 +82,14 @@ func toRequestItem(id uuid.UUID, req model.Request) RequestItem {
 		PK:      pk,
 		SK:      sk,
 		Request: req,
+	}
+}
+
+func toUserItem(user model.User) UserItem {
+	pk, sk := GenUserKey(user.ID)
+	return UserItem{
+		PK:   pk,
+		SK:   sk,
+		User: user,
 	}
 }
