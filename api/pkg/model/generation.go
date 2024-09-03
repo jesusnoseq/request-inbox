@@ -3,6 +3,7 @@ package model
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"math"
 	"time"
 
@@ -71,4 +72,27 @@ func CopyRequest(request Request) Request {
 	copy := request
 	copy.Headers = collection.CopySliceMap(request.Headers)
 	return copy
+}
+
+func GenerateUser() User {
+	email := fmt.Sprintf("%s@%s.com", randomString(5), randomString(5))
+	user := NewUser(email)
+	user.Name = randomString(5)
+	user.Organization = randomString(5)
+	return user
+}
+
+func GenerateUserProvider() UserProvider {
+	return UserProvider{
+		Provider:     "github",
+		Username:     randomString(5),
+		AccessToken:  randomString(16),
+		RefreshToken: randomString(16),
+	}
+}
+
+func GenerateUserWithProvider() User {
+	u := GenerateUser()
+	u.Provider = GenerateUserProvider()
+	return u
 }

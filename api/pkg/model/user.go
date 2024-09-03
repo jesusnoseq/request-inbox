@@ -1,6 +1,10 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type UserProvider struct {
 	Provider     string `dynamodbav:"provider"`
@@ -11,10 +15,22 @@ type UserProvider struct {
 
 type User struct {
 	ID           uuid.UUID
-	Name         string `dynamodbav:"name"`
-	AvatarURL    string `dynamodbav:"avatarURL"`
-	Timestamp    int64  `dynamodbav:"unixTimestamp"`
-	Email        string `dynamodbav:"email"`
-	Provider     string `dynamodbav:"provider" json:"-"`
-	Organization string `dynamodbav:"organization"`
+	Name         string       `dynamodbav:"name"`
+	AvatarURL    string       `dynamodbav:"avatarURL"`
+	Email        string       `dynamodbav:"email"`
+	Organization string       `dynamodbav:"organization"`
+	Provider     UserProvider `dynamodbav:"provider" json:"-"`
+	Timestamp    int64        `dynamodbav:"unixTimestamp"`
+}
+
+func NewUser(email string) User {
+	return User{
+		ID:        NewUserID(email),
+		Email:     email,
+		Timestamp: time.Now().Unix(),
+	}
+}
+
+func NewUserID(email string) uuid.UUID {
+	return uuid.NewSHA1(uuid.NameSpaceDNS, []byte(email))
 }
