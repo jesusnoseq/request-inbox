@@ -2,10 +2,9 @@ package provider
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 	"golang.org/x/oauth2"
@@ -62,30 +61,32 @@ func GetOAuthConfig(provider string) (OAuthConfig, bool) {
 
 func ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User, error) {
 	provider := OauthProvider(prov)
-	user := model.User{}
 	if provider == Google {
 		gInfo := googleUserInfo{}
 		err := json.Unmarshal([]byte(jsonInfo), &gInfo)
 		if err != nil {
 			slog.Error("Error parsing JSON", "error", err)
-			return user, err
+			return model.User{}, err
 		}
+		return model.User{}, fmt.Errorf("provider not implemented yet: %s", prov)
 	}
 	if provider == GitHub {
 		gInfo := githubUserInfo{}
 		err := json.Unmarshal([]byte(jsonInfo), &gInfo)
 		if err != nil {
 			slog.Error("Error parsing JSON", "error", err)
-			return user, err
+			return model.User{}, err
 		}
-		user.Email = gInfo.Email
+		user := model.NewUser(gInfo.Email)
 		user.Organization = gInfo.Company
 		user.Name = gInfo.Name
-		user.Provider = prov
-		user.Timestamp = time.Now().Unix()
+		user.Provider = model.UserProvider{
+			Provider:     prov,
+			AccessToken:  token.AccessToken,
+			RefreshToken: token.RefreshToken,
+		}
+		return user, nil
 	}
 
-	user.ID = uuid.NewSHA1(uuid.NameSpaceDNS, []byte(user.Email))
-
-	return user, nil
+	return model.User{}, fmt.Errorf("provider not available: %s", prov)
 }
