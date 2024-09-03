@@ -336,7 +336,53 @@ func deleteInbox(t *testing.T, dao dynamo.InboxDAO, inboxId uuid.UUID) {
 	}
 }
 
-func expectJSONEquals(t *testing.T, a, b model.Inbox) {
+func TestUpsertUser(t *testing.T) {
+	inboxDAO, ctx := setupTest()
+	t.Run("Create user", func(t *testing.T) {
+		user := model.GenerateUser()
+		err := inboxDAO.UpsertUser(ctx, user)
+		if err != nil {
+			t.Errorf("Expected no error error but got %s.", err)
+		}
+		user.Name = "other name"
+		err = inboxDAO.UpsertUser(ctx, user)
+		if err != nil {
+			t.Errorf("Expected no error error but got %s.", err)
+		}
+		gotUser, err := inboxDAO.GetUser(ctx, user.ID)
+		if err != nil {
+			t.Errorf("Expected no error but got %s.", err)
+		}
+		expectJSONEquals(t, user, gotUser)
+
+		user.Provider = model.GenerateUserProvider()
+		err = inboxDAO.UpsertUser(ctx, user)
+		if err != nil {
+			t.Errorf("Expected no error error but got %s.", err)
+		}
+		gotUser, err = inboxDAO.GetUser(ctx, user.ID)
+		if err != nil {
+			t.Errorf("Expected no error but got %s.", err)
+		}
+		expectJSONEquals(t, user, gotUser)
+	})
+}
+
+func TestGetUser(t *testing.T) {
+	inboxDAO, ctx := setupTest()
+	user := model.GenerateUserWithProvider()
+	err := inboxDAO.UpsertUser(ctx, user)
+	if err != nil {
+		t.Errorf("Expected no error but got %s.", err)
+	}
+	gotUser, err := inboxDAO.GetUser(ctx, user.ID)
+	if err != nil {
+		t.Errorf("Expected no error but got %s.", err)
+	}
+	expectJSONEquals(t, user, gotUser)
+}
+
+func expectJSONEquals[T any](t *testing.T, a, b T) {
 	t.Helper()
 	jsonA, err := json.Marshal(a)
 	if err != nil {
