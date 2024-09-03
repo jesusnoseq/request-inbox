@@ -39,7 +39,13 @@ const Login: React.FC<LoginProps> = ({ user, onLogout }) => {
     return (
         <>
             <IconButton onClick={handleMenuOpen} color="inherit">
-                <Avatar alt={user.Name} src={user.AvatarUrl} />
+                <Avatar
+                    alt={user.Name}
+                    src={user.AvatarURL}
+                    sx={{
+                        border: '2px solid #0005', // Replace with your desired color
+                    }}
+                />
             </IconButton>
             <Menu
                 anchorEl={anchorEl}

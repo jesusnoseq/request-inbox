@@ -16,7 +16,6 @@ export default function Header() {
         const fetchData = async () => {
             try {
                 const userResponse = await getUser();
-                console.log("userResponse ", userResponse);
                 setUser(userResponse);
             } catch (err) {
                 console.log("Some error occur", err);
