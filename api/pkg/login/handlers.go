@@ -73,10 +73,19 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	slog.Info("token ", "token", token)
 
 	user, err := provider.ExtractUser(p, token, body)
-	lh.dao.UpsertUser(c.Request.Context(), user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse user info"})
+		return
+	}
+	err = lh.dao.UpsertUser(c.Request.Context(), user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save user"})
+		return
+	}
+
 	jwtToken, err := GenerateJWT(user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read user info"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate jwt with user info"})
 		return
 	}
 
