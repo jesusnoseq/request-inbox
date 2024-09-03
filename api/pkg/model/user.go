@@ -7,10 +7,11 @@ import (
 )
 
 type UserProvider struct {
-	Provider     string `dynamodbav:"provider"`
-	Username     string `dynamodbav:"username"`
-	AccessToken  string `dynamodbav:"accessToken"`
-	RefreshToken string `dynamodbav:"refreshToken"`
+	Provider     string    `dynamodbav:"provider"`
+	Username     string    `dynamodbav:"username"`
+	AccessToken  string    `dynamodbav:"accessToken"`
+	RefreshToken string    `dynamodbav:"refreshToken"`
+	Expiration   time.Time `dynamodbav:"Expiration"`
 }
 
 type User struct {

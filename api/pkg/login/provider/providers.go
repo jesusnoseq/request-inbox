@@ -47,7 +47,7 @@ func GetOAuthConfig(provider string) (OAuthConfig, bool) {
 				ClientID:     config.GetString(config.LoginGoogleClientId),
 				ClientSecret: config.GetString(config.LoginGoogleClientSecret),
 				RedirectURL:  config.GetString(config.LoginGoogleCallback),
-				Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile"},
+				Scopes:       []string{"openid", "email", "profile"},
 				Endpoint:     google.Endpoint,
 			},
 			UserInfoURL: "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -68,7 +68,17 @@ func ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User,
 			slog.Error("Error parsing JSON", "error", err)
 			return model.User{}, err
 		}
-		return model.User{}, fmt.Errorf("provider not implemented yet: %s", prov)
+		user := model.NewUser(gInfo.Email)
+		user.Name = gInfo.GivenName
+		user.AvatarURL = gInfo.Picture
+		user.Provider = model.UserProvider{
+			Provider:     prov,
+			AccessToken:  token.AccessToken,
+			RefreshToken: token.RefreshToken,
+		}
+		fmt.Println("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+		fmt.Println(user)
+		return user, nil
 	}
 	if provider == GitHub {
 		gInfo := githubUserInfo{}
@@ -80,6 +90,7 @@ func ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User,
 		user := model.NewUser(gInfo.Email)
 		user.Organization = gInfo.Company
 		user.Name = gInfo.Name
+		user.AvatarURL = gInfo.AvatarURL
 		user.Provider = model.UserProvider{
 			Provider:     prov,
 			AccessToken:  token.AccessToken,
