@@ -104,18 +104,19 @@ func (lh *LoginHandler) HandleLoginUser(c *gin.Context) {
 		c.JSON(http.StatusNoContent, nil)
 		return
 	}
-	jwttoken, err := ParseToken(token)
+	claims, err := ParseToken(token)
 	if err != nil {
 		slog.Error("Token not valid", "JWT", token)
 		c.JSON(http.StatusUnauthorized, "JWT not vaid")
 		return
 	}
-	user, err := GetUserFromToken(jwttoken)
-	if err != nil {
-		slog.Error("Token not valid", "JWT", token)
-		c.JSON(http.StatusUnauthorized, "JWT not vaid")
-		return
-	}
+	user := claims.User
+
+	//if err != nil {
+	//	slog.Error("Token not valid", "JWT", token)
+	//	c.JSON(http.StatusUnauthorized, "JWT not vaid")
+	//	return
+	//}
 
 	c.JSON(http.StatusOK, user)
 }

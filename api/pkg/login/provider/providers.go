@@ -76,8 +76,6 @@ func ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User,
 			AccessToken:  token.AccessToken,
 			RefreshToken: token.RefreshToken,
 		}
-		fmt.Println("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-		fmt.Println(user)
 		return user, nil
 	}
 	if provider == GitHub {
