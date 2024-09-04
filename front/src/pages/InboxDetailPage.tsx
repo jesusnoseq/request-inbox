@@ -6,8 +6,6 @@ import { Typography, Divider, Alert, Grid, Switch, Box, SvgIcon, Fab } from '@mu
 import CircularProgress from '@mui/material/CircularProgress';
 import RequestList from '../components/RequestList';
 import { getInbox, deleteInboxRequests } from '../services/inbox';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import InboxDetail from '../components/InboxDetail';
 import UpdateIcon from '@mui/icons-material/Update';
 import UpdateDisabledIcon from '@mui/icons-material/UpdateDisabled';
