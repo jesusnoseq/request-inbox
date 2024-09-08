@@ -56,18 +56,22 @@ const (
 	LoginGithubClientId           Key    = "LOGIN_GITHUB_CLIENT_ID"
 	LoginGithubClientSecret       Key    = "LOGIN_GITHUB_CLIENT_SECRET"
 	LoginGithubCallback           Key    = "LOGIN_GITHUB_CALLBACK"
+	LoginGithubCallbackDefault    string = "https://api.request-inbox.com/api/v1/auth/github/callback"
 	LoginGoogleClientId           Key    = "LOGIN_GOOGLE_CLIENT_ID"
 	LoginGoogleClientSecret       Key    = "LOGIN_GOOGLE_CLIENT_SECRET"
 	LoginGoogleCallback           Key    = "LOGIN_GOOGLE_CALLBACK"
+	LoginGoogleCallbackDefault    string = "https://api.request-inbox.com/api/v1/auth/google/callback"
 	FrontendApplicationURL        Key    = "FRONTEND_APPLICATION_URL"
-	FrontendApplicationURLDefault string = "http://localhost:3000"
+	FrontendApplicationURLDefault string = "https://request-inbox.com/"
 	AuthCookieDomain              Key    = "AUTH_COOKIE_DOMAIN"
-	AuthCookieDomainDefault       string = "localhost"
+	AuthCookieDomainDefault       string = "request-inbox.com"
 	JWTSecret                     Key    = "JWT_SECRET"
 
 	// Features
-	EnableListingInbox        = "ENABLE_LISTING_INBOX"
-	EnableListingInboxDefault = true
+	EnableListingInbox        Key  = "ENABLE_LISTING_INBOX"
+	EnableListingInboxDefault bool = false
+	EnablePrintConfig         Key  = "PRINT_CONFIG"
+	EnablePrintConfigDefault  bool = false
 )
 
 func LoadConfig(app App) {
@@ -84,8 +88,7 @@ func setDefaults(app App) {
 	setDefault(APIHTTPPort, APIHTTPPortDefault)
 
 	// TODO
-	//setDefault(DBEngine, DBEngineDynamo)
-	setDefault(DBEngine, DBEngineBadger)
+	setDefault(DBEngine, DBEngineDynamo)
 	setDefault(DBBadgerPath, DBBadgerPathDefault)
 
 	setDefault(DBDynamoName, DBDynamoNameDefault)
@@ -97,21 +100,16 @@ func setDefaults(app App) {
 
 	setDefault(SnapshotVersion, SnapshotVersionDefault)
 
+	// FEATURES
 	setDefault(EnableListingInbox, EnableListingInboxDefault)
+	setDefault(EnablePrintConfig, EnableListingInboxDefault)
 
-	// TODO
+	// AUTH
 	setDefault(FrontendApplicationURL, FrontendApplicationURLDefault)
 	setDefault(AuthCookieDomain, AuthCookieDomainDefault)
 
-	setDefault(LoginGithubClientId, "")
-	setDefault(LoginGithubClientSecret, "")
-	setDefault(LoginGithubCallback, "http://localhost:8080/api/v1/auth/github/callback")
-	setDefault(LoginGoogleClientId, "")
-	setDefault(LoginGoogleClientSecret, "")
-	setDefault(LoginGoogleCallback, "http://localhost:8080/api/v1/auth/google/callback")
-
-	setDefault(JWTSecret, "")
-
+	setDefault(LoginGithubCallback, LoginGithubCallbackDefault)
+	setDefault(LoginGoogleCallback, LoginGoogleCallbackDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {
@@ -119,6 +117,9 @@ func setDefault[T string | int | bool](k Key, v T) {
 }
 
 func PrintConfig() {
+	if !GetBool(EnablePrintConfig) {
+		return
+	}
 	settings := viper.AllSettings()
 	for key, value := range settings {
 		fmt.Printf("%s: %v\n", key, value)

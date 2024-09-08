@@ -2,7 +2,7 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-cmd = "go build -o ./tmp/api.exe ./cmd/main.go"
+cmd = "[ ! -f .env.development ] || export $(grep -v '^#' .env.development | xargs) && go build -o ./tmp/api.exe ./cmd/main.go"
 bin = "tmp/api.exe"
 full_bin = "./tmp/api.exe"
 delay = 2000

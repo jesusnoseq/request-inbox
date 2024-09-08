@@ -42,3 +42,5 @@ e2e/*report
 
 # IDEs
 .idea
+
+api/.env.development
