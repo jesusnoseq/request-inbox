@@ -8,10 +8,16 @@ import (
 
 const APIBasePath = "/api/v1"
 
-func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
+func SetUtilityRoutes(r gin.IRouter, ih handler.IInboxHandler) {
 	v1 := r.Group(APIBasePath)
 	{
 		v1.GET("/health", ih.Health)
+	}
+}
+
+func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
+	v1 := r.Group(APIBasePath)
+	{
 		inboxes := v1.Group("/inboxes")
 		{
 			inboxes.GET("", ih.ListInbox)

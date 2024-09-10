@@ -118,6 +118,7 @@ func getRouter() (*gin.Engine, func()) {
 
 	ih := handler.NewInboxHandler(dao)
 	route.SetInboxRoutes(r, ih)
+	route.SetUtilityRoutes(r, ih)
 
 	lh := login.NewLoginHandler(dao)
 	route.SetLoginRoutes(r, lh)
