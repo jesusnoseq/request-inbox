@@ -30,6 +30,7 @@ func TestSetInboxRoutes(t *testing.T) {
 	ih.EXPECT().Health(gomock.Any()).Do(returnOk).Times(1)
 
 	route.SetInboxRoutes(r, ih)
+	route.SetUtilityRoutes(r, ih)
 
 	testCases := []struct {
 		desc      string
