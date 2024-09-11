@@ -20,6 +20,8 @@ type JWTClaims struct {
 
 const appName string = "Request Inbox"
 const appAudience string = appName + " web user"
+
+// TODO
 const hashSalt = "AcL30zFxQf"
 const TokenExpiredError = "token expired"
 
@@ -78,7 +80,7 @@ func ParseToken(jwtToken string) (JWTClaims, error) {
 	}
 	if exp.Time.Unix() < time.Now().Unix() {
 		slog.Error("token expired", "exp", exp.Time.Unix())
-		return claims, fmt.Errorf(TokenExpiredError)
+		return claims, fmt.Errorf("%s", TokenExpiredError)
 	}
 
 	sub, err := claims.GetSubject()
