@@ -71,11 +71,6 @@ func ParseToken(jwtToken string) (JWTClaims, error) {
 		slog.Error("invalid token", "jwttoken", jwtToken)
 		return claims, fmt.Errorf("invalid token")
 	}
-	//claims, ok := token.Claims.(jwt.MapClaims)
-	//if !ok {
-	//	slog.Error("couldn't parse claims", "jwttoken", jwtToken)
-	//	return nil, fmt.Errorf("couldn't parse claims")
-	//}
 
 	exp, err := claims.GetExpirationTime()
 	if err != nil {
