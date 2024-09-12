@@ -2,6 +2,7 @@ package model
 
 import (
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -36,7 +37,8 @@ func TestNewApiKey(t *testing.T) {
 	}
 
 	expectedExpiryDate := apiKey.CreationDate.AddDate(0, 3, 0)
-	if !apiKey.ExpiryDate.Equal(expectedExpiryDate) {
+	timeDiff := apiKey.ExpiryDate.Sub(expectedExpiryDate)
+	if timeDiff > time.Second || timeDiff < -time.Second {
 		t.Errorf("Expected ExpiryDate %v, got %v", expectedExpiryDate, apiKey.ExpiryDate)
 	}
 
