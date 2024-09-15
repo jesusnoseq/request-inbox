@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Container from '@mui/material/Container';
 
+import LandingPage from './pages/LandingPage';
 import AboutPage from './pages/AboutPage';
 import InboxListPage from './pages/InboxListPage';
 import InboxDetailPage from './pages/InboxDetailPage';
@@ -9,10 +10,17 @@ import APIDocPage from './pages/APIDocPage';
 import HealthPage from './pages/HealthPage';
 import UsersManualPage from './pages/UsersManualPage';
 import UserProfilePage from './pages/UserProfilePage';
+import CookiePolicyPage from './pages/legal/CookiePolicyPage';
+import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/legal/TermsOfServicePage';
+
 import ScrollConsistencyLayout from './components/ScrollConsistencyLayout';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
+
+
+
 
 function App() {
   return (
@@ -29,6 +37,10 @@ function App() {
             <Route path="/inbox/:inboxId" element={<InboxDetailPage />} />
             <Route path="/profile" element={<UserProfilePage />} />
             <Route path="/health" element={<HealthPage />} />
+            <Route path="/home" element={<LandingPage />} />
+            <Route path="/cookies" element={<CookiePolicyPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfServicePage />} />
           </Routes>
           <CookieBanner />
           <Footer />
