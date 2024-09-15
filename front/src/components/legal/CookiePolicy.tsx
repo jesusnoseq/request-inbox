@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Typography, Link, Button } from "@mui/material";
+import { Box, Typography, Link } from "@mui/material";
+import ContactInformation from './ContactInformation';
 
 const CookiePolicy: React.FC = () => {
     return (
@@ -8,10 +9,10 @@ const CookiePolicy: React.FC = () => {
                 Cookie Policy
             </Typography>
             <Typography variant="subtitle1" gutterBottom>
-                Effective Date: [Insert Date]
+                Effective Date: september 15, 2024
             </Typography>
             <Typography variant="body1" paragraph>
-                This Cookie Policy explains how [Your Company/Website Name] ("we", "us", or "our") uses cookies and similar technologies on our website [www.yourwebsite.com] ("Website"). We use cookies strictly for login purposes and to provide you with a secure and seamless user experience. By using our Website, you consent to the use of cookies in accordance with this Cookie Policy.
+                This Cookie Policy explains how Request Inbox ("we", "us", or "our") uses cookies and similar technologies on our website request-inbox.com ("Website"). We use cookies strictly for login purposes and to provide you with a secure and seamless user experience. By using our Website, you consent to the use of cookies in accordance with this Cookie Policy.
             </Typography>
 
             <Typography variant="h6" gutterBottom>
@@ -88,12 +89,9 @@ const CookiePolicy: React.FC = () => {
                 5. Contact Us
             </Typography>
             <Typography variant="body1" paragraph>
-                If you have any questions about our use of cookies or this Cookie Policy, please contact us at:
-                <br />
-                <strong>Email:</strong> <Link href="mailto:contact@yourwebsite.com">contact@yourwebsite.com</Link>
-                <br />
-                <strong>Address:</strong> [Your Company Address]
+                If you have any questions about our use of cookies or this Cookie Policy, please contact us:
             </Typography>
+            <ContactInformation />
         </Box>
     );
 };

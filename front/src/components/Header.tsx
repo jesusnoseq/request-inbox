@@ -6,6 +6,7 @@ import LoginDialog from '../components/LoginDialog';
 import Login from '../components/Login';
 import { getUser, logout } from '../services/inbox';
 import { User } from '../types/inbox';
+// import { Inbox as InboxIcon } from '@mui/icons-material';
 
 export default function Header() {
     const [open, setOpen] = useState(false);
@@ -47,8 +48,9 @@ export default function Header() {
         <AppBar position="static" sx={{ flexGrow: 1, marginBottom: 2 }}>
             <Toolbar>
 
-                <Typography variant="h3" component="h1" sx={{ flexGrow: 1 }}>
+                <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
                     <Link to="/" component={LinkDOM} color="inherit" underline="none">
+                        <img src="logo.png" alt="Request Inbox logo" style={{ marginRight: '16px', height: '30px' }} />
                         Request Inbox
                     </Link>
                 </Typography>
