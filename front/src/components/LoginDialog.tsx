@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Button,
     Dialog,
@@ -7,6 +7,9 @@ import {
     DialogContentText,
     DialogTitle,
     IconButton,
+    FormControlLabel,
+    Checkbox,
+    Link
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import GoogleIcon from '@mui/icons-material/Google';
@@ -19,6 +22,8 @@ interface LoginDialogProps {
 }
 
 export default function LoginDialog({ open, onClose }: LoginDialogProps) {
+    const [checked, setChecked] = useState(false);
+
 
     const redirectToProvider = (provider: string) => {
         window.location.href = buildLoginURL(provider);
@@ -30,6 +35,10 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
 
     const handleGitHubLogin = () => {
         redirectToProvider('github');
+    };
+
+    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setChecked(event.target.checked);
     };
 
     return (
@@ -59,6 +68,7 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
                     onClick={handleGoogleLogin}
                     fullWidth
                     sx={{ mt: 2, mb: 1 }}
+                    disabled={!checked}
                 >
                     Login with Google
                 </Button>
@@ -68,9 +78,28 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
                     onClick={handleGitHubLogin}
                     fullWidth
                     sx={{ mb: 1 }}
+                    disabled={!checked}
                 >
                     Login with GitHub
                 </Button>
+
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={checked}
+                            onChange={handleCheckboxChange}
+                            color="primary"
+                        />
+                    }
+                    label={
+                        <span>
+                            I accept the{' '}
+                            <Link href="/terms" target="_blank" rel="noopener">Terms of Service</Link>
+                            {' '}and{' '}
+                            <Link href="/privacy" target="_blank" rel="noopener">Privacy Policy</Link>
+                        </span>}
+                />
+
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
