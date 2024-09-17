@@ -116,11 +116,13 @@ func getRouter() (*gin.Engine, func()) {
 		log.Fatal("failed to obtain InboxDAO:", err)
 	}
 
+	r.Use(login.JWTMiddleware())
+	lh := login.NewLoginHandler(dao)
+	route.SetLoginRoutes(r, lh)
+
 	ih := handler.NewInboxHandler(dao)
 	route.SetInboxRoutes(r, ih)
 	route.SetUtilityRoutes(r, ih)
 
-	lh := login.NewLoginHandler(dao)
-	route.SetLoginRoutes(r, lh)
 	return r, closer
 }
