@@ -12,6 +12,7 @@ func SetUtilityRoutes(r gin.IRouter, ih handler.IInboxHandler) {
 	v1 := r.Group(APIBasePath)
 	{
 		v1.GET("/health", ih.Health)
+		v1.GET("/cookies/accept", ih.AcceptCookies)
 	}
 }
 
@@ -39,6 +40,7 @@ func SetLoginRoutes(r gin.IRouter, lh login.ILoginHandler) {
 		{
 			auth.GET("/:provider/login", lh.HandleLogin)
 			auth.GET("/user", lh.HandleLoginUser)
+			auth.DELETE("/user", lh.HandleDeleteLoginUser)
 			auth.GET("/logout", lh.HandleLogout)
 			auth.GET("/:provider/callback", lh.HandleCallback)
 		}
