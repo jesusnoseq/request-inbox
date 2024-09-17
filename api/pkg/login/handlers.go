@@ -10,6 +10,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/login/provider"
+	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
 type LoginHandler struct {
@@ -82,7 +83,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save user"})
 		return
 	}
-
+	slog.Info("Logging user ", "ip", c.ClientIP(), "user", user.Email)
 	jwtToken, err := GenerateJWT(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate jwt with user info"})
@@ -107,25 +108,28 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, config.GetString(config.FrontendApplicationURL))
 }
 
+func ReadJWTToken(token string) (model.User, error) {
+	claims, err := ParseToken(token)
+	if err != nil {
+		slog.Error("Token not valid", "JWT", token)
+		return model.User{}, err
+	}
+	user := claims.User
+	return user, nil
+}
+
 func (lh *LoginHandler) HandleLoginUser(c *gin.Context) {
 	token, _ := c.Cookie(AuthTokenCookieName)
 	if token == "" {
 		c.JSON(http.StatusNoContent, nil)
 		return
 	}
-	claims, err := ParseToken(token)
+	user, err := ReadJWTToken(token)
 	if err != nil {
-		slog.Error("Token not valid", "JWT", token)
+		slog.Error("Token not valid", "JWT", token, "error", err)
 		c.JSON(http.StatusUnauthorized, "JWT not vaid")
 		return
 	}
-	user := claims.User
-
-	//if err != nil {
-	//	slog.Error("Token not valid", "JWT", token)
-	//	c.JSON(http.StatusUnauthorized, "JWT not vaid")
-	//	return
-	//}
 
 	c.JSON(http.StatusOK, user)
 }
@@ -141,4 +145,23 @@ func (lh *LoginHandler) HandleLogout(c *gin.Context) {
 	}
 	http.SetCookie(c.Writer, &cookie)
 	c.JSON(http.StatusOK, gin.H{"message": "You have successfully logged out"})
+}
+
+func (lh *LoginHandler) HandleDeleteLoginUser(c *gin.Context) {
+	token, _ := c.Cookie(AuthTokenCookieName)
+	if token == "" {
+		c.JSON(http.StatusNoContent, nil)
+		return
+	}
+	user, err := ReadJWTToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, "JWT not vaid")
+		return
+	}
+	err = lh.dao.DeleteUser(c, user.ID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, "Error deleting user")
+		return
+	}
+	lh.HandleLogout(c)
 }

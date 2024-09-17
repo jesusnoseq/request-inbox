@@ -167,6 +167,16 @@ func (ib *InboxBadger) UpsertUser(ctx context.Context, user model.User) error {
 	return err
 }
 
+func (ib *InboxBadger) DeleteUser(ctx context.Context, ID uuid.UUID) error {
+	err := ib.db.Update(func(txn *badger.Txn) error {
+		return txn.Delete(ib.getUserKey(ID))
+	})
+	if err != nil {
+		return fmt.Errorf("error deleting %v: %w", ID, err)
+	}
+	return nil
+}
+
 func (ib *InboxBadger) GetUser(ctx context.Context, ID uuid.UUID) (model.User, error) {
 	var valCopy []byte
 	err := ib.db.View(func(txn *badger.Txn) error {

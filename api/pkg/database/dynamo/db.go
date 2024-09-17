@@ -333,6 +333,26 @@ func (d *InboxDAO) GetUser(ctx context.Context, ID uuid.UUID) (model.User, error
 	return userItem.User, nil
 }
 
+func (d *InboxDAO) DeleteUser(ctx context.Context, ID uuid.UUID) error {
+	pk, sk := GenUserKey(ID)
+	key := map[string]types.AttributeValue{
+		"PK": &types.AttributeValueMemberS{Value: pk},
+		"SK": &types.AttributeValueMemberS{Value: sk},
+	}
+
+	input := &dynamodb.DeleteItemInput{
+		TableName: aws.String(d.tableName),
+		Key:       key,
+	}
+
+	_, err := d.dbclient.DeleteItem(context.TODO(), input)
+	if err != nil {
+		return fmt.Errorf("failed to delete item, %w", err)
+	}
+
+	return nil
+}
+
 func MustMarshallUUID(id uuid.UUID) []byte {
 	bin, err := id.MarshalBinary()
 	if err != nil {

@@ -8,5 +8,6 @@ type ILoginHandler interface {
 	HandleLogin(c *gin.Context)
 	HandleCallback(c *gin.Context)
 	HandleLoginUser(c *gin.Context)
+	HandleDeleteLoginUser(c *gin.Context)
 	HandleLogout(c *gin.Context)
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"strings"
 	"testing"
 	"time"
 
@@ -380,6 +381,26 @@ func TestGetUser(t *testing.T) {
 		t.Errorf("Expected no error but got %s.", err)
 	}
 	expectJSONEquals(t, user, gotUser)
+}
+
+func TestDeleteUser(t *testing.T) {
+	inboxDAO, ctx := setupTest()
+	user := model.GenerateUserWithProvider()
+	err := inboxDAO.UpsertUser(ctx, user)
+	if err != nil {
+		t.Errorf("Expected no error but got %s.", err)
+	}
+	err = inboxDAO.DeleteUser(ctx, user.ID)
+	if err != nil {
+		t.Errorf("Expected no error but got %s.", err)
+	}
+	_, err = inboxDAO.GetUser(ctx, user.ID)
+	if err == nil {
+		t.Errorf("Expected error but got %s.", err)
+	}
+	if !strings.HasSuffix(err.Error(), "not found") {
+		t.Errorf("Expected not found error but got %s.", err)
+	}
 }
 
 func expectJSONEquals[T any](t *testing.T, a, b T) {

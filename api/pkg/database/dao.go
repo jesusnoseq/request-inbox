@@ -17,5 +17,6 @@ type InboxDAO interface {
 	AddRequestToInbox(context.Context, uuid.UUID, model.Request) error
 	UpsertUser(context.Context, model.User) error
 	GetUser(context.Context, uuid.UUID) (model.User, error)
+	DeleteUser(context.Context, uuid.UUID) error
 	Close(context.Context) error
 }

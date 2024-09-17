@@ -46,6 +46,18 @@ func (mr *MockILoginHandlerMockRecorder) HandleCallback(arg0 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleCallback", reflect.TypeOf((*MockILoginHandler)(nil).HandleCallback), arg0)
 }
 
+// HandleDeleteLoginUser mocks base method.
+func (m *MockILoginHandler) HandleDeleteLoginUser(arg0 *gin.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "HandleDeleteLoginUser", arg0)
+}
+
+// HandleDeleteLoginUser indicates an expected call of HandleDeleteLoginUser.
+func (mr *MockILoginHandlerMockRecorder) HandleDeleteLoginUser(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleDeleteLoginUser", reflect.TypeOf((*MockILoginHandler)(nil).HandleDeleteLoginUser), arg0)
+}
+
 // HandleLogin mocks base method.
 func (m *MockILoginHandler) HandleLogin(arg0 *gin.Context) {
 	m.ctrl.T.Helper()
