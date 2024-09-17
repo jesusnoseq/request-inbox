@@ -117,6 +117,16 @@ export const getUser = async () => {
 }
 
 
+export const deleteUser = async () => {
+    const resp = await fetch(`${BASE_URL}/api/v1/auth/user`, {
+        method: "DELETE",
+        headers: defaultHeaders,
+        credentials: 'include',
+    });
+    return resp.status === 200;
+}
+
+
 export const logout = async () => {
     const resp = await fetch(`${BASE_URL}/api/v1/auth/logout`, {
         method: "GET",
@@ -128,6 +138,19 @@ export const logout = async () => {
     }
     return await resp.json()
 }
+
+export const acceptCookies = async () => {
+    const resp = await fetch(`${BASE_URL}/api/v1/cookies/accept`, {
+        method: "GET",
+        headers: defaultHeaders,
+    });
+    if (!resp.ok) {
+        throw new Error('API response error ', await resp.json());
+    }
+    console.log("Cookies accepted");
+    return
+}
+
 
 
 export const buildLoginURL = (provider: string) => {
