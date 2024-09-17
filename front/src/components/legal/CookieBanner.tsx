@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Snackbar, Button, Typography } from '@mui/material';
-
+import { acceptCookies } from '../../services/inbox';
 
 function CookieBanner() {
     const [open, setOpen] = useState(false);
@@ -12,8 +12,9 @@ function CookieBanner() {
         }
     }, []);
 
-    const handleAccept = () => {
+    const handleAccept = async () => {
         try {
+            await acceptCookies();
             localStorage.setItem('cookie_consent', 'true');
         } catch (error) {
             console.error('Error setting localStorage:', error);

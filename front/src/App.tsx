@@ -17,7 +17,7 @@ import TermsOfServicePage from './pages/legal/TermsOfServicePage';
 import ScrollConsistencyLayout from './components/ScrollConsistencyLayout';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import CookieBanner from './components/CookieBanner';
+import CookieBanner from './components/legal/CookieBanner';
 
 
 
