@@ -34,6 +34,18 @@ func (m *MockIInboxHandler) EXPECT() *MockIInboxHandlerMockRecorder {
 	return m.recorder
 }
 
+// AcceptCookies mocks base method.
+func (m *MockIInboxHandler) AcceptCookies(arg0 *gin.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "AcceptCookies", arg0)
+}
+
+// AcceptCookies indicates an expected call of AcceptCookies.
+func (mr *MockIInboxHandlerMockRecorder) AcceptCookies(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AcceptCookies", reflect.TypeOf((*MockIInboxHandler)(nil).AcceptCookies), arg0)
+}
+
 // CreateInbox mocks base method.
 func (m *MockIInboxHandler) CreateInbox(arg0 *gin.Context) {
 	m.ctrl.T.Helper()
