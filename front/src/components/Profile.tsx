@@ -32,10 +32,8 @@ export default function Profile({ user, onDeleteAccount }: ProfileProps) {
         setIsDeleting(true);
         try {
             await onDeleteAccount();
-            // Handle successful deletion (e.g., redirect to login page)
         } catch (error) {
             console.error('Error deleting account:', error);
-            // Handle error (e.g., show error message to user)
         } finally {
             setIsDeleting(false);
             handleCloseDialog();

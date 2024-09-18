@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { getUser, logout } from '../services/inbox';
+import { getUser, logout, deleteUser } from '../services/inbox';
 import Profile from '../components/Profile';
 
 import { User } from '../types/inbox';
@@ -10,7 +10,7 @@ const UserProfilePage: React.FC = () => {
     const [user, setUser] = React.useState<null | User>(null);
     const handleDelete = async (): Promise<void> => {
         console.log("Handle delete");
-        logout();
+        deleteUser();
     };
 
     useEffect(() => {
