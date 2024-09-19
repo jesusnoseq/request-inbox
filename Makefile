@@ -37,6 +37,7 @@ download-tools:	## Download all required tools to validate and generate document
 	go install golang.org/x/tools/cmd/goimports@v0.14.0
 	go install go.uber.org/mock/mockgen@v0.3.0
 	go install github.com/cosmtrek/air@v1.49.0
+	go install github.com/joho/godotenv/cmd/godotenv@latest
 
 .PHONY: build-api
 build-api:	## Build API go application
@@ -73,11 +74,11 @@ test:	## Run tests without required build tags
 
 .PHONY: run-api
 run-api:	## Run API
-	cd $(API_DIR) && CGO_CFLAGS=${CGO_CFLAGS} go run $(CMD_FILE)
+	cd $(API_DIR) && CGO_CFLAGS=${CGO_CFLAGS} godotenv -f .env.development go run $(CMD_FILE)
 
 .PHONY: run-api-hot
 run-api-hot:	## Run API with hot reloading
-	cd $(API_DIR) && air -c $(AIR_FILE)
+	cd $(API_DIR) && godotenv -f .env.development air -c $(AIR_FILE)
 
 .PHONY: show-version
 show-version:	## Shows API version
