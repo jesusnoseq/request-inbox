@@ -17,7 +17,7 @@ resource "aws_dynamodb_table" "inbox_requests" {
   }
 
   attribute {
-    name = "OWNER"
+    name = "OWNER_ID"
     type = "S"
   }
 
