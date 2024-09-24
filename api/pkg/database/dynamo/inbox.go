@@ -73,9 +73,9 @@ func isRequestSK(sk string) bool {
 func toInboxItem(in model.Inbox) InboxItem {
 	pk, sk := GenInboxKey(in.ID)
 	in.Requests = []model.Request{}
-	owner := UserKey + KS + uuid.Nil.String()
+	owner, _ := GenUserKey(uuid.Nil)
 	if in.OwnerID != uuid.Nil {
-		owner = UserKey + KS + in.OwnerID.String()
+		owner, _ = GenUserKey(in.OwnerID)
 	}
 	return InboxItem{
 		PK:    pk,
@@ -99,7 +99,7 @@ func toUserItem(user model.User) UserItem {
 	return UserItem{
 		PK:    pk,
 		SK:    sk,
-		OWNER: user.ID.String(),
+		OWNER: pk,
 		User:  user,
 	}
 }
