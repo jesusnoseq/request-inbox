@@ -109,7 +109,10 @@ func TestListInbox(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected no error error but got %s.", err)
 	}
-	inboxDAO.AddRequestToInbox(ctx, createdInbox2.ID, model.GenerateRequest(0))
+	err = inboxDAO.AddRequestToInbox(ctx, createdInbox2.ID, model.GenerateRequest(0))
+	if err != nil {
+		t.Errorf("Expected no error error but got %s.", err)
+	}
 	defer deleteInbox(t, inboxDAO, createdInbox2.ID)
 
 	allInboxes, err = inboxDAO.ListInbox(ctx)
@@ -488,8 +491,10 @@ func TestListInboxByUser(t *testing.T) {
 		t.Errorf("Expected no error error but got %s.", err)
 	}
 	defer deleteInbox(t, inboxDAO, createdInbox1.ID)
-	inboxDAO.AddRequestToInbox(ctx, createdInbox1.ID, model.GenerateRequest(0))
-
+	err = inboxDAO.AddRequestToInbox(ctx, createdInbox1.ID, model.GenerateRequest(0))
+	if err != nil {
+		t.Errorf("Expected no error error but got %s.", err)
+	}
 	inbox2 := model.GenerateInbox()
 	inbox2.OwnerID = user.ID
 	createdInbox2, err := inboxDAO.CreateInbox(ctx, inbox2)
@@ -497,7 +502,10 @@ func TestListInboxByUser(t *testing.T) {
 		t.Errorf("Expected no error error but got %s.", err)
 	}
 	defer deleteInbox(t, inboxDAO, createdInbox2.ID)
-	inboxDAO.AddRequestToInbox(ctx, createdInbox2.ID, model.GenerateRequest(0))
+	err = inboxDAO.AddRequestToInbox(ctx, createdInbox2.ID, model.GenerateRequest(0))
+	if err != nil {
+		t.Errorf("Expected no error error but got %s.", err)
+	}
 
 	allUserInboxes, err = inboxDAO.ListInboxByUser(ctx, user.ID)
 	if err != nil {
