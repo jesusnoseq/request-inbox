@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -32,6 +33,20 @@ func (ih *InboxHandler) CreateInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox", err, http.StatusBadRequest))
 		return
 	}
+	if !login.IsUserLoggedIn(c) && newInbox.IsPrivate {
+		err := fmt.Errorf("you must be logged in to create a private inbox")
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusUnauthorized))
+		return
+	}
+	if login.IsUserLoggedIn(c) {
+		user, err := login.GetUser(c)
+		if err != nil {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+			return
+		}
+		newInbox.OwnerID = user.ID
+	}
+
 	inbox, err := ih.dao.CreateInbox(c, newInbox)
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
@@ -47,6 +62,9 @@ func (ih *InboxHandler) DeleteInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
 		return
 	}
+
+	// TODO if inbox private, requester is the owner
+
 	err = ih.dao.DeleteInbox(c, id)
 	if err != nil {
 		if errors.Is(err, dberrors.ErrItemNotFound) {
@@ -66,6 +84,9 @@ func (ih *InboxHandler) DeleteInboxRequests(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
 		return
 	}
+
+	// TODO if inbox private, requester is the owner
+
 	err = ih.dao.DeleteInboxRequests(c, id)
 	if err != nil {
 		if errors.Is(err, dberrors.ErrItemNotFound) {
@@ -85,7 +106,7 @@ func (ih *InboxHandler) GetInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
 		return
 	}
-	inbox, err := ih.dao.GetInbox(c, id)
+	inbox, err := ih.dao.GetInboxWithRequests(c, id)
 	if err != nil {
 		if errors.Is(err, dberrors.ErrItemNotFound) {
 			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
@@ -114,7 +135,7 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 		return
 	}
 
-	inbox, err := ih.dao.GetInbox(c, id)
+	inbox, err := ih.dao.GetInboxWithRequests(c, id)
 	if err != nil {
 		if errors.Is(err, dberrors.ErrItemNotFound) {
 			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
@@ -160,7 +181,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		return
 	}
 
-	inbox, err := ih.dao.GetInbox(c, id)
+	inbox, err := ih.dao.GetInboxWithRequests(c, id)
 	if err != nil {
 		if errors.Is(err, dberrors.ErrItemNotFound) {
 			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))

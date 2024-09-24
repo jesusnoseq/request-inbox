@@ -2,6 +2,7 @@ package login
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -106,6 +107,27 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	}
 	http.SetCookie(c.Writer, &cookie)
 	c.Redirect(http.StatusTemporaryRedirect, config.GetString(config.FrontendApplicationURL))
+}
+
+func IsUserLoggedIn(c *gin.Context) bool {
+	return c.GetBool(IS_LOGGED_IN_CONTEXT_KEY)
+}
+
+func GetUser(c *gin.Context) (model.User, error) {
+	errVal, _ := c.Get(LOGIN_ERROR_CONTEXT_KEY)
+	err, _ := errVal.(error)
+	if err != nil {
+		return model.User{}, err
+	}
+	userVal, exists := c.Get(USER_CONTEXT_KEY)
+	if !exists {
+		return model.User{}, fmt.Errorf("the user is not logged in")
+	}
+	user, ok := userVal.(model.User)
+	if !ok {
+		return model.User{}, fmt.Errorf("there was an error with your user")
+	}
+	return user, nil
 }
 
 func ReadJWTToken(token string) (model.User, error) {
