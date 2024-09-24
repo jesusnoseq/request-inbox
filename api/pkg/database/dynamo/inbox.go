@@ -13,11 +13,13 @@ const (
 	inProjectionExpression     = "PK, SK, doc"
 	inUpdateExpresion          = "set doc=:doc"
 	inUpdateConditionExpresion = "PK= :PK AND SK= :SK"
+	OwnerIndex                 = "OWNER_INDEX"
 )
 
 type InboxItem struct {
 	PK    string      `dynamodbav:"PK"`
 	SK    string      `dynamodbav:"SK"`
+	OWNER string      `dynamodbav:"OWNER_ID"`
 	Inbox model.Inbox `dynamodbav:"doc"`
 }
 
@@ -28,14 +30,16 @@ type RequestItem struct {
 }
 
 type UserItem struct {
-	PK   string     `dynamodbav:"PK"`
-	SK   string     `dynamodbav:"SK"`
-	User model.User `dynamodbav:"doc"`
+	PK    string     `dynamodbav:"PK"`
+	SK    string     `dynamodbav:"SK"`
+	OWNER string     `dynamodbav:"OWNER_ID"`
+	User  model.User `dynamodbav:"doc"`
 }
 
 const InboxKey = "INBOX"
 const RequestKey = "REQUEST"
 const UserKey = "USER"
+const OWNERKey = "OWNER_ID"
 const KS = "#" // Key Separator
 
 func GenUserKey(id uuid.UUID) (string, string) {
@@ -69,9 +73,14 @@ func isRequestSK(sk string) bool {
 func toInboxItem(in model.Inbox) InboxItem {
 	pk, sk := GenInboxKey(in.ID)
 	in.Requests = []model.Request{}
+	owner := UserKey + KS + uuid.Nil.String()
+	if in.OwnerID != uuid.Nil {
+		owner = UserKey + KS + in.OwnerID.String()
+	}
 	return InboxItem{
 		PK:    pk,
 		SK:    sk,
+		OWNER: owner,
 		Inbox: in,
 	}
 }
@@ -88,8 +97,9 @@ func toRequestItem(id uuid.UUID, req model.Request) RequestItem {
 func toUserItem(user model.User) UserItem {
 	pk, sk := GenUserKey(user.ID)
 	return UserItem{
-		PK:   pk,
-		SK:   sk,
-		User: user,
+		PK:    pk,
+		SK:    sk,
+		OWNER: user.ID.String(),
+		User:  user,
 	}
 }

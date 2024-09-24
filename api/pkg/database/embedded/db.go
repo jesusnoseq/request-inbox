@@ -78,7 +78,7 @@ func (ib *InboxBadger) UpdateInbox(ctx context.Context, inbox model.Inbox) (mode
 }
 
 func (ib *InboxBadger) AddRequestToInbox(ctx context.Context, ID uuid.UUID, req model.Request) error {
-	inbox, err := ib.GetInbox(ctx, ID)
+	inbox, err := ib.GetInboxWithRequests(ctx, ID)
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (ib *InboxBadger) AddRequestToInbox(ctx context.Context, ID uuid.UUID, req 
 	return err
 }
 
-func (ib *InboxBadger) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox, error) {
+func (ib *InboxBadger) GetInboxWithRequests(ctx context.Context, ID uuid.UUID) (model.Inbox, error) {
 	var valCopy []byte
 	err := ib.db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(ib.getInboxKey(ID))
@@ -106,6 +106,10 @@ func (ib *InboxBadger) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox,
 	return decode[model.Inbox](valCopy)
 }
 
+func (ib *InboxBadger) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox, error) {
+	return ib.GetInboxWithRequests(ctx, ID)
+}
+
 func (ib *InboxBadger) DeleteInbox(ctx context.Context, ID uuid.UUID) error {
 	err := ib.db.Update(func(txn *badger.Txn) error {
 		return txn.Delete(ib.getInboxKey(ID))
@@ -117,7 +121,7 @@ func (ib *InboxBadger) DeleteInbox(ctx context.Context, ID uuid.UUID) error {
 }
 
 func (ib *InboxBadger) DeleteInboxRequests(ctx context.Context, ID uuid.UUID) error {
-	inbox, err := ib.GetInbox(ctx, ID)
+	inbox, err := ib.GetInboxWithRequests(ctx, ID)
 	if err != nil {
 		return err
 	}
@@ -129,7 +133,19 @@ func (ib *InboxBadger) DeleteInboxRequests(ctx context.Context, ID uuid.UUID) er
 	return nil
 }
 
-func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
+func (ib *InboxBadger) ListInbox(ctx context.Context) ([]model.Inbox, error) {
+	return ib.listInbox(ctx, func(i model.Inbox) bool {
+		return true
+	})
+}
+
+func (ib *InboxBadger) ListInboxByUser(ctx context.Context, userID uuid.UUID) ([]model.Inbox, error) {
+	return ib.listInbox(ctx, func(i model.Inbox) bool {
+		return i.OwnerID == userID
+	})
+}
+
+func (ib *InboxBadger) listInbox(ctx context.Context, filter func(model.Inbox) bool) ([]model.Inbox, error) {
 	inboxList := []model.Inbox{}
 	err := ib.db.View(func(txn *badger.Txn) error {
 		it := txn.NewIterator(badger.DefaultIteratorOptions)
@@ -143,7 +159,9 @@ func (ib *InboxBadger) ListInbox(context.Context) ([]model.Inbox, error) {
 				if err != nil {
 					return err
 				}
-				inboxList = append(inboxList, inbox)
+				if filter(inbox) {
+					inboxList = append(inboxList, inbox)
+				}
 				return nil
 			})
 			if err != nil {

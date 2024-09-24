@@ -20,6 +20,8 @@ type Inbox struct {
 	Response              Response  `dynamodbav:"resp"`
 	Requests              []Request `dynamodbav:"req"`
 	ObfuscateHeaderFields []string  `dynamodbav:"ofuscate"`
+	OwnerID               uuid.UUID `dynamodbav:"OwnerID"`
+	IsPrivate             bool      `dynamodbav:"IsPrivate"`
 }
 
 type Response struct {
@@ -56,5 +58,7 @@ func NewInbox() Inbox {
 		},
 		Requests:              []Request{},
 		ObfuscateHeaderFields: []string{},
+		IsPrivate:             false,
+		OwnerID:               uuid.UUID{},
 	}
 }
