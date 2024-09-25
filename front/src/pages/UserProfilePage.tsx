@@ -31,7 +31,9 @@ const UserProfilePage: React.FC = () => {
         <>
             {
                 user != null &&
-                <Profile user={user} onDeleteAccount={handleDelete} />
+                <>
+                    <Profile user={user} onDeleteAccount={handleDelete} />
+                </>
             }
         </>
     );

@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
+    Box,
+    Typography,
     Button,
     Dialog,
-    DialogActions,
+    DialogTitle,
     DialogContent,
     DialogContentText,
-    DialogTitle,
-    Typography,
-    Box,
-} from '@mui/material';
+    DialogActions,
+    Divider,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Avatar,
+} from '@mui/material'
+import { Person, Email, DeleteForever } from '@mui/icons-material'
 import { User } from '../types/inbox';
+import APIKeyManager from './APIKeyManager';
 
 interface ProfileProps {
     user: User;
@@ -41,25 +49,51 @@ export default function Profile({ user, onDeleteAccount }: ProfileProps) {
     };
 
     return (
-        <Box sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
+        <Box sx={{ margin: 'auto', padding: 3 }}>
             <Typography variant="h4" gutterBottom>
                 Profile
             </Typography>
-            <Typography variant="body1" paragraph>
-                Name: {user.Name}
-            </Typography>
-            <Typography variant="body1" paragraph>
-                Email: {user.Email}
-            </Typography>
+            {/* <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
+                <Avatar
+                    src={user.AvatarURL}
+                    alt={user.Name}
+                    sx={{ width: 100, height: 100, mb: 2 }}
+                />
+            </Box> */}
 
-            <Button
-                variant="contained"
-                color="error"
-                onClick={handleOpenDialog}
-                sx={{ mt: 2 }}
-            >
-                Delete Account
-            </Button>
+            <List>
+                <ListItem>
+                    <ListItemIcon>
+                        <Person />
+                    </ListItemIcon>
+                    <ListItemText primary="Name" secondary={user.Name} />
+                </ListItem>
+                <ListItem>
+                    <ListItemIcon>
+                        <Email />
+                    </ListItemIcon>
+                    <ListItemText primary="Email" secondary={user.Email} />
+                </ListItem>
+            </List>
+
+            <Divider sx={{ my: 3 }} />
+
+            <APIKeyManager />
+
+            <Divider sx={{ my: 3 }} />
+            <Box sx={{ mt: 2 }}>
+                <Typography variant="h6" gutterBottom color="error">
+                    Danger Zone
+                </Typography>
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleOpenDialog}
+                    startIcon={<DeleteForever />}
+                >
+                    Delete Account
+                </Button>
+            </Box>
 
             <Dialog
                 open={openDialog}
@@ -89,6 +123,6 @@ export default function Profile({ user, onDeleteAccount }: ProfileProps) {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </Box >
     );
 }
