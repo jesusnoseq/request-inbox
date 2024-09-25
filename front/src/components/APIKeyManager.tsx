@@ -17,7 +17,7 @@ import {
     Grid2,
     Typography,
 } from '@mui/material';
-import { Add as AddIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon, ContentCopy as ContentCopyIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Add as AddIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import CopyToClipboardButton from './CopyToClipboardButton';
 
 

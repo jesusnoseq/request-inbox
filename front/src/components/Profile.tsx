@@ -13,7 +13,6 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
-    Avatar,
 } from '@mui/material'
 import { Person, Email, DeleteForever } from '@mui/icons-material'
 import { User } from '../types/inbox';
