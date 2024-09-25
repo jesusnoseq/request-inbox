@@ -166,6 +166,10 @@ components:
         Timestamp:
           type: integer
           format: int64
+        IsPrivate:
+          type: bool
+        OwnerID:
+          type: bool
         Response:
           $ref: "#/components/schemas/Response"
         Requests:
