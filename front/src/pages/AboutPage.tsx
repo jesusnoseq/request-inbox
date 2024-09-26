@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     Container,
     Typography,
     Paper,
-    Grid,
+    Grid2,
     Button,
     useTheme,
     useMediaQuery,
@@ -18,15 +18,35 @@ import {
     TimelineDot,
 } from '@mui/lab';
 import { Code as CodeIcon, Cloud as CloudIcon, Speed as SpeedIcon } from '@mui/icons-material';
+import { useNavigate } from "react-router-dom";
+import { useUser } from '../context/UserContext';
+import LoginDialog from '../components/LoginDialog';
+import SignUpButton from '../components/SignUpButton';
 
 export default function AboutPage() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const { isLoggedIn } = useUser();
+    const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+
+    const handleClick = async () => {
+        if (isLoggedIn()) {
+            navigate('/');
+        } else {
+            setOpen(true);
+        }
+    };
+
+
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     return (
         <Container maxWidth="lg">
             <Box my={8}>
-                <Typography variant="h2" component="h1" gutterBottom align="center">
+                <Typography variant="h3" component="h1" gutterBottom align="center">
                     About Request Inbox
                 </Typography>
                 <Typography variant="h5" component="h2" gutterBottom align="center" color="textSecondary">
@@ -43,8 +63,8 @@ export default function AboutPage() {
                 </Typography>
             </Paper>
 
-            <Grid container spacing={4} justifyContent="center" sx={{ mb: 6 }}>
-                <Grid item xs={12} md={4}>
+            <Grid2 container spacing={4} justifyContent="center" sx={{ mb: 6 }}>
+                <Grid2 size={4}>
                     <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <CodeIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                         <Typography variant="h6" component="h3" gutterBottom align="center">
@@ -54,8 +74,8 @@ export default function AboutPage() {
                             Built with the latest web technologies, ensuring speed, reliability, and a seamless user experience.
                         </Typography>
                     </Paper>
-                </Grid>
-                <Grid item xs={12} md={4}>
+                </Grid2>
+                <Grid2 size={4}>
                     <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <CloudIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                         <Typography variant="h6" component="h3" gutterBottom align="center">
@@ -65,8 +85,8 @@ export default function AboutPage() {
                             Your dedicated URL is always ready, providing a reliable endpoint for all your webhook testing needs.
                         </Typography>
                     </Paper>
-                </Grid>
-                <Grid item xs={12} md={4}>
+                </Grid2>
+                <Grid2 size={4}>
                     <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <SpeedIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                         <Typography variant="h6" component="h3" gutterBottom align="center">
@@ -76,8 +96,8 @@ export default function AboutPage() {
                             Designed to make your life easier, saving you time and reducing frustration in your development process.
                         </Typography>
                     </Paper>
-                </Grid>
-            </Grid>
+                </Grid2>
+            </Grid2>
 
             <Paper elevation={3} sx={{ p: 4, mb: 6 }}>
                 <Typography variant="h4" component="h2" gutterBottom align="center">
@@ -138,9 +158,12 @@ export default function AboutPage() {
                 <Typography variant="h4" component="h2" gutterBottom>
                     Ready to Simplify Your Webhook Testing?
                 </Typography>
-                <Button variant="contained" color="primary" size="large">
+
+                {/* <Button variant="contained" color="primary" size="large" onClick={handleClick}>
                     Get Started Now
-                </Button>
+                </Button> */}
+                <SignUpButton text='Get Started Now' />
+                <LoginDialog open={open} onClose={handleClose} />
             </Box>
         </Container>
     );

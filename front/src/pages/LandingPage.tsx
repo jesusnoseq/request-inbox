@@ -1,13 +1,12 @@
 'use client'
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     Button,
     Container,
-    Grid,
+    Grid2,
     Paper,
-    TextField,
     Typography,
 } from '@mui/material';
 import {
@@ -16,29 +15,34 @@ import {
     Lock as LockIcon,
     Notifications as NotificationsIcon,
 } from '@mui/icons-material';
+import { useNavigate } from "react-router-dom";
+import SignUpButton from '../components/SignUpButton';
+
 
 export default function LandingPage() {
+    const navigate = useNavigate();
+
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Container component="main" maxWidth="md" sx={{ mt: 8, mb: 2 }}>
                 <Typography
                     component="h1"
-                    variant="h2"
+                    variant="h3"
                     align="center"
                     color="textPrimary"
                     gutterBottom
                 >
-                    Test Callbacks and Webhooks with Ease
+                    Test Callbacks and Webhooks <br />with Ease
                 </Typography>
                 <Typography variant="h5" align="center" color="textSecondary" paragraph>
                     Request Inbox simplifies the process of testing and debugging callbacks and webhooks. Capture, inspect, and manage incoming HTTP requests effortlessly.
                 </Typography>
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                    <Button variant="contained" color="primary" sx={{ mx: 1 }}>
+                    <Button variant="contained" color="primary" sx={{ mx: 1 }} onClick={() => navigate('/')}>
                         Get Started
                     </Button>
-                    <Button variant="outlined" color="primary" sx={{ mx: 1 }}>
+                    <Button variant="outlined" color="primary" sx={{ mx: 1 }} onClick={() => navigate('/users-manual')}>
                         Learn More
                     </Button>
                 </Box>
@@ -54,8 +58,8 @@ export default function LandingPage() {
                 >
                     Key Features
                 </Typography>
-                <Grid container spacing={4} sx={{ mt: 4 }}>
-                    <Grid item xs={12} sm={4}>
+                <Grid2 container spacing={4} sx={{ mt: 4 }}>
+                    <Grid2 size={4}>
                         <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <CodeIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                             <Typography variant="h5" component="h3" gutterBottom>
@@ -65,8 +69,8 @@ export default function LandingPage() {
                                 Instantly capture and display incoming HTTP requests for immediate analysis.
                             </Typography>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
+                    </Grid2>
+                    <Grid2 size={4}>
                         <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <NotificationsIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                             <Typography variant="h5" component="h3" gutterBottom>
@@ -76,8 +80,8 @@ export default function LandingPage() {
                                 Set up alerts for specific request patterns or payload contents.
                             </Typography>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
+                    </Grid2>
+                    <Grid2 size={4}>
                         <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <LockIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                             <Typography variant="h5" component="h3" gutterBottom>
@@ -87,8 +91,8 @@ export default function LandingPage() {
                                 Generate unique, secure URLs for each testing session to protect your data.
                             </Typography>
                         </Paper>
-                    </Grid>
-                </Grid>
+                    </Grid2>
+                </Grid2>
             </Container>
 
             <Container component="section" maxWidth="sm" sx={{ mt: 8, mb: 2 }}>
@@ -99,27 +103,25 @@ export default function LandingPage() {
                     color="textPrimary"
                     gutterBottom
                 >
-                    Ready to Simplify Your Webhook Testing?
+                    Ready to Simplify<br /> Your Webhook Testing?
                 </Typography>
                 <Typography variant="h5" align="center" color="textSecondary" paragraph>
                     Join thousands of developers who trust Request Inbox for their callback and webhook testing needs.
                 </Typography>
                 <Box component="form" sx={{ mt: 4 }}>
-                    <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} sm={8}>
+                    <Grid2 container spacing={2} alignItems="center">
+                        {/* <Grid2 size={12} >
                             <TextField
                                 fullWidth
                                 variant="outlined"
                                 placeholder="Enter your email"
                                 type="email"
                             />
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <Button fullWidth variant="contained" color="primary" size="large">
-                                Sign Up
-                            </Button>
-                        </Grid>
-                    </Grid>
+                        </Grid2> */}
+                        <Grid2 size={12}>
+                            <SignUpButton />
+                        </Grid2>
+                    </Grid2>
                     <Typography variant="caption" align="center" sx={{ mt: 2, display: 'block' }}>
                         Free plan available. No credit card required.
                     </Typography>
