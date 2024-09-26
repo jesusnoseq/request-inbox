@@ -18,18 +18,24 @@ import ScrollConsistencyLayout from './components/ScrollConsistencyLayout';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/legal/CookieBanner';
-
+import { useUser } from './context/UserContext';
 
 
 
 function App() {
+  const { isLoggedIn } = useUser();
+
   return (
     <ScrollConsistencyLayout>
       <Router>
         <Container>
           <Header />
           <Routes>
-            <Route path="/" element={<InboxListPage />} />
+            {isLoggedIn() ? (
+              <Route path="/" element={<InboxListPage />} />
+            ) : (
+              <Route path="/" element={<LandingPage />} />
+            )}
             <Route path="/inbox" element={<InboxListPage />} />
             <Route path="/api-doc" element={<APIDocPage />} />
             <Route path="/about" element={<AboutPage />} />

@@ -1,30 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link as LinkDOM, useNavigate } from "react-router-dom";
 import { Link, Typography, Box, Button, Toolbar, AppBar } from '@mui/material';
 import ThemeSwitch from '../components/ThemeSwitch';
 import LoginDialog from '../components/LoginDialog';
 import Login from '../components/Login';
-import { getUser, logout } from '../services/inbox';
-import { User } from '../types/inbox';
+import { useUser } from '../context/UserContext';
 // import { Inbox as InboxIcon } from '@mui/icons-material';
 
 export default function Header() {
     const [open, setOpen] = useState(false);
-    const [user, setUser] = React.useState<null | User>(null);
+    const { user, isLoggedIn, logout } = useUser();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const userResponse = await getUser();
-                setUser(userResponse);
-            } catch (err) {
-                console.log("Some error occur", err);
-            }
-        };
-
-        fetchData();
-    }, []);
 
 
     const handleClickOpen = () => {
@@ -36,9 +22,8 @@ export default function Header() {
     };
 
     const handleLogout = async () => {
-        const resp = await logout();
+        const resp = logout();
         console.log("handleLogout resp", resp);
-        setUser(null);
         navigate("/");
     };
 
@@ -62,10 +47,10 @@ export default function Header() {
                     <Button color="inherit" component={LinkDOM} to="/about">About</Button>
                 </Box>
                 <div>
-                    {user &&
+                    {isLoggedIn() &&
                         <Login user={user} onLogout={handleLogout} />
                     }
-                    {!user &&
+                    {!isLoggedIn() &&
                         <>
                             <Button sx={{ marginX: 2 }} color="inherit" variant="outlined" onClick={handleClickOpen}>Login</Button>
                             <LoginDialog open={open} onClose={handleClose} />
