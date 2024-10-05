@@ -117,6 +117,7 @@ func getRouter() (*gin.Engine, func()) {
 	}
 
 	r.Use(login.JWTMiddleware())
+	r.Use(login.APIKeyMiddleware(dao))
 	lh := login.NewLoginHandler(dao)
 	route.SetLoginRoutes(r, lh)
 

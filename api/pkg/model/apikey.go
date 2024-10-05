@@ -16,6 +16,8 @@ const Read PermissionAction = "Read"
 const Update PermissionAction = "Update"
 const Delete PermissionAction = "Delete"
 
+const API_KEY_SIZE = 32
+
 type APIKeyPermissions map[PermissionDomain]map[PermissionAction]bool
 
 type APIKey struct {
@@ -30,7 +32,7 @@ type APIKey struct {
 }
 
 func generateAPIKey() (string, error) {
-	return randomString(32)
+	return randomString(API_KEY_SIZE)
 }
 
 func NewAPIKey(userID uuid.UUID) (APIKey, error) {
