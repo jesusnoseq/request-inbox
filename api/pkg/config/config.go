@@ -68,7 +68,7 @@ const (
 	JWTSecret                     Key    = "JWT_SECRET"
 
 	// Features
-	EnableListingInbox        Key  = "ENABLE_LISTING_INBOX"
+	EnableListingPublicInbox  Key  = "ENABLE_LISTING_PUBLIC_INBOX"
 	EnableListingInboxDefault bool = false
 	EnablePrintConfig         Key  = "PRINT_CONFIG"
 	EnablePrintConfigDefault  bool = false
@@ -101,7 +101,7 @@ func setDefaults(app App) {
 	setDefault(SnapshotVersion, SnapshotVersionDefault)
 
 	// FEATURES
-	setDefault(EnableListingInbox, EnableListingInboxDefault)
+	setDefault(EnableListingPublicInbox, EnableListingInboxDefault)
 	setDefault(EnablePrintConfig, EnableListingInboxDefault)
 
 	// AUTH

@@ -204,7 +204,22 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 }
 
 func (ih *InboxHandler) ListInbox(c *gin.Context) {
-	if !config.GetBool(config.EnableListingInbox) {
+	if login.IsUserLoggedIn(c) {
+		user, err := login.GetUser(c)
+		if err != nil {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+			return
+		}
+		inboxes, err := ih.dao.ListInboxByUser(c, user.ID)
+		if err != nil {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+			return
+		}
+		c.JSON(http.StatusOK, model.NewItemList(inboxes))
+		return
+	}
+
+	if !config.GetBool(config.EnableListingPublicInbox) {
 		c.JSON(http.StatusOK, model.NewItemList([]model.Inbox{}))
 		return
 	}

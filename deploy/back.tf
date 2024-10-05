@@ -64,7 +64,7 @@ resource "aws_lambda_function" "api_lambda" {
     variables = {
       API_MODE = "lambda"
       DB_ENGINE = "dynamo"
-      ENABLE_LISTING_INBOX = "false"
+      ENABLE_LISTING_PUBLIC_INBOX = "false"
       SNAPSHOT_VERSION = var.API_SNAPSHOT_VERSION
     }
   }
@@ -72,7 +72,7 @@ resource "aws_lambda_function" "api_lambda" {
 
 resource "aws_cloudwatch_log_group" "api_lambda_log_group" {
   name = "/aws/lambda/${aws_lambda_function.api_lambda.function_name}"
-  retention_in_days = 30
+  retention_in_days = 90
 }
 
 
