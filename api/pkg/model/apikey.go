@@ -16,37 +16,38 @@ const Read PermissionAction = "Read"
 const Update PermissionAction = "Update"
 const Delete PermissionAction = "Delete"
 
-type ApiKeyPermissions map[PermissionDomain]map[PermissionAction]bool
+type APIKeyPermissions map[PermissionDomain]map[PermissionAction]bool
 
-type ApiKey struct {
+type APIKey struct {
 	ID           uuid.UUID
-	Porpose      string
-	UserID       uuid.UUID
+	Name         string
+	OwnerID      uuid.UUID
 	APIKey       string
 	CreationDate time.Time
 	ExpiryDate   time.Time
 	IsActive     bool
-	Permissions  ApiKeyPermissions
+	Permissions  APIKeyPermissions
 }
 
 func generateAPIKey() (string, error) {
 	return randomString(32)
 }
 
-func NewApiKey(userID uuid.UUID) (ApiKey, error) {
+func NewAPIKey(userID uuid.UUID) (APIKey, error) {
 	apiKey, err := generateAPIKey()
 	if err != nil {
 		fmt.Println("Error generating API key:", err)
-		return ApiKey{}, err
+		return APIKey{}, err
 	}
-	return ApiKey{
+	return APIKey{
 		ID:           NewApiKeyID(apiKey),
-		UserID:       userID,
+		Name:         "",
+		OwnerID:      userID,
 		APIKey:       apiKey,
 		CreationDate: time.Now(),
 		ExpiryDate:   time.Now().AddDate(0, 3, 0),
 		IsActive:     true,
-		Permissions:  ApiKeyPermissions{},
+		//Permissions:  ApiKeyPermissions{},
 	}, nil
 }
 

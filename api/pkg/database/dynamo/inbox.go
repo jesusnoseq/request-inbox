@@ -1,6 +1,7 @@
 package dynamo
 
 import (
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -36,11 +37,27 @@ type UserItem struct {
 	User  model.User `dynamodbav:"doc"`
 }
 
+type APIKeyItem struct {
+	PK     string       `dynamodbav:"PK"`
+	SK     string       `dynamodbav:"SK"`
+	OWNER  string       `dynamodbav:"OWNER_ID"`
+	APIKey model.APIKey `dynamodbav:"doc"`
+}
+
 const InboxKey = "INBOX"
 const RequestKey = "REQUEST"
 const UserKey = "USER"
 const OWNERKey = "OWNER_ID"
+const APIKeyKey = "API_KEY"
 const KS = "#" // Key Separator
+
+func GenAPIKeyKey(id uuid.UUID) (string, string) {
+	return APIKeyKey + KS + id.String(), APIKeyKey
+}
+
+func IsAPIKeySK(sk string) bool {
+	return strings.HasPrefix(sk, APIKeyKey)
+}
 
 func GenUserKey(id uuid.UUID) (string, string) {
 	return UserKey + KS + id.String(), UserKey
@@ -101,5 +118,20 @@ func toUserItem(user model.User) UserItem {
 		SK:    sk,
 		OWNER: pk,
 		User:  user,
+	}
+}
+
+func toAPIKeyItem(ak model.APIKey) APIKeyItem {
+	pk, sk := GenAPIKeyKey(ak.ID)
+	if ak.OwnerID == uuid.Nil {
+		log.Fatal("API key user ID can not be nil")
+	}
+
+	owner, _ := GenUserKey(ak.OwnerID)
+	return APIKeyItem{
+		PK:     pk,
+		SK:     sk,
+		OWNER:  owner,
+		APIKey: ak,
 	}
 }

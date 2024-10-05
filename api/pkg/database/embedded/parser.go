@@ -8,7 +8,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-func encode[T model.Inbox | model.User](inbox T) ([]byte, error) {
+func encode[T model.Inbox | model.User | model.APIKey](inbox T) ([]byte, error) {
 	var buffer bytes.Buffer
 	encoder := gob.NewEncoder(&buffer)
 	err := encoder.Encode(inbox)
@@ -18,7 +18,7 @@ func encode[T model.Inbox | model.User](inbox T) ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-func decode[T model.Inbox | model.User](b []byte) (T, error) {
+func decode[T model.Inbox | model.User | model.APIKey](b []byte) (T, error) {
 	decoder := gob.NewDecoder(bytes.NewReader(b))
 	var inbox T
 	err := decoder.Decode(&inbox)

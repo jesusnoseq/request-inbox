@@ -12,6 +12,7 @@ import (
 
 const inboxPrefix = "inbox#"
 const userPrefix = "user#"
+const apiKeyPrefix = "apiKey#"
 
 type InboxBadger struct {
 	db *badger.DB
@@ -45,6 +46,10 @@ func (ib *InboxBadger) getInboxKey(id uuid.UUID) []byte {
 
 func (ib *InboxBadger) getUserKey(id uuid.UUID) []byte {
 	return append([]byte(userPrefix), id[:]...)
+}
+
+func (ib *InboxBadger) getAPIKeyKey(id uuid.UUID) []byte {
+	return append([]byte(apiKeyPrefix), id[:]...)
 }
 
 func (ib *InboxBadger) CreateInbox(ctx context.Context, inbox model.Inbox) (model.Inbox, error) {
@@ -212,4 +217,84 @@ func (ib *InboxBadger) GetUser(ctx context.Context, ID uuid.UUID) (model.User, e
 		return model.User{}, err
 	}
 	return decode[model.User](valCopy)
+}
+
+func (ib *InboxBadger) CreateAPIKey(ctx context.Context, apiKey model.APIKey) error {
+	data, err := encode(apiKey)
+	if err != nil {
+		return err
+	}
+
+	e := badger.NewEntry(ib.getAPIKeyKey(apiKey.ID), data)
+	err = ib.db.Update(func(txn *badger.Txn) error {
+		return txn.SetEntry(e)
+	})
+	return err
+}
+
+func (ib *InboxBadger) GetAPIKey(ctx context.Context, apiKeyID uuid.UUID) (model.APIKey, error) {
+	var valCopy []byte
+	err := ib.db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get(ib.getAPIKeyKey(apiKeyID))
+		if err != nil {
+			return err
+		}
+		err = item.Value(func(val []byte) error {
+			valCopy = append([]byte{}, val...)
+			return nil
+		})
+		return err
+	})
+	if err != nil {
+		return model.APIKey{}, err
+	}
+
+	return decode[model.APIKey](valCopy)
+}
+
+func (ib *InboxBadger) ListAPIKeyByUser(ctx context.Context, userID uuid.UUID) ([]model.APIKey, error) {
+	var apiKeys []model.APIKey
+	prefix := ib.getAPIKeyKey(userID)
+
+	err := ib.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = true
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			item := it.Item()
+			var valCopy []byte
+			err := item.Value(func(val []byte) error {
+				valCopy = append([]byte{}, val...)
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+
+			apiKey, err := decode[model.APIKey](valCopy)
+			if err != nil {
+				return err
+			}
+
+			apiKeys = append(apiKeys, apiKey)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return apiKeys, nil
+}
+
+func (ib *InboxBadger) DeleteAPIKey(ctx context.Context, apiKeyID uuid.UUID) error {
+	err := ib.db.Update(func(txn *badger.Txn) error {
+		return txn.Delete(ib.getAPIKeyKey(apiKeyID))
+	})
+	if err != nil {
+		return fmt.Errorf("error deleting API key %v: %w", apiKeyID, err)
+	}
+	return nil
 }

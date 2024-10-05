@@ -8,6 +8,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jesusnoseq/request-inbox/pkg/collection"
 )
 
@@ -106,4 +107,13 @@ func GenerateUserWithProvider() User {
 	u := GenerateUser()
 	u.Provider = GenerateUserProvider()
 	return u
+}
+
+func GenerateAPIKey(userID uuid.UUID) APIKey {
+	ak, err := NewAPIKey(userID)
+	if err != nil {
+		panic(err)
+	}
+	ak.Name = "Generated API key"
+	return ak
 }
