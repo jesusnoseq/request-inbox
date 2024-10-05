@@ -40,7 +40,7 @@ func NewAPIKey(userID uuid.UUID) (APIKey, error) {
 		return APIKey{}, err
 	}
 	return APIKey{
-		ID:           NewApiKeyID(apiKey),
+		ID:           NewAPIKeyID(apiKey),
 		Name:         "",
 		OwnerID:      userID,
 		APIKey:       apiKey,
@@ -51,6 +51,6 @@ func NewAPIKey(userID uuid.UUID) (APIKey, error) {
 	}, nil
 }
 
-func NewApiKeyID(key string) uuid.UUID {
+func NewAPIKeyID(key string) uuid.UUID {
 	return uuid.NewSHA1(uuid.NameSpaceOID, []byte(key))
 }

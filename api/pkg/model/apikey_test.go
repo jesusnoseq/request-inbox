@@ -7,16 +7,16 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestNewApiKey(t *testing.T) {
+func TestNewAPIKey(t *testing.T) {
 	userID := uuid.New()
 
-	apiKey, err := NewApiKey(userID)
+	apiKey, err := NewAPIKey(userID)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
-	if apiKey.UserID != userID {
-		t.Errorf("Expected UserID %v, got %v", userID, apiKey.UserID)
+	if apiKey.OwnerID != userID {
+		t.Errorf("Expected UserID %v, got %v", userID, apiKey.OwnerID)
 	}
 
 	if apiKey.APIKey == "" {
@@ -27,7 +27,7 @@ func TestNewApiKey(t *testing.T) {
 		t.Errorf("Expected APIKey to have 32 chars, but it has %d", len(apiKey.APIKey))
 	}
 
-	expectedID := NewApiKeyID(apiKey.APIKey)
+	expectedID := NewAPIKeyID(apiKey.APIKey)
 	if apiKey.ID != expectedID {
 		t.Errorf("Expected ID %v, got %v", expectedID, apiKey.ID)
 	}
@@ -53,8 +53,8 @@ func TestNewApiKey(t *testing.T) {
 
 func TestNewApiKeyID(t *testing.T) {
 	apiKey := "some-random-key"
-	id1 := NewApiKeyID(apiKey)
-	id2 := NewApiKeyID(apiKey)
+	id1 := NewAPIKeyID(apiKey)
+	id2 := NewAPIKeyID(apiKey)
 
 	if id1 != id2 {
 		t.Errorf("Expected the same UUID for the same API key, got %v and %v", id1, id2)
