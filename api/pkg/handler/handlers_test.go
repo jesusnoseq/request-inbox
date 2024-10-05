@@ -128,7 +128,7 @@ func TestCreateInbox(t *testing.T) {
 
 func TestListInbox(t *testing.T) {
 	config.LoadConfig(config.Test)
-	config.Set(config.EnableListingInbox, true)
+	config.Set(config.EnableListingPublicInbox, true)
 	ih, closer := mustGetInboxHandler()
 	defer closer()
 	inboxA := shoudlExistsInbox(ih, model.GenerateInbox())
