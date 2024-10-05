@@ -1,6 +1,8 @@
 package collection
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func SliceContains[T comparable](s []T, e T) bool {
 	for _, a := range s {
@@ -11,9 +13,9 @@ func SliceContains[T comparable](s []T, e T) bool {
 	return false
 }
 
-type EqualsFunc func(a any, b any) bool
+type EqualsFunc[T any] func(a T, b T) bool
 
-func SliceOfAnyContains[T any](s []T, e T, equals EqualsFunc) bool {
+func SliceOfAnyContains[T any](s []T, e T, equals EqualsFunc[T]) bool {
 	for _, a := range s {
 		if equals(a, e) {
 			return true

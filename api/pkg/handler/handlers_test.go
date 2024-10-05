@@ -160,7 +160,7 @@ func TestListInbox(t *testing.T) {
 	}
 }
 
-func InboxEquals(a any, b any) bool {
+func InboxEquals(a, b model.Inbox) bool {
 	return cmp.Equal(a, b)
 }
 
