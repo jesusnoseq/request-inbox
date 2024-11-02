@@ -26,8 +26,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Inbox"
+        403:
+          description: You are not allowed to read the inbox
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         404:
-          description: No spacecraft found for the provided `inboxID`
+          description: No inbox found for the provided `inboxID`
           content:
             application/json:
               schema:
@@ -49,6 +55,12 @@ paths:
       responses:
         200:
           description: Inbox updated successfully
+        403:
+          description: You are not allowed to update the inbox
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         404:
           description: No inbox found for the provided `inboxID`
           content:
@@ -66,6 +78,12 @@ paths:
       responses:
         204:
           description: delete the provided `inboxID`
+        403:
+          description: You are not allowed to delete the inbox
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         404:
           description: No inbox found for the provided `inboxID`
           content:
@@ -235,6 +253,6 @@ components:
     ApiKey:
       type: apiKey
       in: header
-      name: X-Api-Key
+      name: X-API-KEY
 security:
   - ApiKey: []
