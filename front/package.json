@@ -22,7 +22,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.18.0",
     "react-scripts": "5.0.1",
-    "swagger-ui-react": "^5.10.5",
+    "swagger-ui-react": "^5.17.14",
     "swr": "^2.2.4",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
