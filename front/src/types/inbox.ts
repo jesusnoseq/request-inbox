@@ -10,6 +10,7 @@ export type Inbox = {
     Response: InboxResponse;
     Requests: InboxRequest[];
     ObfuscateHeaderFields: string[];
+    IsPrivate: boolean;
 }
 
 export type InboxRequest = {

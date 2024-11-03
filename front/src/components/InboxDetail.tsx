@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Inbox, InboxResponse } from '../types/inbox';
-import { Typography, Paper } from '@mui/material';
+import { Typography, Paper, Box } from '@mui/material';
 import moment from 'moment';
 import HighlightURL from '../components/HighlightURL';
 import { buildInboxURL, updateInbox } from '../services/inbox';
 import ResponseInlineEditor from '../components/ResponseInlineEditor';
 import TextInlineEditor from '../components/TextInlineEditor';
+import InboxVisibilityToggle from '../components/InboxVisibilityToggle';
+
 
 
 type InboxDetailProps = {
@@ -35,13 +37,30 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
         setInbox(resp);
     };
 
+    const handleSaveIsPublic = async (isPublic: boolean) => {
+        const updatedInbox = {
+            ...inbox,
+            IsPrivate: !isPublic
+        };
+        const resp = await updateInbox(updatedInbox)
+        setInbox(resp);
+    }
+
     return (
         <Paper sx={{ padding: 2 }}>
             <TextInlineEditor initialValue={inbox.Name} label='Inbox' onSave={handleSaveInboxName} />
-
-            <Typography color="textSecondary">
-                Open since {moment(inbox.Timestamp).format('LLL')}
-            </Typography>
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+                mb={2}
+            >
+                <Typography color="textSecondary">
+                    Open since {moment(inbox.Timestamp).format('LLL')}
+                </Typography>
+                <InboxVisibilityToggle defaultPublic={!inbox.IsPrivate} onChange={handleSaveIsPublic} />
+            </Box>
             <HighlightURL url={inboxURL} />
 
             <ResponseInlineEditor response={inbox.Response} onSave={handleSaveResponse} />
