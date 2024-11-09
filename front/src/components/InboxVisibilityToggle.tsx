@@ -28,32 +28,34 @@ export default function InboxVisibilityToggle({ onChange, defaultPublic = false 
     }
 
     return (
-        <Tooltip
-            title={isPublic ?
-                "Make this inbox private.<br/> Other users can not see this page. This change does not affect the collection of requests." :
-                "Make this inbox public.<br/> Any user can see this page. This change does not affect the collection of requests."
-            }
-            placement="top"
-            arrow
-        >
-            <FormControlLabel
-                control={
-                    <StyledSwitch
-                        checked={isPublic}
-                        onChange={handleChange}
-                        inputProps={{ 'aria-label': 'visibility toggle' }}
-                        size="small"
-                    />
+        <>
+            <Tooltip
+                title={isPublic ?
+                    "Any user can view this page." :
+                    "Other users cannot view this page."
                 }
-                label={isPublic ? "Public" : "Private"}
-                sx={{
-                    marginLeft: 1,
-                    '& .MuiFormControlLabel-label': {
-                        fontSize: '0.875rem',
-                        color: 'text.secondary'
+                placement="top"
+                arrow
+            >
+                <FormControlLabel
+                    control={
+                        <StyledSwitch
+                            checked={isPublic}
+                            onChange={handleChange}
+                            inputProps={{ 'aria-label': 'visibility toggle' }}
+                            size="small"
+                        />
                     }
-                }}
-            />
-        </Tooltip>
+                    label={isPublic ? "Public" : "Private"}
+                    sx={{
+                        marginLeft: 1,
+                        '& .MuiFormControlLabel-label': {
+                            fontSize: '0.875rem',
+                            color: 'text.secondary'
+                        }
+                    }}
+                />
+            </Tooltip >
+        </>
     )
 }
