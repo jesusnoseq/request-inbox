@@ -7,7 +7,7 @@ import { buildInboxURL, updateInbox } from '../services/inbox';
 import ResponseInlineEditor from '../components/ResponseInlineEditor';
 import TextInlineEditor from '../components/TextInlineEditor';
 import InboxVisibilityToggle from '../components/InboxVisibilityToggle';
-
+import { useUser } from '../context/UserContext';
 
 
 type InboxDetailProps = {
@@ -16,6 +16,7 @@ type InboxDetailProps = {
 
 
 const InboxDetail: React.FC<InboxDetailProps> = (props) => {
+    const { isLoggedIn } = useUser();
     const [inbox, setInbox] = useState<Inbox>(props.inbox);
     const inboxURL = buildInboxURL(props.inbox.ID);
 
@@ -59,7 +60,9 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
                 <Typography color="textSecondary">
                     Open since {moment(inbox.Timestamp).format('LLL')}
                 </Typography>
-                <InboxVisibilityToggle defaultPublic={!inbox.IsPrivate} onChange={handleSaveIsPublic} />
+                {isLoggedIn() &&
+                    <InboxVisibilityToggle defaultPublic={!inbox.IsPrivate} onChange={handleSaveIsPublic} />
+                }
             </Box>
             <HighlightURL url={inboxURL} />
 
