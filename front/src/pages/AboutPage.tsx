@@ -5,7 +5,6 @@ import {
     Typography,
     Paper,
     Grid2,
-    Button,
     useTheme,
     useMediaQuery,
 } from '@mui/material';
@@ -30,13 +29,13 @@ export default function AboutPage() {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
 
-    const handleClick = async () => {
-        if (isLoggedIn()) {
-            navigate('/');
-        } else {
-            setOpen(true);
-        }
-    };
+    // const handleClick = async () => {
+    //     if (isLoggedIn()) {
+    //         navigate('/');
+    //     } else {
+    //         setOpen(true);
+    //     }
+    // };
 
 
     const handleClose = () => {
