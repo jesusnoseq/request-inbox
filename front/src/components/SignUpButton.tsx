@@ -7,9 +7,10 @@ import LoginDialog from './LoginDialog';
 
 interface SignUpButtonProps {
     text?: string;
+    fill?: boolean;
 }
 
-const SignUpButton: React.FC<SignUpButtonProps> = ({ text = "Sign Up" }) => {
+const SignUpButton: React.FC<SignUpButtonProps> = ({ text = "Sign Up", fill = false }) => {
     const [open, setOpen] = useState(false);
     const { isLoggedIn } = useUser();
     const navigate = useNavigate();
@@ -28,10 +29,10 @@ const SignUpButton: React.FC<SignUpButtonProps> = ({ text = "Sign Up" }) => {
     return (
         <>
             <Button
-                fullWidth
-                variant="contained"
-                color="primary"
                 size="large"
+                fullWidth={fill}
+                color="primary"
+                variant="contained"
                 onClick={handleOpen}
             >
                 {text}
