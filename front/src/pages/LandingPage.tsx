@@ -13,15 +13,14 @@ import {
     Code as CodeIcon,
     // Inbox as InboxIcon,
     Lock as LockIcon,
-    Notifications as NotificationsIcon,
+    DynamicFeed as DynamicFeedIcon,
 } from '@mui/icons-material';
 import { useNavigate } from "react-router-dom";
 import SignUpButton from '../components/SignUpButton';
-
+import CreateInboxButton from '../components/CreateNewInboxButton'
 
 export default function LandingPage() {
     const navigate = useNavigate();
-
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -39,12 +38,16 @@ export default function LandingPage() {
                     Request Inbox simplifies the process of testing and debugging callbacks and webhooks. Capture, inspect, and manage incoming HTTP requests effortlessly.
                 </Typography>
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                    <Button variant="contained" color="primary" sx={{ mx: 1 }} onClick={() => navigate('/')}>
-                        Get Started
-                    </Button>
+                    <SignUpButton />
                     <Button variant="outlined" color="primary" sx={{ mx: 1 }} onClick={() => navigate('/users-manual')}>
                         Learn More
                     </Button>
+                </Box>
+                <Typography variant="h5" align="center" color="textSecondary" paragraph sx={{ mt: 5 }}>
+                    Or jump straight into action and create a new Request Inbox anonymously.
+                </Typography>
+                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+                    <CreateInboxButton />
                 </Box>
             </Container>
 
@@ -61,23 +64,23 @@ export default function LandingPage() {
                 <Grid2 container spacing={4} sx={{ mt: 4 }}>
                     <Grid2 size={4}>
                         <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <CodeIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
+                            <DynamicFeedIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                             <Typography variant="h5" component="h3" gutterBottom>
-                                Real-time Request Capture
+                                Request Capture
                             </Typography>
                             <Typography align="center">
-                                Instantly capture and display incoming HTTP requests for immediate analysis.
+                                Capture and display incoming HTTP requests for immediate analysis.
                             </Typography>
                         </Paper>
                     </Grid2>
                     <Grid2 size={4}>
                         <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <NotificationsIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
+                            <CodeIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                             <Typography variant="h5" component="h3" gutterBottom>
-                                Custom Notifications
+                                Custom Responses
                             </Typography>
                             <Typography align="center">
-                                Set up alerts for specific request patterns or payload contents.
+                                Configure and send tailored responses to incoming requests, enabling flexible testing scenarios.
                             </Typography>
                         </Paper>
                     </Grid2>
@@ -105,9 +108,9 @@ export default function LandingPage() {
                 >
                     Ready to Simplify<br /> Your Webhook Testing?
                 </Typography>
-                <Typography variant="h5" align="center" color="textSecondary" paragraph>
+                {/* <Typography variant="h5" align="center" color="textSecondary" paragraph>
                     Join thousands of developers who trust Request Inbox for their callback and webhook testing needs.
-                </Typography>
+                </Typography> */}
                 <Box component="form" sx={{ mt: 4 }}>
                     <Grid2 container spacing={2} alignItems="center">
                         {/* <Grid2 size={12} >
@@ -119,12 +122,12 @@ export default function LandingPage() {
                             />
                         </Grid2> */}
                         <Grid2 size={12}>
-                            <SignUpButton />
+                            <SignUpButton fill />
                         </Grid2>
                     </Grid2>
-                    <Typography variant="caption" align="center" sx={{ mt: 2, display: 'block' }}>
+                    {/* <Typography variant="caption" align="center" sx={{ mt: 2, display: 'block' }}>
                         Free plan available. No credit card required.
-                    </Typography>
+                    </Typography> */}
                 </Box>
             </Container>
         </Box>

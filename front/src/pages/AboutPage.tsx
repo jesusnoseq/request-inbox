@@ -54,11 +54,8 @@ export default function AboutPage() {
             </Box>
 
             <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
-                <Typography variant="body1" paragraph>
-                    In the fast-paced world of web development, every second counts. That's where Request Inbox comes in – your steadfast ally in the realm of webhook testing and debugging.
-                </Typography>
-                <Typography variant="body1" paragraph>
-                    Born from the frustrations of developers constantly searching for reliable webhook endpoints, Request Inbox is more than just a tool. It's a solution that brings peace of mind to your development process.
+                <Typography variant="body1" >
+                    It's a tool for testing and debugging webhooks, built to make a developer's life easier. If you're tired of hunting for reliable webhook endpoints, Request Inbox has your back. It's simple, dependable, and takes the hassle out of your workflow so you can focus on what you do best.
                 </Typography>
             </Paper>
 
@@ -112,7 +109,7 @@ export default function AboutPage() {
                             <Typography variant="h6" component="h1">
                                 The Problem
                             </Typography>
-                            <Typography>Developers struggled with unreliable webhook testing solutions.</Typography>
+                            <Typography>Developers struggled with unreliable webhook <br />testing solutions.</Typography>
                         </TimelineContent>
                     </TimelineItem>
                     <TimelineItem>
@@ -124,7 +121,8 @@ export default function AboutPage() {
                             <Typography variant="h6" component="h1">
                                 The Idea
                             </Typography>
-                            <Typography>We envisioned a tool that would always be there when you need it.</Typography>
+                            <Typography>We envisioned a tool that would always be there
+                                <br />when you need it.</Typography>
                         </TimelineContent>
                     </TimelineItem>
                     <TimelineItem>
@@ -136,7 +134,7 @@ export default function AboutPage() {
                             <Typography variant="h6" component="h1">
                                 The Solution
                             </Typography>
-                            <Typography>Request Inbox was born, offering reliable URLs for webhook testing.</Typography>
+                            <Typography>Request Inbox was born, offering reliable URLs <br />for webhook testing.</Typography>
                         </TimelineContent>
                     </TimelineItem>
                     <TimelineItem>
@@ -147,7 +145,7 @@ export default function AboutPage() {
                             <Typography variant="h6" component="h1">
                                 The Future
                             </Typography>
-                            <Typography>Continuously evolving to meet the needs of developers worldwide.</Typography>
+                            <Typography>Continuously evolving to meet the needs <br />of developers worldwide.</Typography>
                         </TimelineContent>
                     </TimelineItem>
                 </Timeline>
@@ -161,7 +159,10 @@ export default function AboutPage() {
                 {/* <Button variant="contained" color="primary" size="large" onClick={handleClick}>
                     Get Started Now
                 </Button> */}
-                <SignUpButton text='Get Started Now' />
+                <Box sx={{ maxWidth: 300, margin: 'auto' }}>
+                    <SignUpButton text='Get Started Now' />
+                </Box>
+
                 <LoginDialog open={open} onClose={handleClose} />
             </Box>
         </Container>
