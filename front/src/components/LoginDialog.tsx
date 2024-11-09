@@ -62,7 +62,7 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
                 <DialogContentText>
                     Please choose a method to log in:
                 </DialogContentText>
-                <Button
+                {/* <Button
                     variant="contained"
                     startIcon={<GoogleIcon />}
                     onClick={handleGoogleLogin}
@@ -71,7 +71,7 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
                     disabled={!checked}
                 >
                     Login with Google
-                </Button>
+                </Button> */}
                 <Button
                     variant="contained"
                     startIcon={<GitHubIcon />}
