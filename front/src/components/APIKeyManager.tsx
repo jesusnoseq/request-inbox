@@ -90,10 +90,10 @@ export default function APIKeyManager() {
 
             <Paper style={{ padding: '20px', marginBottom: '20px' }}>
                 <Typography variant="h6" gutterBottom>
-                    Request New API Key
+                    Request new API key
                 </Typography>
                 <Grid2 container spacing={2} alignItems="flex-end">
-                    <Grid2>
+                    <Grid2 size={7}>
                         <TextField
                             fullWidth
                             size='small'
@@ -102,7 +102,7 @@ export default function APIKeyManager() {
                             onChange={(e) => setNewKeyDescription(e.target.value)}
                         />
                     </Grid2>
-                    <Grid2>
+                    <Grid2 size={2}>
                         <FormControl fullWidth>
                             <InputLabel>Expiration</InputLabel>
                             <Select
@@ -119,7 +119,7 @@ export default function APIKeyManager() {
                             </Select>
                         </FormControl>
                     </Grid2>
-                    <Grid2>
+                    <Grid2 size={3}>
                         <Button
                             variant="contained"
                             color="primary"
