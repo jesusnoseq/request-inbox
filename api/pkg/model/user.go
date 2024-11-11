@@ -24,6 +24,8 @@ type User struct {
 	Timestamp    int64        `dynamodbav:"unixTimestamp"`
 }
 
+const UserEntityName = "User"
+
 func NewUser(email string) User {
 	return User{
 		ID:        NewUserID(email),

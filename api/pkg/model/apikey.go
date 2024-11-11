@@ -16,6 +16,8 @@ const Read PermissionAction = "Read"
 const Update PermissionAction = "Update"
 const Delete PermissionAction = "Delete"
 
+const APIKeyEntityName = "API key"
+
 const API_KEY_SIZE = 32
 
 type APIKeyPermissions map[PermissionDomain]map[PermissionAction]bool
@@ -46,8 +48,8 @@ func NewAPIKey(userID uuid.UUID) (APIKey, error) {
 		Name:         "",
 		OwnerID:      userID,
 		APIKey:       apiKey,
-		CreationDate: time.Now(),
-		ExpiryDate:   time.Now().AddDate(0, 3, 0),
+		CreationDate: time.Now().UTC(),
+		ExpiryDate:   time.Now().UTC().AddDate(0, 3, 0),
 		IsActive:     true,
 		//Permissions:  ApiKeyPermissions{},
 	}, nil

@@ -11,6 +11,7 @@ const (
 	ContentTypeHeader        = "Content-Type"
 	DefaultContentTypeHeader = "application/json; charset=utf-8"
 	DefaultBody              = "{}"
+	InboxEntityName          = "Inbox"
 )
 
 type Inbox struct {
