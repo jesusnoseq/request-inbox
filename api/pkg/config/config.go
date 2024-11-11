@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
@@ -77,6 +78,9 @@ const (
 func LoadConfig(app App) {
 	setDefaults(app)
 	viper.AutomaticEnv()
+	if app == Test {
+		gin.SetMode(gin.TestMode)
+	}
 	PrintConfig()
 }
 
