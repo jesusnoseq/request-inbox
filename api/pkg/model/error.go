@@ -1,5 +1,7 @@
 package model
 
+import "net/http"
+
 type ErrorDetail struct {
 	Field   string `json:"field"`
 	Code    string `json:"code"`
@@ -39,4 +41,12 @@ func ErrorResponseFromError(err error, code int) (int, ErrorResponse) {
 		Code:    code,
 		Message: err.Error(),
 	}
+}
+
+func NewUnauthorizedError() (int, ErrorResponse) {
+	return ErrorResponseMsg("Unauthorized", http.StatusUnauthorized)
+}
+
+func NewNotFoundError(entity string) (int, ErrorResponse) {
+	return ErrorResponseMsg(entity+" not found", http.StatusNotFound)
 }
