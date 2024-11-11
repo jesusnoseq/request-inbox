@@ -37,9 +37,10 @@ function App() {
               <Route path="/" element={<LandingPage />} />
             )}
             <Route path="/inbox" element={<InboxListPage />} />
-            <Route path="/api-doc" element={<APIDocPage />} />
+            <Route path="/api-docs" element={<APIDocPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/users-manual" element={<UsersManualPage />} />
+            <Route path="/docs" element={<UsersManualPage />} />
             <Route path="/inbox/:inboxId" element={<InboxDetailPage />} />
             <Route path="/profile" element={<UserProfilePage />} />
             <Route path="/health" element={<HealthPage />} />
