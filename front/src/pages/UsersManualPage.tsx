@@ -1,45 +1,177 @@
 import React from 'react';
-import Box from '@mui/material/Box';
+import { Box, Button } from '@mui/material';
 import ExternalLink from '../components/ExternalLink';
-
+import { useNavigate } from 'react-router-dom';
 import { Container, Typography, Accordion, AccordionSummary, AccordionDetails, List, ListItem, Paper } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 
 const UsersManualPage: React.FC = () => {
+    const navigate = useNavigate();
     return (
         <Container>
             <Box my={4}>
                 <Typography variant="h4" component="h2" gutterBottom>
-                    Request Inbox user's manual
+                    Request Inbox Docs
                 </Typography>
-                <Typography variant="body1" paragraph>
-                    Welcome to the user manual. Here you will find detailed instructions on how to use each feature of our application.<br />
+                <Typography variant="body1" component="p">
+                    Here you will find instructions on how to use each feature of our application.
                     This is a work in progress so forgive me for the lack of completeness.
                 </Typography>
 
+                <Typography variant="body1" component="p">
+                    Also, you can check our API docs for more detailed technical information and integration guidelines
+                </Typography>
+
+
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => navigate('/api-docs')}
+                    sx={{ m: 2 }}
+                >
+                    Explore API Docs
+                </Button>
+
+                <Accordion sx={{ maxWidth: 'md' }}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                        <Typography variant="h5" component="h3" >Core concepts</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <List>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Inbox</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            Manages incoming requests. Each Inbox has a unique URL that receives and captures all requests sent to it.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Request</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            Represents each individual HTTP request sent to the Inbox's unique URL. This entity logs important details of the incoming request, such as headers, body content, and timestamp.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Response</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            Defines the default reply sent back to the client when a request is captured by an Inbox. The Response entity can be customized to return specific data or statuses based on testing needs.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                        </List>
+                    </AccordionDetails>
+                </Accordion>
+
+                <Accordion sx={{ maxWidth: 'md' }}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                        <Typography variant="h5" component="h3" >Anonymous, Public, Private inboxes</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Typography component="p">
+                            The application provides three types of inboxes; Anonymous, Public and Private. Each with distinct permissions for managing access to captured requests.
+                        </Typography>
+                        <List>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Anonymous Inbox</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            An Anonymous Inbox is a type of Public Inbox with open access. Created by unregistered users.
+                                            Anyone can read, modify, or delete the contents of an Anonymous Inbox, making it completely open.
+                                            Anonymous Inboxes are not listed within the web interface or API, making them accessible only via a direct link to their unique URL.
+                                            This makes them suitable for temporary testing needs where access control and visibility are not required,
+                                            but it's important to avoid using Anonymous Inboxes for sensitive or persistent data due to their lack of protection.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Public Inbox</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            A Public Inbox is visible to everyone, allowing any user to read its contents. However, only the owner has permission to modify or delete the inbox and its contents.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Private Inbox</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            A Private Inbox is fully restricted to the owner. Only the owner can read, modify, or delete the inbox and its contents.
+                                            The inbox will still capture all incoming requests sent to its URL, but only the owner can access or manage them.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                        </List>
+                    </AccordionDetails>
+                </Accordion>
 
                 <Accordion sx={{ maxWidth: 'md' }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
                         <Typography variant="h5" component="h3" >Dynamic responses</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                        <Typography paragraph>
+                        <Typography component="p">
                             Dynamic responses can be activated for each inbox individually.
                             This feature make that for each request sent to the inbox URL a specific response will be calculated by rendering templates.
                             Once enabled, headers values and response body are threated as templates.
                         </Typography>
-                        <Typography paragraph>
+                        <Typography component="p">
                             Status code template is a optional special field that can be filled once dynamic response is activated.
                             It allows setup a template to calculate the status code of a response. The template should output an integer between 100 and 999.
                             If the template renders a number successfully, it will rewrite the status code.
                             Status code value will be use as fallback when renders status code template does not result in a valid HTTP status code number
                         </Typography>
-                        <Typography paragraph>
+                        <Typography component="p">
                             The rendering order of the response templates is: status code template, body and headers.
                             In this way, for example, headers and body could use the result of rendering the status code template in status code field and headers cloud use a rendered response body.
                         </Typography>
-                        <Typography paragraph>
+                        <Typography component="p">
                             Request inbox templates are based on <ExternalLink href="https://pkg.go.dev/text/template">Golang templates</ExternalLink>.
                             The documentation is wide and this manual will provide some examples.
                         </Typography>
