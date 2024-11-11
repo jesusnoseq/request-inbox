@@ -1,11 +1,17 @@
 
 import React, { useState } from 'react';
-import { LoadingButton } from '@mui/lab';
+import { LoadingButton, LoadingButtonProps } from '@mui/lab';
 import { useNavigate } from 'react-router-dom';
 import { newInbox } from '../services/inbox';
 import { useError } from '../context/ErrorContext';
 
-export default function CreateNewInboxButton() {
+
+
+interface CreateNewInboxButtonProps extends LoadingButtonProps {
+    text?: string;
+}
+
+const CreateNewInboxButton: React.FC<CreateNewInboxButtonProps> = ({ text = "Create new Inbox", ...props }) => {
     const [loading, setLoading] = useState(false);
     const { setError } = useError();
 
@@ -24,15 +30,14 @@ export default function CreateNewInboxButton() {
     };
 
     return (
-        <>
-            <LoadingButton
-                variant="contained"
-                color="primary"
-                onClick={handleCreateInbox}
-                loading={loading}
-            >
-                Create new Inbox
-            </LoadingButton>
-        </>
+        <LoadingButton
+            onClick={handleCreateInbox}
+            loading={loading}
+            {...props}
+        >
+            Create new Inbox
+        </LoadingButton>
     );
 }
+
+export default CreateNewInboxButton;
