@@ -16,7 +16,7 @@ type InboxDetailProps = {
 
 
 const InboxDetail: React.FC<InboxDetailProps> = (props) => {
-    const { isLoggedIn } = useUser();
+    const { isLoggedIn, user } = useUser();
     const [inbox, setInbox] = useState<Inbox>(props.inbox);
     const inboxURL = buildInboxURL(props.inbox.ID);
 
@@ -47,6 +47,8 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
         setInbox(resp);
     }
 
+    const canEdit = inbox.OwnerID === '00000000-0000-0000-0000-000000000000' || (isLoggedIn() && inbox.OwnerID === user.ID)
+
     return (
         <Paper sx={{ padding: 2 }}>
             <TextInlineEditor initialValue={inbox.Name} label='Inbox' onSave={handleSaveInboxName} />
@@ -60,13 +62,13 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
                 <Typography color="textSecondary">
                     Open since {moment(inbox.Timestamp).format('LLL')}
                 </Typography>
-                {isLoggedIn() &&
+                {canEdit &&
                     <InboxVisibilityToggle defaultPublic={!inbox.IsPrivate} onChange={handleSaveIsPublic} />
                 }
             </Box>
             <HighlightURL url={inboxURL} />
 
-            <ResponseInlineEditor response={inbox.Response} onSave={handleSaveResponse} />
+            <ResponseInlineEditor response={inbox.Response} onSave={handleSaveResponse} readonly={!canEdit} />
         </Paper>
     );
 };

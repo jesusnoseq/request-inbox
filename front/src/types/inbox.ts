@@ -11,6 +11,7 @@ export type Inbox = {
     Requests: InboxRequest[];
     ObfuscateHeaderFields: string[];
     IsPrivate: boolean;
+    OwnerID: string;
 }
 
 export type InboxRequest = {
@@ -19,11 +20,11 @@ export type InboxRequest = {
     URI: string;
     Headers: Record<string, string>;
     Body: string;
-    Host: string
-    RemoteAddr: string
-    Protocol: string
-    Method: string
-    ContentLength: number
+    Host: string;
+    RemoteAddr: string;
+    Protocol: string;
+    Method: string;
+    ContentLength: number;
 }
 
 export type InboxResponse = {
