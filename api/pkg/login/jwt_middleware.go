@@ -3,6 +3,7 @@ package login
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
@@ -55,11 +56,23 @@ func APIKeyMiddleware(dao database.InboxDAO) gin.HandlerFunc {
 			c.AbortWithStatusJSON(model.ErrorResponseFromError(fmt.Errorf("API key is no valid"), http.StatusUnauthorized))
 			return
 		}
+
+		if !ak.IsActive {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(fmt.Errorf("API key is not active"), http.StatusUnauthorized))
+			return
+		}
+
+		if !ak.ExpiryDate.IsZero() && ak.ExpiryDate.UTC().Before(time.Now().UTC()) {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(fmt.Errorf("API key has expired"), http.StatusUnauthorized))
+			return
+		}
+
 		user, err := dao.GetUser(c, ak.OwnerID)
 		if err != nil {
 			c.AbortWithStatusJSON(model.ErrorResponseFromError(fmt.Errorf("API key is no valid"), http.StatusUnauthorized))
 			return
 		}
+
 		c.Set(IS_LOGGED_IN_CONTEXT_KEY, true)
 		c.Set(USER_CONTEXT_KEY, user)
 
