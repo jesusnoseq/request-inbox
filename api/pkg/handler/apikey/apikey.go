@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
@@ -27,6 +28,7 @@ func (h *APIKeyHandler) CreateAPIKey(c *gin.Context) {
 	}
 	user, err := login.GetUser(c)
 	if err != nil {
+		instrumentation.LogError(c, err, "error getting user")
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("Could not retrieve user", err, http.StatusInternalServerError))
 		return
 	}
@@ -60,6 +62,7 @@ func (h *APIKeyHandler) GetAPIKey(c *gin.Context) {
 
 	user, err := login.GetUser(c)
 	if err != nil {
+		instrumentation.LogError(c, err, "error getting user")
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("Could not retrieve user", err, http.StatusInternalServerError))
 		return
 	}
@@ -72,6 +75,7 @@ func (h *APIKeyHandler) GetAPIKey(c *gin.Context) {
 
 	apiKey, err := h.dao.GetAPIKey(c.Request.Context(), id)
 	if err != nil || apiKey.OwnerID != user.ID {
+		instrumentation.LogError(c, err, "error getting API key")
 		c.AbortWithStatusJSON(model.NewNotFoundError(model.APIKeyEntityName))
 		return
 	}
@@ -87,12 +91,14 @@ func (h *APIKeyHandler) ListAPIKeysByUser(c *gin.Context) {
 
 	user, err := login.GetUser(c)
 	if err != nil {
+		instrumentation.LogError(c, err, "error getting user")
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("Could not retrieve user", err, http.StatusInternalServerError))
 		return
 	}
 
 	apiKeys, err := h.dao.ListAPIKeyByUser(c.Request.Context(), user.ID)
 	if err != nil {
+		instrumentation.LogError(c, err, "error getting list of api keys")
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("Failed to list API keys", err, http.StatusInternalServerError))
 		return
 	}
@@ -107,6 +113,7 @@ func (h *APIKeyHandler) DeleteAPIKey(c *gin.Context) {
 	}
 	user, err := login.GetUser(c)
 	if err != nil {
+		instrumentation.LogError(c, err, "error getting user")
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("Could not retrieve user", err, http.StatusInternalServerError))
 		return
 	}
