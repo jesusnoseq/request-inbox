@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
+	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
@@ -52,7 +53,7 @@ func (d *InboxDAO) GetUser(ctx context.Context, ID uuid.UUID) (model.User, error
 	}
 
 	if result.Item == nil {
-		return model.User{}, fmt.Errorf("user with ID %s not found", ID.String())
+		return model.User{}, dberrors.ErrItemNotFound
 	}
 
 	var userItem UserItem

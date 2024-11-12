@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
+	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
@@ -31,7 +32,7 @@ func (d *InboxDAO) GetAPIKey(ctx context.Context, ID uuid.UUID) (model.APIKey, e
 	}
 
 	if result.Item == nil {
-		return model.APIKey{}, fmt.Errorf("API key with ID %s not found", ID.String())
+		return model.APIKey{}, dberrors.ErrItemNotFound
 	}
 
 	var apiKeyItem APIKeyItem
