@@ -66,7 +66,7 @@ resource "aws_lambda_function" "api_lambda" {
       DB_ENGINE = "dynamo"
       PRINT_CONFIG = "false"
       ENABLE_LISTING_PUBLIC_INBOX = "false"
-      SNAPSHOT_VERSION = var.API_SNAPSHOT_VERSION
+      SNAPSHOT_VERSION = var.api_snapshot_version
       LOGIN_GITHUB_CLIENT_ID = var.login_github_client_id
       LOGIN_GITHUB_CLIENT_SECRET = var.login_github_client_secret
       LOGIN_GITHUB_CALLBACK = var.login_github_callback
