@@ -45,3 +45,11 @@ func CopySlice[T any](s []T) []T {
 	copy(copiedSlice, s)
 	return copiedSlice
 }
+
+func ToAnySlice[T any](slice []T) []any {
+	result := make([]any, len(slice))
+	for i, v := range slice {
+		result[i] = v
+	}
+	return result
+}
