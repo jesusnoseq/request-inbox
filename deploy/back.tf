@@ -67,15 +67,15 @@ resource "aws_lambda_function" "api_lambda" {
       PRINT_CONFIG = "false"
       ENABLE_LISTING_PUBLIC_INBOX = "false"
       SNAPSHOT_VERSION = var.API_SNAPSHOT_VERSION
-      LOGIN_GITHUB_CLIENT_ID = var.LOGIN_GITHUB_CLIENT_ID
-      LOGIN_GITHUB_CLIENT_SECRET = var.LOGIN_GITHUB_CLIENT_SECRET
-      LOGIN_GITHUB_CALLBACK = var.LOGIN_GITHUB_CALLBACK
-      LOGIN_GOOGLE_CLIENT_ID = var.LOGIN_GOOGLE_CLIENT_ID
-      LOGIN_GOOGLE_CLIENT_SECRET = var.LOGIN_GOOGLE_CLIENT_SECRET
-      LOGIN_GOOGLE_CALLBACK = var.LOGIN_GOOGLE_CALLBACK
-      FRONTEND_APPLICATION_URL = var.FRONTEND_APPLICATION_URL
-      AUTH_COOKIE_DOMAIN = var.AUTH_COOKIE_DOMAIN
-      JWT_SECRET = var.JWT_SECRET
+      LOGIN_GITHUB_CLIENT_ID = var.login_github_client_id
+      LOGIN_GITHUB_CLIENT_SECRET = var.login_github_client_secret
+      LOGIN_GITHUB_CALLBACK = var.login_github_callback
+      LOGIN_GOOGLE_CLIENT_ID = var.login_google_client_id
+      LOGIN_GOOGLE_CLIENT_SECRET = var.login_google_client_secret
+      LOGIN_GOOGLE_CALLBACK = var.login_google_callback
+      FRONTEND_APPLICATION_URL = var.frontend_application_url
+      AUTH_COOKIE_DOMAIN = var.auth_cookie_domain
+      JWT_SECRET = var.jwt_secret
     }
   }
 }
