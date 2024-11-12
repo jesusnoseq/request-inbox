@@ -13,3 +13,13 @@ func MustJson(t *testing.T, payload any) []byte {
 	}
 	return b
 }
+
+func AssertEqualsAsJson(t *testing.T, expected, actual any) {
+	t.Helper()
+	expectedJson := string(MustJson(t, expected))
+	actualJson := string(MustJson(t, actual))
+
+	if expectedJson != actualJson {
+		t.Fatalf("Expected JSON %s but got %s", expectedJson, actualJson)
+	}
+}
