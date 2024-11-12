@@ -17,16 +17,12 @@ import {
     TimelineDot,
 } from '@mui/lab';
 import { Code as CodeIcon, Cloud as CloudIcon, Speed as SpeedIcon } from '@mui/icons-material';
-import { useNavigate } from "react-router-dom";
-import { useUser } from '../context/UserContext';
 import LoginDialog from '../components/LoginDialog';
 import SignUpButton from '../components/SignUpButton';
 
 export default function AboutPage() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const { isLoggedIn } = useUser();
-    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
 
     // const handleClick = async () => {

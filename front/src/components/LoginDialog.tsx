@@ -12,7 +12,7 @@ import {
     Link
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import GoogleIcon from '@mui/icons-material/Google';
+// import GoogleIcon from '@mui/icons-material/Google';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { buildLoginURL } from '../services/inbox';
 
@@ -29,9 +29,9 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
         window.location.href = buildLoginURL(provider);
     }
 
-    const handleGoogleLogin = () => {
-        redirectToProvider('google');
-    };
+    // const handleGoogleLogin = () => {
+    //     redirectToProvider('google');
+    // };
 
     const handleGitHubLogin = () => {
         redirectToProvider('github');
