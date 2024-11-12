@@ -25,10 +25,10 @@ variable "web_domain_name" {
   default = "www.request-inbox.com"
 }
 
-variable "inbox_domain_name" {
-  type = string
-  default = "in.request-inbox.com"
-}
+# variable "inbox_domain_name" {
+#   type = string
+#   default = "in.request-inbox.com"
+# }
 
 variable "db_name" {
   type = string
@@ -40,14 +40,32 @@ variable "API_SNAPSHOT_VERSION" {
   default = "TF_SNAPSHOT_VERSION"
 }
 
-variable "LOGIN_GITHUB_CLIENT_ID" {}
-variable "LOGIN_GITHUB_CLIENT_SECRET" {}
-variable "LOGIN_GITHUB_CALLBACK" {}
-variable "LOGIN_GOOGLE_CLIENT_ID" {}
-variable "LOGIN_GOOGLE_CLIENT_SECRET" {}
-variable "LOGIN_GOOGLE_CALLBACK" {}
-variable "FRONTEND_APPLICATION_URL" {}
-variable "AUTH_COOKIE_DOMAIN" {}
-variable "JWT_SECRET" {}
+variable "LOGIN_GITHUB_CLIENT_ID" {
+    type = string
+}
+variable "LOGIN_GITHUB_CLIENT_SECRET" {
+    type = string
+}
+variable "LOGIN_GITHUB_CALLBACK" {
+    type = string
+}
+variable "LOGIN_GOOGLE_CLIENT_ID" {
+    type = string
+}
+variable "LOGIN_GOOGLE_CLIENT_SECRET" {
+    type = string
+}
+variable "LOGIN_GOOGLE_CALLBACK" {
+    type = string
+}
+variable "FRONTEND_APPLICATION_URL" {
+    type = string
+}
+variable "AUTH_COOKIE_DOMAIN" {  
+  type = string
+}
+variable "JWT_SECRET" {
+    type = string
+}
 
 
