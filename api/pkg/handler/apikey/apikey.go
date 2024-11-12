@@ -97,7 +97,7 @@ func (h *APIKeyHandler) ListAPIKeysByUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, apiKeys)
+	c.JSON(http.StatusOK, model.NewItemList(apiKeys))
 }
 
 func (h *APIKeyHandler) DeleteAPIKey(c *gin.Context) {

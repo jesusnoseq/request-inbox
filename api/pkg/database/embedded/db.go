@@ -254,7 +254,7 @@ func (ib *InboxBadger) GetAPIKey(ctx context.Context, apiKeyID uuid.UUID) (model
 
 func (ib *InboxBadger) ListAPIKeyByUser(ctx context.Context, userID uuid.UUID) ([]model.APIKey, error) {
 	var apiKeys []model.APIKey
-	prefix := ib.getAPIKeyKey(userID)
+	prefix := []byte(apiKeyPrefix)
 
 	err := ib.db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -277,8 +277,9 @@ func (ib *InboxBadger) ListAPIKeyByUser(ctx context.Context, userID uuid.UUID) (
 			if err != nil {
 				return err
 			}
-
-			apiKeys = append(apiKeys, apiKey)
+			if apiKey.OwnerID == userID {
+				apiKeys = append(apiKeys, apiKey)
+			}
 		}
 		return nil
 	})
