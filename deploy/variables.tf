@@ -35,36 +35,36 @@ variable "db_name" {
   default = "inbox_requests"
 }
 
-variable "API_SNAPSHOT_VERSION" {
+variable "api_snapshot_version" {
   type = string
   default = "TF_SNAPSHOT_VERSION"
 }
 
-variable "LOGIN_GITHUB_CLIENT_ID" {
+variable "login_github_client_id" {
     type = string
 }
-variable "LOGIN_GITHUB_CLIENT_SECRET" {
+variable "login_github_client_secret" {
     type = string
 }
-variable "LOGIN_GITHUB_CALLBACK" {
+variable "login_github_callback" {
     type = string
 }
-variable "LOGIN_GOOGLE_CLIENT_ID" {
+variable "login_google_client_id" {
     type = string
 }
-variable "LOGIN_GOOGLE_CLIENT_SECRET" {
+variable "login_google_client_secret" {
     type = string
 }
-variable "LOGIN_GOOGLE_CALLBACK" {
+variable "login_google_callback" {
     type = string
 }
-variable "FRONTEND_APPLICATION_URL" {
+variable "frontend_application_url" {
     type = string
 }
-variable "AUTH_COOKIE_DOMAIN" {  
+variable "auth_cookie_domain" {  
   type = string
 }
-variable "JWT_SECRET" {
+variable "jwt_secret" {
     type = string
 }
 
