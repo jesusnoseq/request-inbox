@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Grid, CircularProgress, Button, Box, Alert } from '@mui/material';
+import { Container, Typography, Grid2, CircularProgress, Button, Box, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Inbox } from '../types/inbox';
 import { getInboxList, newInbox, deleteInbox } from '../services/inbox';
 import InboxListItem from '../components/InboxListItem';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import SearchBar from '../components/SearchBar';
 
 const InboxListPage: React.FC = () => {
@@ -33,7 +31,6 @@ const InboxListPage: React.FC = () => {
     }, []);
 
     const handleCreateInbox = async () => {
-
         const fetchData = async () => {
             try {
                 setLoading(true);
@@ -88,7 +85,6 @@ const InboxListPage: React.FC = () => {
     if (error) {
         return (
             <Container>
-                <Header />
                 <Alert variant="outlined" severity="error">
                     {error}
                 </Alert>
@@ -98,7 +94,7 @@ const InboxListPage: React.FC = () => {
 
     return (
         <Container>
-            <Header />
+
             <Typography variant="h2" fontSize={'2.5rem'} gutterBottom>
                 Inbox List
             </Typography>
@@ -110,14 +106,13 @@ const InboxListPage: React.FC = () => {
                 <SearchBar onChange={handleSearch} />
             </Box>
 
-            <Grid container spacing={2}>
+            <Grid2 container spacing={2}>
                 {inboxes.filter((inbox) => inbox.ID.includes(filter)).map((inbox) => (
-                    <Grid item xs={12} sm={6} md={4} lg={4} key={inbox.ID}>
+                    <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 4 }} key={inbox.ID}>
                         <InboxListItem inbox={inbox} onDelete={handleDeleteInbox} />
-                    </Grid>
+                    </Grid2>
                 ))}
-            </Grid>
-            <Footer />
+            </Grid2>
         </Container >
     );
 };

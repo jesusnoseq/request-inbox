@@ -10,6 +10,8 @@ export type Inbox = {
     Response: InboxResponse;
     Requests: InboxRequest[];
     ObfuscateHeaderFields: string[];
+    IsPrivate: boolean;
+    OwnerID: string;
 }
 
 export type InboxRequest = {
@@ -18,11 +20,11 @@ export type InboxRequest = {
     URI: string;
     Headers: Record<string, string>;
     Body: string;
-    Host: string
-    RemoteAddr: string
-    Protocol: string
-    Method: string
-    ContentLength: number
+    Host: string;
+    RemoteAddr: string;
+    Protocol: string;
+    Method: string;
+    ContentLength: number;
 }
 
 export type InboxResponse = {
@@ -31,4 +33,12 @@ export type InboxResponse = {
     Body: string;
     Headers: Record<string, string>;
     IsDynamic: boolean;
+}
+
+export type User = {
+    ID: number;
+    Name: string;
+    Email: string;
+    Organization: string;
+    AvatarURL: string;
 }

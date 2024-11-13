@@ -17,19 +17,14 @@ resource "aws_dynamodb_table" "inbox_requests" {
   }
 
   attribute {
-    name = "GSI1PK"
-    type = "S"
-  }
-
-  attribute {
-    name = "GSI1SK"
+    name = "OWNER_ID"
     type = "S"
   }
 
   global_secondary_index {
-    name               = "GSI1"
-    hash_key           = "GSI1PK"
-    range_key          = "GSI1SK"
+    name               = "OWNER_INDEX"
+    hash_key           = "OWNER_ID"
+    range_key          = "SK"
     write_capacity     = 0
     read_capacity      = 0
     projection_type    = "ALL"

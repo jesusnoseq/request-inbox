@@ -13,8 +13,11 @@ code {
 }
 
 
-/* Swagger */
+/*Swagger */
+.swagger-ui .scheme-container {
+  background: transparent !important;
+}
 
-.swagger-ui .description {
-  display: none;
+.swagger-ui .schemes-server-container * {
+  background: transparent !important;
 }

@@ -11,6 +11,7 @@ const (
 	ContentTypeHeader        = "Content-Type"
 	DefaultContentTypeHeader = "application/json; charset=utf-8"
 	DefaultBody              = "{}"
+	InboxEntityName          = "Inbox"
 )
 
 type Inbox struct {
@@ -19,7 +20,9 @@ type Inbox struct {
 	Timestamp             int64     `dynamodbav:"unixTimestamp"`
 	Response              Response  `dynamodbav:"resp"`
 	Requests              []Request `dynamodbav:"req"`
-	ObfuscateHeaderFields []string
+	ObfuscateHeaderFields []string  `dynamodbav:"ofuscate"`
+	OwnerID               uuid.UUID `dynamodbav:"OwnerID"`
+	IsPrivate             bool      `dynamodbav:"IsPrivate"`
 }
 
 type Response struct {
@@ -56,5 +59,7 @@ func NewInbox() Inbox {
 		},
 		Requests:              []Request{},
 		ObfuscateHeaderFields: []string{},
+		IsPrivate:             false,
+		OwnerID:               uuid.UUID{},
 	}
 }

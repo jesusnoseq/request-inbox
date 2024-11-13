@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, SvgIcon } from '@mui/material';
+import { Switch, SvgIcon, Tooltip } from '@mui/material';
 import { useCustomTheme } from '../theme';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import BedtimeIcon from '@mui/icons-material/Bedtime';
@@ -12,13 +12,15 @@ const ThemeSwitch = () => {
     const dayIconStyle = {
         transform: 'translate(-3px, -2px)',
     };
+    const title = "Change to " + (isDarkMode ? "light" : "dark") + " theme";
     return (
-
-        < Switch
-            checked={isDarkMode}
-            onChange={toggleTheme}
-            icon={<SvgIcon style={dayIconStyle}>< WbSunnyIcon /></SvgIcon>}
-            checkedIcon={<SvgIcon style={nightIconStyle}>< BedtimeIcon /></SvgIcon>} />
+        <Tooltip title={title}>
+            <Switch
+                checked={isDarkMode}
+                onChange={toggleTheme}
+                icon={<SvgIcon style={dayIconStyle}><WbSunnyIcon /></SvgIcon>}
+                checkedIcon={<SvgIcon style={nightIconStyle}><BedtimeIcon /></SvgIcon>} />
+        </Tooltip>
     );
 };
 export default ThemeSwitch;

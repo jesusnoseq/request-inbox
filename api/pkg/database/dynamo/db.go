@@ -37,7 +37,77 @@ func NewInboxDAO(
 	}
 }
 
-func (d *InboxDAO) GetInbox(ctx context.Context, id uuid.UUID) (model.Inbox, error) {
+func (d *InboxDAO) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox, error) {
+	ctx, cancel := context.WithTimeout(ctx, d.timeout)
+	defer cancel()
+	pk, sk := GenInboxKey(ID)
+	input := &dynamodb.GetItemInput{
+		TableName: aws.String(d.tableName),
+		Key: map[string]types.AttributeValue{
+			"PK": &types.AttributeValueMemberS{Value: pk},
+			"SK": &types.AttributeValueMemberS{Value: sk},
+		},
+	}
+
+	result, err := d.dbclient.GetItem(ctx, input)
+	if err != nil {
+		return model.Inbox{}, fmt.Errorf("failed to get inbox item from DynamoDB: %w", err)
+	}
+
+	if result.Item == nil {
+		return model.Inbox{}, dberrors.ErrItemNotFound
+	}
+
+	var inboxItem InboxItem
+	err = attributevalue.UnmarshalMap(result.Item, &inboxItem)
+	if err != nil {
+		return model.Inbox{}, fmt.Errorf("failed to unmarshal DynamoDB inbox item: %w", err)
+	}
+
+	return inboxItem.Inbox, nil
+}
+
+func (d *InboxDAO) ListInboxByUser(ctx context.Context, userID uuid.UUID) ([]model.Inbox, error) {
+	ctx, cancel := context.WithTimeout(ctx, d.timeout)
+	defer cancel()
+	userKey, _ := GenUserKey(userID)
+	input := &dynamodb.QueryInput{
+		TableName:              aws.String(d.tableName),
+		IndexName:              aws.String(OwnerIndex),
+		KeyConditionExpression: aws.String(OWNERKey + " = :" + OWNERKey + " AND SK = :SK"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":" + OWNERKey: &types.AttributeValueMemberS{Value: userKey},
+			":SK":          &types.AttributeValueMemberS{Value: InboxKey},
+		},
+	}
+
+	queryPaginator := dynamodb.NewQueryPaginator(d.dbclient, input)
+	items := make([]InboxItem, 0, MaxBatchItems)
+	inboxes := make([]model.Inbox, 0, MaxBatchItems)
+	for queryPaginator.HasMorePages() {
+		response, err := queryPaginator.NextPage(ctx)
+		if err != nil {
+			return inboxes, fmt.Errorf("get inboxes of user failed: %w", err)
+		}
+		for _, item := range response.Items {
+			sk := item["SK"].(*types.AttributeValueMemberS).Value
+			if isInboxSK(sk) {
+				inboxItem := InboxItem{}
+				err = attributevalue.UnmarshalMap(item, &inboxItem)
+				if err != nil {
+					return inboxes, fmt.Errorf("unmarshal request failed: %w", err)
+				}
+				inboxes = append(inboxes, inboxItem.Inbox)
+			}
+		}
+	}
+	for i, item := range items {
+		inboxes[i] = toInboxModel(item)
+	}
+	return inboxes, nil
+}
+
+func (d *InboxDAO) GetInboxWithRequests(ctx context.Context, id uuid.UUID) (model.Inbox, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	pk, _ := GenInboxKey(id)
@@ -90,6 +160,7 @@ func (d *InboxDAO) CreateInbox(
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	id := uuid.New()
+
 	if in.Name == "" || in.Name == in.ID.String() {
 		in.Name = id.String()
 	}

@@ -25,14 +25,47 @@ variable "web_domain_name" {
   default = "www.request-inbox.com"
 }
 
+# variable "inbox_domain_name" {
+#   type = string
+#   default = "in.request-inbox.com"
+# }
+
 variable "db_name" {
   type = string
   default = "inbox_requests"
 }
 
-variable "API_SNAPSHOT_VERSION" {
+variable "api_snapshot_version" {
   type = string
   default = "TF_SNAPSHOT_VERSION"
+}
+
+variable "login_github_client_id" {
+    type = string
+}
+variable "login_github_client_secret" {
+    type = string
+}
+variable "login_github_callback" {
+    type = string
+}
+variable "login_google_client_id" {
+    type = string
+}
+variable "login_google_client_secret" {
+    type = string
+}
+variable "login_google_callback" {
+    type = string
+}
+variable "frontend_application_url" {
+    type = string
+}
+variable "auth_cookie_domain" {  
+  type = string
+}
+variable "jwt_secret" {
+    type = string
 }
 
 

@@ -6,8 +6,6 @@ import { Typography, Divider, Alert, Grid, Switch, Box, SvgIcon, Fab } from '@mu
 import CircularProgress from '@mui/material/CircularProgress';
 import RequestList from '../components/RequestList';
 import { getInbox, deleteInboxRequests } from '../services/inbox';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import InboxDetail from '../components/InboxDetail';
 import UpdateIcon from '@mui/icons-material/Update';
 import UpdateDisabledIcon from '@mui/icons-material/UpdateDisabled';
@@ -19,6 +17,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 
 const InboxDetailPage: React.FC = () => {
     const { inboxId } = useParams<'inboxId'>();
@@ -66,11 +65,9 @@ const InboxDetailPage: React.FC = () => {
     if (isLoading) {
         return (
             <Container>
-                <Header />
                 <Grid container spacing={0} justifyContent="center" alignItems="center" >
                     <CircularProgress />
                 </Grid>
-                <Footer />
             </Container>
         );
     }
@@ -78,11 +75,9 @@ const InboxDetailPage: React.FC = () => {
     if (error) {
         return (
             <Container>
-                <Header />
                 <Alert variant="outlined" severity="error">
                     {error}
                 </Alert>
-                <Footer />
             </Container>
         );
     }
@@ -131,7 +126,6 @@ const InboxDetailPage: React.FC = () => {
 
     return (
         <Container>
-            <Header />
             <Dialog
                 open={confirmDialogOpen}
                 onClose={handleCloseDeleteRequestsDialog}
@@ -160,13 +154,17 @@ const InboxDetailPage: React.FC = () => {
                             icon={<SvgIcon style={iconStyle}><UpdateDisabledIcon /></SvgIcon>}
                             checkedIcon={<SvgIcon style={iconStyle}><UpdateIcon /></SvgIcon>}
                         />
-                        <Fab size="small" color="secondary" aria-label="Delete requests" onClick={openDeleteRequestsDialog}
-                            style={{ marginLeft: 'auto', marginRight: '20px' }}>
-                            <DeleteSweepIcon />
-                        </Fab>
-                        <Fab size="small" color="secondary" aria-label="go down" onClick={scrollToBottom}>
-                            <ArrowDownwardIcon />
-                        </Fab>
+                        <Tooltip title="Delete All Request">
+                            <Fab size="small" color="secondary" aria-label="Delete requests" onClick={openDeleteRequestsDialog}
+                                style={{ marginLeft: 'auto', marginRight: '20px' }}>
+                                <DeleteSweepIcon />
+                            </Fab>
+                        </Tooltip>
+                        <Tooltip title="Go Down">
+                            <Fab size="small" color="secondary" aria-label="go down" onClick={scrollToBottom} >
+                                <ArrowDownwardIcon />
+                            </Fab>
+                        </Tooltip>
                     </Box>
                     <Divider sx={{ my: 2 }} />
                     {inbox.Requests && inbox.Requests.length > 0 ? (
@@ -177,7 +175,6 @@ const InboxDetailPage: React.FC = () => {
                 </>
             )
             }
-            <Footer />
         </Container >
     );
 };

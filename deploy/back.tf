@@ -64,15 +64,25 @@ resource "aws_lambda_function" "api_lambda" {
     variables = {
       API_MODE = "lambda"
       DB_ENGINE = "dynamo"
-      ENABLE_LISTING_INBOX = "false"
-      SNAPSHOT_VERSION = var.API_SNAPSHOT_VERSION
+      PRINT_CONFIG = "false"
+      ENABLE_LISTING_PUBLIC_INBOX = "false"
+      SNAPSHOT_VERSION = var.api_snapshot_version
+      LOGIN_GITHUB_CLIENT_ID = var.login_github_client_id
+      LOGIN_GITHUB_CLIENT_SECRET = var.login_github_client_secret
+      LOGIN_GITHUB_CALLBACK = var.login_github_callback
+      LOGIN_GOOGLE_CLIENT_ID = var.login_google_client_id
+      LOGIN_GOOGLE_CLIENT_SECRET = var.login_google_client_secret
+      LOGIN_GOOGLE_CALLBACK = var.login_google_callback
+      FRONTEND_APPLICATION_URL = var.frontend_application_url
+      AUTH_COOKIE_DOMAIN = var.auth_cookie_domain
+      JWT_SECRET = var.jwt_secret
     }
   }
 }
 
 resource "aws_cloudwatch_log_group" "api_lambda_log_group" {
   name = "/aws/lambda/${aws_lambda_function.api_lambda.function_name}"
-  retention_in_days = 30
+  retention_in_days = 90
 }
 
 

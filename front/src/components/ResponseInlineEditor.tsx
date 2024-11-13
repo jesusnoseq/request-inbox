@@ -21,9 +21,10 @@ import HeadersEditor, { Header, convertRecordToHeaders, convertHeadersToRecord }
 type ResponseInlineEditorProps = {
     response: InboxResponse;
     onSave: (resp: InboxResponse) => void;
+    readonly: boolean
 };
 
-const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, onSave }) => {
+const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, onSave, readonly }) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const [headers, setHeaders] = useState<Header[]>(convertRecordToHeaders(response.Headers));
     const [body, setBody] = useState<string>(response.Body);
@@ -108,9 +109,11 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                 <Box sx={{ mb: 2 }}>
                     <Box display="flex" alignItems="center" gap={1}>
                         Response
-                        <IconButton aria-label="edit response" size="small" onClick={enableEditMode}>
-                            <ModeEditIcon fontSize="medium" />
-                        </IconButton>
+                        {!readonly &&
+                            <IconButton aria-label="edit response" size="small" onClick={enableEditMode}>
+                                <ModeEditIcon fontSize="medium" />
+                            </IconButton>
+                        }
                     </Box>
                     <Container>
                         <Box sx={{ display: 'flex', flexGrow: 1 }}>

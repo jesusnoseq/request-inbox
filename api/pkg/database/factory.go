@@ -41,7 +41,7 @@ func GetInboxDAO(ctx context.Context, e Engine) (InboxDAO, error) {
 			return nil, fmt.Errorf("error getting AWS session: %w", err)
 		}
 		dbClient := dynamo.NewDynamoClient(s)
-		dao := dynamo.NewInboxDAO(config.GetString(config.DBDynamoName), dbClient, 5*time.Second)
+		dao := dynamo.NewInboxDAO(config.GetString(config.DBDynamoName), dbClient, 10*time.Second)
 		return dao, nil
 	}
 	return nil, fmt.Errorf("Engine %q not registered", e)

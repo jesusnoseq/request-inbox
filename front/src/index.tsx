@@ -4,15 +4,21 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { CustomThemeProvider } from './theme';
+import { UserProvider } from './context/UserContext';
+import { ErrorProvider } from './context/ErrorContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <CustomThemeProvider>
-      <App />
-    </CustomThemeProvider>
+    <UserProvider>
+      <CustomThemeProvider>
+        <ErrorProvider>
+          <App />
+        </ErrorProvider>
+      </CustomThemeProvider>
+    </UserProvider>
   </React.StrictMode>
 );
 

@@ -10,6 +10,7 @@ import (
 const (
 	notFoundMessage         = "resource not found"
 	methodNotAllowedMessage = "method not allowed"
+	notAllowedMessage       = "not allowed"
 )
 
 func MethodNotAllowedHandler(ctx *gin.Context) {
