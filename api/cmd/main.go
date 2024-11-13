@@ -97,7 +97,7 @@ func getRouter() (*gin.Engine, func()) {
 	r.NoRoute(handler.NotFoundHandler)
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:8080"},
+		AllowOrigins:     config.GetStringSlice(config.CORSAllowOrigins),
 		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
