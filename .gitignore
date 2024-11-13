@@ -22,6 +22,8 @@ bootstrap
 # Go workspace file
 go.work
 
+tmp/*
+
 # Logs
 *.log
 
@@ -40,3 +42,5 @@ e2e/*report
 
 # IDEs
 .idea
+
+api/.env.development

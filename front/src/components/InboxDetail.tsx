@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Inbox, InboxResponse } from '../types/inbox';
-import { Typography, Paper } from '@mui/material';
+import { Typography, Paper, Box } from '@mui/material';
 import moment from 'moment';
 import HighlightURL from '../components/HighlightURL';
 import { buildInboxURL, updateInbox } from '../services/inbox';
 import ResponseInlineEditor from '../components/ResponseInlineEditor';
 import TextInlineEditor from '../components/TextInlineEditor';
+import InboxVisibilityToggle from '../components/InboxVisibilityToggle';
+import { useUser } from '../context/UserContext';
 
 
 type InboxDetailProps = {
@@ -14,6 +16,7 @@ type InboxDetailProps = {
 
 
 const InboxDetail: React.FC<InboxDetailProps> = (props) => {
+    const { isLoggedIn, user } = useUser();
     const [inbox, setInbox] = useState<Inbox>(props.inbox);
     const inboxURL = buildInboxURL(props.inbox.ID);
 
@@ -35,16 +38,37 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
         setInbox(resp);
     };
 
+    const handleSaveIsPublic = async (isPublic: boolean) => {
+        const updatedInbox = {
+            ...inbox,
+            IsPrivate: !isPublic
+        };
+        const resp = await updateInbox(updatedInbox)
+        setInbox(resp);
+    }
+
+    const canEdit = inbox.OwnerID === '00000000-0000-0000-0000-000000000000' || (isLoggedIn() && inbox.OwnerID === user.ID)
+
     return (
         <Paper sx={{ padding: 2 }}>
             <TextInlineEditor initialValue={inbox.Name} label='Inbox' onSave={handleSaveInboxName} />
-
-            <Typography color="textSecondary">
-                Open since {moment(inbox.Timestamp).format('LLL')}
-            </Typography>
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+                mb={2}
+            >
+                <Typography color="textSecondary">
+                    Open since {moment(inbox.Timestamp).format('LLL')}
+                </Typography>
+                {canEdit &&
+                    <InboxVisibilityToggle defaultPublic={!inbox.IsPrivate} onChange={handleSaveIsPublic} />
+                }
+            </Box>
             <HighlightURL url={inboxURL} />
 
-            <ResponseInlineEditor response={inbox.Response} onSave={handleSaveResponse} />
+            <ResponseInlineEditor response={inbox.Response} onSave={handleSaveResponse} readonly={!canEdit} />
         </Paper>
     );
 };

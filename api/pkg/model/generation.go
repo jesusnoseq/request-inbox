@@ -3,30 +3,43 @@ package model
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
+	"log"
 	"math"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jesusnoseq/request-inbox/pkg/collection"
 )
 
-// Generates a Base16 random string
-func randomString(l int) string {
+func randomString(l int) (string, error) {
 	buff := make([]byte, int(math.Ceil(float64(l)/2)))
-	_, _ = rand.Read(buff)
+	_, err := rand.Read(buff)
+	if err != nil {
+		return "", err
+	}
 	str := hex.EncodeToString(buff)
-	return str[:l] // strip 1 extra character we get from odd length results
+	return str[:l], nil // strip 1 extra character we get from odd length results
+}
+
+func mustRandomString(l int) string {
+	r, err := randomString(l)
+	if err != nil {
+		log.Fatal("error generating random string", err)
+	}
+	return r
 }
 
 func GenerateInbox() Inbox {
 	return Inbox{
-		Name:      randomString(10),
+		Name:      mustRandomString(10),
 		Timestamp: time.Now().UnixMilli(),
 		Response: Response{
 			Code: 200,
-			Body: "response body" + randomString(5),
+			Body: "response body" + mustRandomString(5),
 			Headers: map[string]string{
-				"Content-Type":  "application/json; charset=utf-8",
-				randomString(5): randomString(5),
+				"Content-Type":      "application/json; charset=utf-8",
+				mustRandomString(5): mustRandomString(5),
 			},
 		},
 		Requests:              []Request{GenerateRequest(1), GenerateRequest(2)},
@@ -35,7 +48,7 @@ func GenerateInbox() Inbox {
 }
 
 func GenerateRequest(id int) Request {
-	body := "This is the request body." + randomString(10)
+	body := "This is the request body." + mustRandomString(10)
 	return Request{
 		ID:        id,
 		Timestamp: time.Now().UnixMilli(),
@@ -71,4 +84,36 @@ func CopyRequest(request Request) Request {
 	copy := request
 	copy.Headers = collection.CopySliceMap(request.Headers)
 	return copy
+}
+
+func GenerateUser() User {
+	email := fmt.Sprintf("%s@%s.com", mustRandomString(5), mustRandomString(5))
+	user := NewUser(email)
+	user.Name = mustRandomString(5)
+	user.Organization = mustRandomString(5)
+	return user
+}
+
+func GenerateUserProvider() UserProvider {
+	return UserProvider{
+		Provider:     "github",
+		Username:     mustRandomString(5),
+		AccessToken:  mustRandomString(16),
+		RefreshToken: mustRandomString(16),
+	}
+}
+
+func GenerateUserWithProvider() User {
+	u := GenerateUser()
+	u.Provider = GenerateUserProvider()
+	return u
+}
+
+func GenerateAPIKey(userID uuid.UUID) APIKey {
+	ak, err := NewAPIKey(userID)
+	if err != nil {
+		panic(err)
+	}
+	ak.Name = "Generated API key"
+	return ak
 }

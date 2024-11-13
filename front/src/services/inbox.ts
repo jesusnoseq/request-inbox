@@ -11,6 +11,7 @@ export const getInboxList = async () => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes`, {
         method: "GET",
         headers: defaultHeaders,
+        credentials: 'include',
     });
     if (!resp.ok) {
         throw new Error('API response error ', await resp.json());
@@ -25,6 +26,7 @@ export const getInbox = async (id: string) => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}`, {
         method: "GET",
         headers: defaultHeaders,
+        credentials: 'include',
     });
     if (!resp.ok) {
         throw new Error('API response error ', await resp.json());
@@ -37,13 +39,14 @@ export const newInbox = async () => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes`, {
         method: "POST",
         headers: defaultHeaders,
+        credentials: 'include',
         body: JSON.stringify({}),
     });
     if (!resp.ok) {
         throw new Error('API response error ', await resp.json());
     }
     const inbox = (await resp.json()) as Inbox;
-    console.log(inbox);
+    console.log("newInbox", inbox);
     return inbox;
 }
 
@@ -56,6 +59,7 @@ export const updateInbox = async (inbox: Inbox) => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${inbox.ID}`, {
         method: "PUT",
         headers: defaultHeaders,
+        credentials: 'include',
         body: JSON.stringify(reqInbox),
     });
     if (!resp.ok) {
@@ -70,6 +74,7 @@ export const deleteInbox = async (id: string) => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}`, {
         method: "DELETE",
         headers: defaultHeaders,
+        credentials: 'include',
     });
     return resp.status === 204;
 }
@@ -79,6 +84,7 @@ export const deleteInboxRequests = async (id: string) => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}/requests`, {
         method: "DELETE",
         headers: defaultHeaders,
+        credentials: 'include',
     });
     return resp.status === 204;
 }
@@ -94,6 +100,62 @@ export const health = async () => {
     return await resp.json()
 }
 
+
+export const getUser = async () => {
+    const resp = await fetch(`${BASE_URL}/api/v1/auth/user`, {
+        method: "GET",
+        credentials: 'include',
+        headers: defaultHeaders,
+    });
+    if (!resp.ok) {
+        throw new Error('API response error ', await resp.json());
+    }
+    if (resp.status === 204) {
+        return null;
+    }
+    return await resp.json()
+}
+
+
+export const deleteUser = async () => {
+    const resp = await fetch(`${BASE_URL}/api/v1/auth/user`, {
+        method: "DELETE",
+        headers: defaultHeaders,
+        credentials: 'include',
+    });
+    return resp.status === 200;
+}
+
+
+export const logout = async () => {
+    const resp = await fetch(`${BASE_URL}/api/v1/auth/logout`, {
+        method: "GET",
+        credentials: 'include',
+        headers: defaultHeaders,
+    });
+    if (!resp.ok) {
+        throw new Error('API response error ', await resp.json());
+    }
+    return await resp.json()
+}
+
+export const acceptCookies = async () => {
+    const resp = await fetch(`${BASE_URL}/api/v1/cookies/accept`, {
+        method: "GET",
+        headers: defaultHeaders,
+    });
+    if (!resp.ok) {
+        throw new Error('API response error ', await resp.json());
+    }
+    console.log("Cookies accepted");
+    return
+}
+
+
+
+export const buildLoginURL = (provider: string) => {
+    return `${BASE_URL}/api/v1/auth/${provider}/login/`;
+}
 
 
 export const buildInboxURL = (id: string) => {

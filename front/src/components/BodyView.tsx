@@ -12,7 +12,7 @@ interface BodyViewProps {
     data: any;
 }
 
-const BodyView: React.FC<BodyViewProps> = ({ data, title }) => {
+const BodyView: React.FC<BodyViewProps> = ({ title, data }) => {
     const theme = useContext(ThemeContext);
     let body;
 

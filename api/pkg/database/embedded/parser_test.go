@@ -15,7 +15,7 @@ func TestEncodeDecode(t *testing.T) {
 		t.Errorf("Error encoding: %v", encodeErr)
 	}
 
-	decoded, decodeErr := decode(encoded)
+	decoded, decodeErr := decode[model.Inbox](encoded)
 	if decodeErr != nil {
 		t.Errorf("Error decoding: %v", decodeErr)
 	}

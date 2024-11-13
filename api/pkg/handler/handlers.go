@@ -2,7 +2,10 @@ package handler
 
 import (
 	"errors"
+	"fmt"
+	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +14,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
 	"github.com/jesusnoseq/request-inbox/pkg/dynamic_response"
+	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
@@ -30,6 +34,20 @@ func (ih *InboxHandler) CreateInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox", err, http.StatusBadRequest))
 		return
 	}
+	if !login.IsUserLoggedIn(c) && newInbox.IsPrivate {
+		err := fmt.Errorf("you must be logged in to create a private inbox")
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusUnauthorized))
+		return
+	}
+	if login.IsUserLoggedIn(c) {
+		user, err := login.GetUser(c)
+		if err != nil {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+			return
+		}
+		newInbox.OwnerID = user.ID
+	}
+
 	inbox, err := ih.dao.CreateInbox(c, newInbox)
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
@@ -45,6 +63,23 @@ func (ih *InboxHandler) DeleteInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
 		return
 	}
+
+	inbox, err := ih.dao.GetInbox(c, id)
+	if err != nil {
+		if errors.Is(err, dberrors.ErrItemNotFound) {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
+			return
+		}
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+		return
+	}
+
+	err = checkWriteInboxPermissions(c, inbox)
+	if err != nil {
+		slog.Error("error deleting inbox", "error", err)
+		return
+	}
+
 	err = ih.dao.DeleteInbox(c, id)
 	if err != nil {
 		if errors.Is(err, dberrors.ErrItemNotFound) {
@@ -64,6 +99,23 @@ func (ih *InboxHandler) DeleteInboxRequests(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
 		return
 	}
+
+	inbox, err := ih.dao.GetInbox(c, id)
+	if err != nil {
+		if errors.Is(err, dberrors.ErrItemNotFound) {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
+			return
+		}
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+		return
+	}
+
+	err = checkWriteInboxPermissions(c, inbox)
+	if err != nil {
+		slog.Error("error deleting requests of inbox", "error", err)
+		return
+	}
+
 	err = ih.dao.DeleteInboxRequests(c, id)
 	if err != nil {
 		if errors.Is(err, dberrors.ErrItemNotFound) {
@@ -83,7 +135,8 @@ func (ih *InboxHandler) GetInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
 		return
 	}
-	inbox, err := ih.dao.GetInbox(c, id)
+
+	inbox, err := ih.dao.GetInboxWithRequests(c, id)
 	if err != nil {
 		if errors.Is(err, dberrors.ErrItemNotFound) {
 			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
@@ -96,6 +149,13 @@ func (ih *InboxHandler) GetInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(code, errResp)
 		return
 	}
+
+	err = checkReadInboxPermissions(c, inbox)
+	if err != nil {
+		slog.Error("error getting inbox", "error", err)
+		return
+	}
+
 	c.JSON(http.StatusOK, inbox)
 }
 
@@ -124,6 +184,13 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(code, errResp)
 		return
 	}
+
+	err = checkWriteInboxPermissions(c, inbox)
+	if err != nil {
+		slog.Error("error updating inbox", "error", err)
+		return
+	}
+
 	updatedInbox.ID = id
 	updatedInbox.Timestamp = inbox.Timestamp
 	updatedInbox.Requests = inbox.Requests
@@ -137,7 +204,22 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 }
 
 func (ih *InboxHandler) ListInbox(c *gin.Context) {
-	if !config.GetBool(config.EnableListingInbox) {
+	if login.IsUserLoggedIn(c) {
+		user, err := login.GetUser(c)
+		if err != nil {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+			return
+		}
+		inboxes, err := ih.dao.ListInboxByUser(c, user.ID)
+		if err != nil {
+			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
+			return
+		}
+		c.JSON(http.StatusOK, model.NewItemList(inboxes))
+		return
+	}
+
+	if !config.GetBool(config.EnableListingPublicInbox) {
 		c.JSON(http.StatusOK, model.NewItemList([]model.Inbox{}))
 		return
 	}
@@ -157,7 +239,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		return
 	}
 
-	inbox, err := ih.dao.GetInbox(c, id)
+	inbox, err := ih.dao.GetInboxWithRequests(c, id)
 	if err != nil {
 		if errors.Is(err, dberrors.ErrItemNotFound) {
 			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusNotFound))
@@ -189,6 +271,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		ContentLength: c.Request.ContentLength,
 		Body:          string(body),
 	}
+	filterRequestData(&request)
 
 	err = ih.dao.AddRequestToInbox(c, id, request)
 	if err != nil {
@@ -220,4 +303,21 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 		c.Header(k, v)
 	}
 	c.Data(inbox.Response.Code, contentType, []byte(inbox.Response.Body))
+}
+
+func filterRequestData(req *model.Request) {
+	cookies := req.Headers["Cookie"]
+	if len(cookies) == 0 {
+		return
+	}
+	cookieSeparator := "; "
+	cs := strings.Split(cookies[0], cookieSeparator)
+	fc := []string{}
+	for _, c := range cs {
+		if strings.HasPrefix(c, login.AuthTokenCookieName+"=") || strings.HasPrefix(c, login.OauthStateCookieName+"=") {
+			continue
+		}
+		fc = append(fc, c)
+	}
+	cookies[0] = strings.Join(fc, cookieSeparator)
 }

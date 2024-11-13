@@ -10,7 +10,6 @@ import (
 )
 
 func TestGenerateInbox(t *testing.T) {
-
 	t.Run("it should have random values", func(t *testing.T) {
 		inbox := model.GenerateInbox()
 		if hasEmptyField(t, inbox, nil) {

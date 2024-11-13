@@ -16,11 +16,10 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/handler"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
+	"github.com/jesusnoseq/request-inbox/pkg/t_util"
 )
 
-type closer func()
-
-func mustGetInboxHandler() (*handler.InboxHandler, closer) {
+func mustGetInboxHandler() (*handler.InboxHandler, func()) {
 	ctx := context.Background()
 	dao, err := database.GetInboxDAO(ctx, database.Badger)
 	if err != nil {
@@ -29,14 +28,6 @@ func mustGetInboxHandler() (*handler.InboxHandler, closer) {
 	return handler.NewInboxHandler(dao), func() {
 		dao.Close(ctx)
 	}
-}
-
-func mustJson(payload any) []byte {
-	b, err := json.Marshal(payload)
-	if err != nil {
-		panic(err)
-	}
-	return b
 }
 
 func mustParseInbox(payload []byte) model.Inbox {
@@ -62,10 +53,10 @@ func isUUID(id string) bool {
 	return err == nil
 }
 
-func shoudlExistsInbox(ih *handler.InboxHandler, i model.Inbox) model.Inbox {
+func shoudlExistsInbox(t *testing.T, ih *handler.InboxHandler, i model.Inbox) model.Inbox {
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
-	body := mustJson(i)
+	body := t_util.MustJson(t, i)
 	req, err := http.NewRequest(
 		"POST",
 		"",
@@ -87,7 +78,7 @@ func shoudlExistsInbox(ih *handler.InboxHandler, i model.Inbox) model.Inbox {
 func TestCreateInbox(t *testing.T) {
 	config.LoadConfig(config.Test)
 	inbox := model.GenerateInbox()
-	body := mustJson(inbox)
+	body := t_util.MustJson(t, inbox)
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
 	req, err := http.NewRequest(
@@ -128,10 +119,11 @@ func TestCreateInbox(t *testing.T) {
 
 func TestListInbox(t *testing.T) {
 	config.LoadConfig(config.Test)
+	config.Set(config.EnableListingPublicInbox, true)
 	ih, closer := mustGetInboxHandler()
 	defer closer()
-	inboxA := shoudlExistsInbox(ih, model.GenerateInbox())
-	inboxB := shoudlExistsInbox(ih, model.GenerateInbox())
+	inboxA := shoudlExistsInbox(t, ih, model.GenerateInbox())
+	inboxB := shoudlExistsInbox(t, ih, model.GenerateInbox())
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
 	req, err := http.NewRequest(
@@ -159,7 +151,7 @@ func TestListInbox(t *testing.T) {
 	}
 }
 
-func InboxEquals(a any, b any) bool {
+func InboxEquals(a, b model.Inbox) bool {
 	return cmp.Equal(a, b)
 }
 
@@ -167,7 +159,7 @@ func TestDeleteInbox(t *testing.T) {
 	config.LoadConfig(config.Test)
 	ih, closer := mustGetInboxHandler()
 	defer closer()
-	inbox := shoudlExistsInbox(ih, model.GenerateInbox())
+	inbox := shoudlExistsInbox(t, ih, model.GenerateInbox())
 
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
@@ -193,7 +185,7 @@ func TestDeleteInboxRequests(t *testing.T) {
 	config.LoadConfig(config.Test)
 	ih, closer := mustGetInboxHandler()
 	defer closer()
-	inbox := shoudlExistsInbox(ih, model.GenerateInbox())
+	inbox := shoudlExistsInbox(t, ih, model.GenerateInbox())
 
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
@@ -220,7 +212,7 @@ func TestGetInbox(t *testing.T) {
 	ih, closer := mustGetInboxHandler()
 	defer closer()
 	inbox := model.GenerateInbox()
-	inbox = shoudlExistsInbox(ih, inbox)
+	inbox = shoudlExistsInbox(t, ih, inbox)
 
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
@@ -258,13 +250,13 @@ func TestUpdateInbox(t *testing.T) {
 	ih, closer := mustGetInboxHandler()
 	defer closer()
 	inbox := model.GenerateInbox()
-	inbox = shoudlExistsInbox(ih, inbox)
+	inbox = shoudlExistsInbox(t, ih, inbox)
 
 	modInbox := model.GenerateInbox()
 	modInbox.ID = inbox.ID
 	modInbox.Timestamp = inbox.Timestamp
 	modInbox.Requests = inbox.Requests
-	body := mustJson(modInbox)
+	body := t_util.MustJson(t, modInbox)
 	req, err := http.NewRequest(
 		"PUT",
 		"",

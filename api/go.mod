@@ -12,14 +12,18 @@ require (
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.5.0
 	github.com/spf13/viper v1.18.2
 	github.com/tidwall/gjson v1.17.1
+	golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc
+	golang.org/x/oauth2 v0.21.0
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.14 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.14.11 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.10 // indirect
@@ -80,7 +84,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.7.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
-	golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect

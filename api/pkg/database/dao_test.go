@@ -72,7 +72,7 @@ func TestGetInbox(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			got, err := db.GetInbox(context.Background(), tc.id)
+			got, err := db.GetInboxWithRequests(context.Background(), tc.id)
 			if tc.expectedErr {
 				if err == nil {
 					t.Errorf("Expected an error but got nil.")
@@ -131,7 +131,7 @@ func TestUpdateInbox(t *testing.T) {
 		if diff := cmp.Diff(modDBInbox, got); diff != "" {
 			t.Errorf("Expected modDBInbox, but got items: %v", diff)
 		}
-		got, err = db.GetInbox(ctx, inDBInbox.ID)
+		got, err = db.GetInboxWithRequests(ctx, inDBInbox.ID)
 		if err != nil {
 			t.Errorf("Expected no error, but got an error: %v", err)
 		}
@@ -177,7 +177,7 @@ func TestDeleteInbox(t *testing.T) {
 			} else if !tc.expectedErr && err != nil {
 				t.Errorf("Expected no error, but got an error: %v", err)
 			}
-			got, err := db.GetInbox(context.Background(), tc.id)
+			got, err := db.GetInboxWithRequests(context.Background(), tc.id)
 			if !cmp.Equal(got, empty) {
 				t.Errorf("Expected empty inbox but got %+v", got)
 			}

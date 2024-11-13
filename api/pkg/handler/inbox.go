@@ -13,4 +13,5 @@ type IInboxHandler interface {
 	DeleteInboxRequests(c *gin.Context)
 	RegisterInboxRequest(c *gin.Context)
 	Health(c *gin.Context)
+	AcceptCookies(c *gin.Context)
 }

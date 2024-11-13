@@ -135,3 +135,32 @@ func TestCopySlice(t *testing.T) {
 		})
 	}
 }
+
+func TestToAnySlice(t *testing.T) {
+	t.Run("Convert slice of integers", func(t *testing.T) {
+		input := []int{1, 2, 3, 4, 5}
+		expected := []any{1, 2, 3, 4, 5}
+		result := ToAnySlice(input)
+		if !reflect.DeepEqual(result, expected) {
+			t.Errorf("Expected %v, but got %v", expected, result)
+		}
+	})
+	t.Run("Convert empty slice", func(t *testing.T) {
+		var input []int
+		result := ToAnySlice(input)
+		if len(result) != 0 {
+			t.Errorf("Expected empty slice, but got %v", result)
+		}
+	})
+
+	t.Run("Convert nil slice", func(t *testing.T) {
+		var input []string
+		result := ToAnySlice(input)
+		if result == nil {
+			t.Error("Expected non-nil slice, but got nil")
+		}
+		if len(result) != 0 {
+			t.Errorf("Expected empty slice, but got %v", result)
+		}
+	})
+}

@@ -19,6 +19,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/handler"
 	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
+	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/route"
 )
 
@@ -63,6 +64,7 @@ func Handler(
 func startServer() {
 	r, closer := getRouter()
 	defer closer()
+	config.PrintConfig()
 	srv := &http.Server{
 		Addr:           ":" + config.GetString(config.APIHTTPPort),
 		Handler:        r,
@@ -84,7 +86,7 @@ func startServer() {
 		log.Fatal("Server Shutdown with error", err)
 	}
 	<-ctx.Done()
-	log.Println("Goodbye!")
+	slog.Info("Goodbye!")
 }
 
 func getRouter() (*gin.Engine, func()) {
@@ -95,9 +97,9 @@ func getRouter() (*gin.Engine, func()) {
 	r.NoRoute(handler.NotFoundHandler)
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
-		AllowHeaders:     []string{"*"},
+		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:8080"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
@@ -114,7 +116,14 @@ func getRouter() (*gin.Engine, func()) {
 		log.Fatal("failed to obtain InboxDAO:", err)
 	}
 
+	r.Use(login.JWTMiddleware())
+	r.Use(login.APIKeyMiddleware(dao))
+	lh := login.NewLoginHandler(dao)
+	route.SetLoginRoutes(r, lh)
+
 	ih := handler.NewInboxHandler(dao)
 	route.SetInboxRoutes(r, ih)
+	route.SetUtilityRoutes(r, ih)
+
 	return r, closer
 }

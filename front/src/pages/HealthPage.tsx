@@ -2,8 +2,6 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import { useEffect, useState } from 'react';
 import { health } from '../services/inbox';
 
@@ -21,7 +19,6 @@ const AboutPage: React.FC = () => {
 
     return (
         <Container>
-            <Header />
             <Box my={4}>
                 <Typography variant="h4" component="h2" gutterBottom>
                     Health
@@ -30,7 +27,6 @@ const AboutPage: React.FC = () => {
                     {data}
                 </Typography>
             </Box>
-            <Footer />
         </Container>
     );
 };
