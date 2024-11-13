@@ -14,7 +14,7 @@ on:
       - "api/**"
 
 env:
-  TF_VAR_API_SNAPSHOT_VERSION: ${{ github.run_number }}
+  TF_VAR_api_snapshot_version: ${{ github.run_number }}
 
 jobs:
   build-and-deploy:
@@ -65,10 +65,10 @@ jobs:
           TF_VAR_login_github_client_secret: ${{ secrets.LOGIN_GITHUB_CLIENT_SECRET }}
           TF_VAR_login_google_client_id: ${{ secrets.LOGIN_GOOGLE_CLIENT_ID }}
           TF_VAR_login_google_client_secret: ${{ secrets.LOGIN_GOOGLE_CLIENT_SECRET }}
-          TF_VAR_auth_cookie_domain: ${{ env.AUTH_COOKIE_DOMAIN }}
-          TF_VAR_frontend_application_url: ${{ env.FRONTEND_APPLICATION_URL }}
-          TF_VAR_login_github_callback: ${{ env.LOGIN_GITHUB_CALLBACK }}
-          TF_VAR_login_google_callback: ${{ env.LOGIN_GOOGLE_CALLBACK }}
+          TF_VAR_auth_cookie_domain: ${{ vars.AUTH_COOKIE_DOMAIN }}
+          TF_VAR_frontend_application_url: ${{ vars.FRONTEND_APPLICATION_URL }}
+          TF_VAR_login_github_callback: ${{ vars.LOGIN_GITHUB_CALLBACK }}
+          TF_VAR_login_google_callback: ${{ vars.LOGIN_GOOGLE_CALLBACK }}
         working-directory: ./deploy
         run: terraform plan -input=false
       - name: Terraform Apply
@@ -79,9 +79,9 @@ jobs:
           TF_VAR_login_github_client_secret: ${{ secrets.LOGIN_GITHUB_CLIENT_SECRET }}
           TF_VAR_login_google_client_id: ${{ secrets.LOGIN_GOOGLE_CLIENT_ID }}
           TF_VAR_login_google_client_secret: ${{ secrets.LOGIN_GOOGLE_CLIENT_SECRET }}
-          TF_VAR_auth_cookie_domain: ${{ env.AUTH_COOKIE_DOMAIN }}
-          TF_VAR_frontend_application_url: ${{ env.FRONTEND_APPLICATION_URL }}
-          TF_VAR_login_github_callback: ${{ env.LOGIN_GITHUB_CALLBACK }}
-          TF_VAR_login_google_callback: ${{ env.LOGIN_GOOGLE_CALLBACK }}
+          TF_VAR_auth_cookie_domain: ${{ vars.AUTH_COOKIE_DOMAIN }}
+          TF_VAR_frontend_application_url: ${{ vars.FRONTEND_APPLICATION_URL }}
+          TF_VAR_login_github_callback: ${{ vars.LOGIN_GITHUB_CALLBACK }}
+          TF_VAR_login_google_callback: ${{ vars.LOGIN_GOOGLE_CALLBACK }}
         working-directory: ./deploy
         run: terraform apply -auto-approve
