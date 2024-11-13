@@ -68,4 +68,6 @@ variable "jwt_secret" {
     type = string
 }
 
-
+variable "cors_allow_origins" {
+    type = string
+}
