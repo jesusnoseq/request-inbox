@@ -67,6 +67,8 @@ const (
 	AuthCookieDomain              Key    = "AUTH_COOKIE_DOMAIN"
 	AuthCookieDomainDefault       string = "request-inbox.com"
 	JWTSecret                     Key    = "JWT_SECRET"
+	CORSAllowOrigins              Key    = "CORS_ALLOW_ORIGINS"
+	CORSAllowOriginsDefault       string = "https://request-inbox.com https://api.request-inbox.com"
 
 	// Features
 	EnableListingPublicInbox  Key  = "ENABLE_LISTING_PUBLIC_INBOX"
@@ -114,6 +116,7 @@ func setDefaults(app App) {
 
 	setDefault(LoginGithubCallback, LoginGithubCallbackDefault)
 	setDefault(LoginGoogleCallback, LoginGoogleCallbackDefault)
+	setDefault(CORSAllowOrigins, CORSAllowOriginsDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {
