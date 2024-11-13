@@ -76,6 +76,7 @@ resource "aws_lambda_function" "api_lambda" {
       FRONTEND_APPLICATION_URL = var.frontend_application_url
       AUTH_COOKIE_DOMAIN = var.auth_cookie_domain
       JWT_SECRET = var.jwt_secret
+      CORS_ALLOW_ORIGINS = var.cors_allow_origins
     }
   }
 }

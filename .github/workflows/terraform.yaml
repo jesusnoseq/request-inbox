@@ -60,6 +60,7 @@ jobs:
           TF_VAR_frontend_application_url: ${{ vars.FRONTEND_APPLICATION_URL }}
           TF_VAR_login_github_callback: ${{ vars.LOGIN_GITHUB_CALLBACK }}
           TF_VAR_login_google_callback: ${{ vars.LOGIN_GOOGLE_CALLBACK }}
+          TF_VAR_cors_allow_origins: ${{ vars.CORS_ALLOW_ORIGINS }}
         id: plan
         working-directory: ./deploy
         run: |
