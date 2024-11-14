@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
@@ -91,21 +92,18 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		return
 	}
 
-	secureCookie := true
-	if config.FrontendApplicationURLDefault == config.GetString(config.FrontendApplicationURL) {
-		secureCookie = false
-	}
-	cookie := http.Cookie{
-		Name:     AuthTokenCookieName,
-		Value:    jwtToken,
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   secureCookie,
-		SameSite: http.SameSiteNoneMode,
-		Domain:   config.GetString(config.AuthCookieDomain),
-		MaxAge:   3600,
-	}
-	http.SetCookie(c.Writer, &cookie)
+	secureCookie := strings.HasPrefix("https", config.GetString(config.FrontendApplicationURL))
+
+	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetCookie(
+		AuthTokenCookieName,
+		jwtToken,
+		60*60,
+		"/",
+		config.GetString(config.AuthCookieDomain),
+		secureCookie,
+		true,
+	)
 	c.Redirect(http.StatusTemporaryRedirect, config.GetString(config.FrontendApplicationURL))
 }
 
