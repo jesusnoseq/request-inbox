@@ -50,31 +50,6 @@ resource "aws_iam_role_policy_attachment" "attach_dynamodb_access" {
   policy_arn = aws_iam_policy.dynamodb_access.arn
 }
 
-resource "aws_iam_role_policy" "lambda_logging" {
-  name = "lambda_logging_policy"
-  role = aws_iam_role.lambda_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "arn:aws:logs:*:*:*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "attach_logging_access" {
-  role       = aws_iam_role.lambda_exec_role.name
-  policy_arn = aws_iam_policy.lambda_logging.arn
-}
-
 resource "aws_lambda_function" "api_lambda" {
   function_name = "request-inbox-api"
   filename = data.archive_file.lambda-package.output_path
