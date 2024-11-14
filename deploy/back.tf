@@ -90,15 +90,6 @@ resource "aws_cloudwatch_log_group" "api_lambda_log_group" {
 resource "aws_apigatewayv2_api" "api" {
   name          = "request-inbox-apigw"
   protocol_type = "HTTP"
-
-  cors_configuration {
-    allow_credentials = false
-    allow_headers     = ["*"]
-    allow_methods     = ["*"]
-    allow_origins     = ["*"]
-    expose_headers    = ["*"]
-    max_age           = 3600
-  }
 }
 
 resource "aws_cloudwatch_log_group" "api_logs" {
