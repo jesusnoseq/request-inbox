@@ -102,6 +102,7 @@ func getRouter() (*gin.Engine, func()) {
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		MaxAge:           10 * time.Minute,
 	}))
 
 	ctx := context.Background()

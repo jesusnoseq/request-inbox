@@ -32,7 +32,7 @@ func (lh *LoginHandler) HandleLogin(c *gin.Context) {
 		return
 	}
 	oauthStateString := generateStateString()
-	c.SetCookie(OauthStateCookieName, oauthStateString, 3600, "/", "localhost", false, true)
+	c.SetCookie(OauthStateCookieName, oauthStateString, 3600, "/", config.GetString(config.AuthCookieDomain), false, true)
 	url := oauthConfig.Config.AuthCodeURL(oauthStateString)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
