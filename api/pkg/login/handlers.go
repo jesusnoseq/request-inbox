@@ -33,7 +33,15 @@ func (lh *LoginHandler) HandleLogin(c *gin.Context) {
 		return
 	}
 	oauthStateString := generateStateString()
-	c.SetCookie(OauthStateCookieName, oauthStateString, 3600, "/", config.GetString(config.AuthCookieDomain), false, true)
+	c.SetCookie(
+		OauthStateCookieName,
+		oauthStateString,
+		3600,
+		"/",
+		config.GetString(config.AuthCookieDomain),
+		isSecureCookie(),
+		true,
+	)
 	url := oauthConfig.Config.AuthCodeURL(oauthStateString)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
@@ -92,8 +100,6 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		return
 	}
 
-	secureCookie := strings.HasPrefix("https", config.GetString(config.FrontendApplicationURL))
-
 	c.SetSameSite(http.SameSiteNoneMode)
 	c.SetCookie(
 		AuthTokenCookieName,
@@ -101,10 +107,14 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		60*60,
 		"/",
 		config.GetString(config.AuthCookieDomain),
-		secureCookie,
+		isSecureCookie(),
 		true,
 	)
 	c.Redirect(http.StatusTemporaryRedirect, config.GetString(config.FrontendApplicationURL))
+}
+
+func isSecureCookie() bool {
+	return strings.HasPrefix("https", config.GetString(config.FrontendApplicationURL))
 }
 
 func IsUserLoggedIn(c *gin.Context) bool {
