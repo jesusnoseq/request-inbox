@@ -2,6 +2,7 @@ package t_util
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -19,11 +20,19 @@ func AssertStringEquals(t *testing.T, actual, expected string) {
 	}
 }
 
-func AssertTrue(t *testing.T, condition bool, message string) {
+func AssertTrue(t *testing.T, condition bool, message ...string) {
 	t.Helper()
 
 	if !condition {
-		t.Errorf("Expected true but got false: %s", message)
+		t.Errorf("Expected true but got false: %s", strings.Join(message, ", "))
+	}
+}
+
+func AssertFalse(t *testing.T, condition bool, message ...string) {
+	t.Helper()
+
+	if condition {
+		t.Errorf("Expected true but got false: %s", strings.Join(message, ", "))
 	}
 }
 

@@ -35,6 +35,7 @@ func TestGenerateJWT(t *testing.T) {
 	var claims JWTClaims
 	err = json.Unmarshal(payload, &claims)
 	t_util.AssertNoError(t, err)
+	t_util.AssertStringNotEquals(t, claims.RegisteredClaims.ID, "")
 	t_util.AssertStringEquals(t, claims.Subject, user.ID.String())
 	t_util.AssertStringEquals(t, claims.Issuer, appName)
 	t_util.AssertStringEquals(t, strings.Join(claims.Audience, " "), appAudience)
