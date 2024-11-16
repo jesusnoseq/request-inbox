@@ -66,9 +66,12 @@ const (
 	FrontendApplicationURLDefault string = "https://request-inbox.com/"
 	AuthCookieDomain              Key    = "AUTH_COOKIE_DOMAIN"
 	AuthCookieDomainDefault       string = "request-inbox.com"
-	JWTSecret                     Key    = "JWT_SECRET"
 	CORSAllowOrigins              Key    = "CORS_ALLOW_ORIGINS"
 	CORSAllowOriginsDefault       string = "https://request-inbox.com https://api.request-inbox.com"
+	JWTSecret                     Key    = "JWT_SECRET"
+	JWTSecretDefault              string = "d14f50e6a26bbbd8922a41449c7f00bb87b4629acfc153403f5ed1342cf6fcd0"
+	UserJTISalt                   Key    = "USER_JTI_SALT"
+	UserJTISaltDefault            string = "AcL30zFxQf"
 
 	// Features
 	EnableListingPublicInbox  Key  = "ENABLE_LISTING_PUBLIC_INBOX"
@@ -106,10 +109,6 @@ func setDefaults(app App) {
 
 	setDefault(SnapshotVersion, SnapshotVersionDefault)
 
-	// FEATURES
-	setDefault(EnableListingPublicInbox, EnableListingInboxDefault)
-	setDefault(EnablePrintConfig, EnableListingInboxDefault)
-
 	// AUTH
 	setDefault(FrontendApplicationURL, FrontendApplicationURLDefault)
 	setDefault(AuthCookieDomain, AuthCookieDomainDefault)
@@ -117,6 +116,15 @@ func setDefaults(app App) {
 	setDefault(LoginGithubCallback, LoginGithubCallbackDefault)
 	setDefault(LoginGoogleCallback, LoginGoogleCallbackDefault)
 	setDefault(CORSAllowOrigins, CORSAllowOriginsDefault)
+
+	if app == Test {
+		setDefault(UserJTISalt, UserJTISaltDefault)
+		setDefault(JWTSecret, JWTSecretDefault)
+	}
+
+	// FEATURES
+	setDefault(EnableListingPublicInbox, EnableListingInboxDefault)
+	setDefault(EnablePrintConfig, EnableListingInboxDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {
