@@ -21,12 +21,11 @@ type JWTClaims struct {
 const appName string = "Request Inbox"
 const appAudience string = appName + " web user"
 
-// TODO
-const hashSalt = "AcL30zFxQf"
 const TokenExpiredError = "token expired"
 
 func calculateJTI(id uuid.UUID, now time.Time) string {
-	jtiContent := fmt.Sprintf("%s:%d:%s", id, now.Unix(), hashSalt)
+	salt := config.GetString(config.UserJTISalt)
+	jtiContent := fmt.Sprintf("%s:%d:%s", id, now.Unix(), salt)
 	hash := sha256.Sum256([]byte(jtiContent))
 	return hex.EncodeToString(hash[:])
 }
@@ -127,4 +126,14 @@ func ParseToken(jwtToken string) (JWTClaims, error) {
 	}
 
 	return claims, nil
+}
+
+func ReadJWTToken(token string) (model.User, error) {
+	claims, err := ParseToken(token)
+	if err != nil {
+		slog.Error("Token not valid", "JWT", token)
+		return model.User{}, err
+	}
+	user := claims.User
+	return user, nil
 }
