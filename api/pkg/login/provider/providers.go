@@ -24,14 +24,20 @@ type OauthProvider string
 const GitHub OauthProvider = "github"
 const Google OauthProvider = "google"
 
-var oAuthConfigs map[OauthProvider]*OAuthConfig
+type ProviderManager struct {
+	oAuthConfigs map[OauthProvider]*OAuthConfig
+}
 
-func GetOAuthConfig(provider string) (OAuthConfig, bool) {
-	if oAuthConfigs != nil {
-		c, exists := oAuthConfigs[OauthProvider(provider)]
+func NewProviderManager() IProviderManager {
+	return &ProviderManager{}
+}
+
+func (p *ProviderManager) GetOAuthConfig(provider string) (OAuthConfig, bool) {
+	if p.oAuthConfigs != nil {
+		c, exists := p.oAuthConfigs[OauthProvider(provider)]
 		return *c, exists
 	}
-	oAuthConfigs = map[OauthProvider]*OAuthConfig{
+	p.oAuthConfigs = map[OauthProvider]*OAuthConfig{
 		GitHub: {
 			Config: &oauth2.Config{
 				ClientID:     config.GetString(config.LoginGithubClientId),
@@ -54,48 +60,59 @@ func GetOAuthConfig(provider string) (OAuthConfig, bool) {
 		},
 	}
 
-	c, exists := oAuthConfigs[OauthProvider(provider)]
+	c, exists := p.oAuthConfigs[OauthProvider(provider)]
 	return *c, exists
-
 }
 
-func ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User, error) {
+func (p *ProviderManager) ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User, error) {
 	provider := OauthProvider(prov)
-	if provider == Google {
-		gInfo := googleUserInfo{}
-		err := json.Unmarshal([]byte(jsonInfo), &gInfo)
-		if err != nil {
-			slog.Error("Error parsing JSON", "error", err)
-			return model.User{}, err
-		}
-		user := model.NewUser(gInfo.Email)
-		user.Name = gInfo.GivenName
-		user.AvatarURL = gInfo.Picture
-		user.Provider = model.UserProvider{
-			Provider:     prov,
-			AccessToken:  token.AccessToken,
-			RefreshToken: token.RefreshToken,
-		}
-		return user, nil
+	switch provider {
+	case Google:
+		return p.extractGoogleUser(token, jsonInfo)
+	case GitHub:
+		return p.extractGitHubUser(token, jsonInfo)
+	default:
+		return model.User{}, fmt.Errorf("provider not available: %s", prov)
 	}
-	if provider == GitHub {
-		gInfo := githubUserInfo{}
-		err := json.Unmarshal([]byte(jsonInfo), &gInfo)
-		if err != nil {
-			slog.Error("Error parsing JSON", "error", err)
-			return model.User{}, err
-		}
-		user := model.NewUser(gInfo.Email)
-		user.Organization = gInfo.Company
-		user.Name = gInfo.Name
-		user.AvatarURL = gInfo.AvatarURL
-		user.Provider = model.UserProvider{
-			Provider:     prov,
-			AccessToken:  token.AccessToken,
-			RefreshToken: token.RefreshToken,
-		}
-		return user, nil
+}
+
+func (p *ProviderManager) extractGoogleUser(token *oauth2.Token, jsonInfo []byte) (model.User, error) {
+	var gInfo googleUserInfo
+	err := json.Unmarshal(jsonInfo, &gInfo)
+	if err != nil {
+		slog.Error("Error parsing Google user JSON", "error", err)
+		return model.User{}, err
 	}
 
-	return model.User{}, fmt.Errorf("provider not available: %s", prov)
+	user := model.NewUser(gInfo.Email)
+	user.Name = gInfo.GivenName
+	user.AvatarURL = gInfo.Picture
+	user.Provider = model.UserProvider{
+		Provider:     string(Google),
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+	}
+
+	return user, nil
+}
+
+func (p *ProviderManager) extractGitHubUser(token *oauth2.Token, jsonInfo []byte) (model.User, error) {
+	var gInfo githubUserInfo
+	err := json.Unmarshal(jsonInfo, &gInfo)
+	if err != nil {
+		slog.Error("Error parsing GitHub user JSON", "error", err)
+		return model.User{}, err
+	}
+
+	user := model.NewUser(gInfo.Email)
+	user.Organization = gInfo.Company
+	user.Name = gInfo.Name
+	user.AvatarURL = gInfo.AvatarURL
+	user.Provider = model.UserProvider{
+		Provider:     string(GitHub),
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+	}
+
+	return user, nil
 }
