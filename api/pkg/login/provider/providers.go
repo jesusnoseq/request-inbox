@@ -25,7 +25,7 @@ const GitHub OauthProvider = "github"
 const Google OauthProvider = "google"
 
 type ProviderManager struct {
-	oAuthConfigs map[OauthProvider]*OAuthConfig
+	oAuthConfigs map[OauthProvider]OAuthConfig
 }
 
 func NewProviderManager() IProviderManager {
@@ -35,9 +35,9 @@ func NewProviderManager() IProviderManager {
 func (p *ProviderManager) GetOAuthConfig(provider string) (OAuthConfig, bool) {
 	if p.oAuthConfigs != nil {
 		c, exists := p.oAuthConfigs[OauthProvider(provider)]
-		return *c, exists
+		return c, exists
 	}
-	p.oAuthConfigs = map[OauthProvider]*OAuthConfig{
+	p.oAuthConfigs = map[OauthProvider]OAuthConfig{
 		GitHub: {
 			Config: &oauth2.Config{
 				ClientID:     config.GetString(config.LoginGithubClientId),
@@ -61,7 +61,7 @@ func (p *ProviderManager) GetOAuthConfig(provider string) (OAuthConfig, bool) {
 	}
 
 	c, exists := p.oAuthConfigs[OauthProvider(provider)]
-	return *c, exists
+	return c, exists
 }
 
 func (p *ProviderManager) ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User, error) {
