@@ -85,6 +85,8 @@ resource "aws_lambda_function" "api_lambda" {
   handler = "bootstrap"
   runtime = "provided.al2"
 
+  timeout       = 15 
+
   role = aws_iam_role.lambda_exec_role.arn
 
   environment {
