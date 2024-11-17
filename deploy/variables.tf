@@ -67,7 +67,9 @@ variable "auth_cookie_domain" {
 variable "jwt_secret" {
     type = string
 }
-
 variable "cors_allow_origins" {
+    type = string
+}
+variable "user_jti_salt" {
     type = string
 }
