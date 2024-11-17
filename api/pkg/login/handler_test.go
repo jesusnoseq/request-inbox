@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -30,6 +31,15 @@ func mustGetLoginHandler() (*LoginHandler, func()) {
 	return NewLoginHandler(dao), func() {
 		dao.Close(ctx)
 	}
+}
+
+func findCookie(cookies []*http.Cookie, name string) *http.Cookie {
+	for _, cookie := range cookies {
+		if cookie.Name == name {
+			return cookie
+		}
+	}
+	return nil
 }
 
 func TestHandleLogout(t *testing.T) {
@@ -182,15 +192,7 @@ func TestHandleLogin(t *testing.T) {
 				t.Errorf("Expected redirect to %s, got %s", tc.expectedURL, location)
 			}
 
-			cookies := resp.Cookies()
-			var oauthStateCookie *http.Cookie
-			for _, cookie := range cookies {
-				if cookie.Name == OauthStateCookieName {
-					oauthStateCookie = cookie
-					break
-				}
-			}
-
+			oauthStateCookie := findCookie(resp.Cookies(), OauthStateCookieName)
 			if oauthStateCookie == nil {
 				t.Fatal("OAuth state cookie not set")
 			}
@@ -201,7 +203,7 @@ func TestHandleLogin(t *testing.T) {
 			t_util.AssertStringEquals(t, oauthStateCookie.Domain, "localhost")
 			t_util.AssertTrue(t, oauthStateCookie.HttpOnly)
 			t_util.AssertTrue(t, oauthStateCookie.Secure)
-
+			t_util.AssertEquals(t, oauthStateCookie.SameSite, http.SameSiteNoneMode)
 		})
 	}
 }
@@ -221,8 +223,8 @@ func TestHandleCallback(t *testing.T) {
 	config.Set(config.AuthCookieDomain, "localhost")
 
 	pm := provider_mock.NewMockIProviderManager(mockCtrl)
-	pm.EXPECT().GetOAuthConfig("mock").Return(getMockOauthConfig(server.URL), true).Times(1)
-	//pm.EXPECT().GetOAuthConfig("invalid").Return(provider.OAuthConfig{}, false).Times(1)
+	pm.EXPECT().GetOAuthConfig("mock").Return(getMockOauthConfig(server.URL), true).Times(2)
+	pm.EXPECT().GetOAuthConfig("invalid").Return(provider.OAuthConfig{}, false).Times(1)
 	pm.EXPECT().ExtractUser("mock", gomock.Any(), gomock.Any()).DoAndReturn(
 		func(prov string, token *oauth2.Token, jsonInfo []byte) (model.User, error) {
 			t_util.AssertStructIsNotEmpty(t, *token)
@@ -232,36 +234,50 @@ func TestHandleCallback(t *testing.T) {
 	)
 	lh.pm = pm
 	testCases := []struct {
-		name           string
-		provider       string
-		expectedStatus int
+		name                string
+		provider            string
+		state               string
+		expectedLocationURL string
+		expectedStatus      int
+		expectedBody        string
 	}{
 		{
-			name:           "Valid Provider",
-			provider:       "mock",
-			expectedStatus: http.StatusTemporaryRedirect,
+			name:                "Valid Provider",
+			provider:            "mock",
+			state:               "statecode",
+			expectedLocationURL: server.URL,
+			expectedStatus:      http.StatusTemporaryRedirect,
+			expectedBody:        "<a href=\"" + server.URL + "\">Temporary Redirect</a>.\n\n",
 		},
-		// {
-		// 	name:           "Invalid Provider",
-		// 	provider:       "invalid",
-		// 	expectedStatus: http.StatusBadRequest,
-		// },
+		{
+			name:           "Invalid Provider",
+			provider:       "invalid",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "{\"code\":400,\"message\":\"Provider not supported\"}",
+		},
+		{
+			name:           "Invalid state",
+			provider:       "mock",
+			state:          "does not match",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"code\":401,\"message\":\"Invalid state\"}",
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			ginCtx, _ := gin.CreateTestContext(w)
-			state := "statecode"
+
 			code := "code"
 			req := t_util.MustRequest(t, "GET", "auth/"+tc.provider+"/callback", nil)
 			parameters := url.Values{}
-			parameters.Add("state", state)
+			parameters.Add("state", tc.state)
 			parameters.Add("code", code)
 			req.URL.RawQuery = parameters.Encode()
 
 			req.AddCookie(&http.Cookie{
 				Name:     OauthStateCookieName,
-				Value:    state,
+				Value:    "statecode",
 				Path:     "/",
 				Domain:   "localhost",
 				MaxAge:   int(time.Now().Add(1 * time.Hour).Unix()),
@@ -276,78 +292,103 @@ func TestHandleCallback(t *testing.T) {
 
 			resp := w.Result()
 			resp.Body.Close()
-			t_util.AssertStringEquals(t, w.Body.String(), "<a href=\""+server.URL+"\">Temporary Redirect</a>.\n\n")
+			t_util.AssertStringEquals(t, w.Body.String(), tc.expectedBody)
 			t_util.AssertStatusCode(t, resp.StatusCode, tc.expectedStatus)
+
+			location := resp.Header.Get("Location")
+			if !strings.HasPrefix(location, tc.expectedLocationURL) {
+				t.Errorf("Expected redirect to %s, got %s", tc.expectedLocationURL, location)
+			}
+
+			if tc.expectedStatus != http.StatusTemporaryRedirect {
+				return
+			}
+
+			oauthStateCookie := findCookie(resp.Cookies(), AuthTokenCookieName)
+			if oauthStateCookie == nil {
+				t.Fatal("OAuth state cookie not set")
+			}
+
+			t_util.AssertNotEquals(t, oauthStateCookie.Value, "")
+			t_util.AssertEquals(t, oauthStateCookie.MaxAge, 3600)
+			t_util.AssertStringEquals(t, oauthStateCookie.Path, "/")
+			t_util.AssertStringEquals(t, oauthStateCookie.Domain, "localhost")
+			t_util.AssertTrue(t, oauthStateCookie.HttpOnly)
+			t_util.AssertTrue(t, oauthStateCookie.Secure)
+			t_util.AssertEquals(t, oauthStateCookie.SameSite, http.SameSiteNoneMode)
+
+			claims, err := ParseToken(oauthStateCookie.Value)
+			t_util.AssertNoError(t, err)
+			t_util.AssertStructIsNotEmpty(t, claims)
 		})
 	}
 }
 
-// func TestHandleLoginUser(t *testing.T) {
-// 	config.LoadConfig(config.Test)
-// 	w := httptest.NewRecorder()
-// 	ginCtx, _ := gin.CreateTestContext(w)
-// 	lh := &LoginHandler{}
-// 	userId := uuid.New()
+func TestHandleLoginUser(t *testing.T) {
+	config.LoadConfig(config.Test)
+	lh := &LoginHandler{}
+	user := model.NewUser("test@mail.dev")
+	jwt, err := GenerateJWT(user)
+	t_util.RequireNoError(t, err)
 
-// 	testCases := []struct {
-// 		name           string
-// 		token          string
-// 		mockReadJWT    func(token string) (*model.User, error)
-// 		expectedStatus int
-// 		expectedBody   string
-// 	}{
-// 		{
-// 			name:  "Valid Token",
-// 			token: "valid_token",
-// 			mockReadJWT: func(token string) (*model.User, error) {
-// 				return &model.User{ID: userId, Email: "user@example.com"}, nil
-// 			},
-// 			expectedStatus: http.StatusOK,
-// 			expectedBody:   `{"id":"123","email":"user@example.com"}`,
-// 		},
-// 		{
-// 			name:           "No Token",
-// 			token:          "",
-// 			mockReadJWT:    nil,
-// 			expectedStatus: http.StatusNoContent,
-// 			expectedBody:   "",
-// 		},
-// 		{
-// 			name:  "Invalid Token",
-// 			token: "invalid_token",
-// 			mockReadJWT: func(token string) (*model.User, error) {
-// 				return nil, errors.New("invalid token")
-// 			},
-// 			expectedStatus: http.StatusUnauthorized,
-// 			expectedBody:   `"JWT not vaid"`,
-// 		},
-// 	}
+	testCases := []struct {
+		name           string
+		token          string
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name:           "Valid Token",
+			token:          jwt,
+			expectedStatus: http.StatusOK,
 
-// 	for _, tc := range testCases {
-// 		t.Run(tc.name, func(t *testing.T) {
-// 			// Create a new HTTP request
-// 			req, err := http.NewRequest("GET", "/login", nil)
-// 			if err != nil {
-// 				t.Fatalf("Couldn't create request: %v\n", err)
-// 			}
-// 			if tc.token != "" {
-// 				req.AddCookie(&http.Cookie{Name: AuthTokenCookieName, Value: tc.token})
-// 			}
+			expectedBody: fmt.Sprintf(`{"ID":"%s","Name":"","AvatarURL":"","Email":"%s","Organization":""`, user.ID.String(), user.Email),
+		},
+		{
+			name:           "No Token",
+			token:          "",
+			expectedStatus: http.StatusNoContent,
+			expectedBody:   "",
+		},
+		{
+			name:           "Invalid Token",
+			token:          "invalid_token",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   `{"code":401,"message":"Token not valid"}`,
+		},
+	}
 
-// 			w := httptest.NewRecorder()
-// 			ginCtx.Request = req
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			ginCtx, _ := gin.CreateTestContext(w)
+			req := t_util.MustRequest(t, "GET", "auth/user", nil)
+			req.AddCookie(&http.Cookie{
+				Name:     AuthTokenCookieName,
+				Value:    tc.token,
+				Path:     "/",
+				Domain:   "localhost",
+				MaxAge:   int(time.Now().Add(1 * time.Hour).Unix()),
+				HttpOnly: true,
+				Secure:   true,
+				SameSite: http.SameSiteNoneMode,
+			})
+			ginCtx.Request = req
 
-// 			lh.HandleLoginUser(ginCtx)
+			lh.HandleLoginUser(ginCtx)
 
-// 			// Check the status code
-// 			if w.Code != tc.expectedStatus {
-// 				t.Errorf("Expected status %d, got %d", tc.expectedStatus, w.Code)
-// 			}
+			resp := w.Result()
+			resp.Body.Close()
 
-// 			// Check the response body
-// 			if w.Body.String() != tc.expectedBody {
-// 				t.Errorf("Expected body %s, got %s", tc.expectedBody, w.Body.String())
-// 			}
-// 		})
-// 	}
-// }
+			t_util.AssertStatusCode(t, resp.StatusCode, tc.expectedStatus)
+			if !strings.HasPrefix(w.Body.String(), tc.expectedBody) {
+				t.Errorf("Expected body to be to %s, got %s", w.Body.String(), tc.expectedBody)
+			}
+
+			if tc.expectedStatus != http.StatusOK {
+				return
+			}
+
+		})
+	}
+}
