@@ -77,7 +77,7 @@ export default function Profile({ user, onDeleteAccount }: ProfileProps) {
 
             <Divider sx={{ my: 3 }} />
 
-            <APIKeyManager />
+            {/*<APIKeyManager />*/}
 
             <Divider sx={{ my: 3 }} />
             <Box sx={{ mt: 2 }}>
