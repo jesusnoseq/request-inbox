@@ -104,7 +104,7 @@ resource "aws_lambda_function" "api_lambda" {
       LOGIN_GOOGLE_CALLBACK = var.login_google_callback
       FRONTEND_APPLICATION_URL = var.frontend_application_url
       AUTH_COOKIE_DOMAIN = var.auth_cookie_domain
-      JWT_SECRET = var.
+      JWT_SECRET = var.jwt_secret
       USER_JTI_SALT = var.user_jti_salt
       CORS_ALLOW_ORIGINS = var.cors_allow_origins
     }
