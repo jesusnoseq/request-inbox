@@ -1,7 +1,7 @@
 package model
 
 import (
-	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
@@ -40,7 +40,7 @@ func generateAPIKey() (string, error) {
 func NewAPIKey(userID uuid.UUID) (APIKey, error) {
 	apiKey, err := generateAPIKey()
 	if err != nil {
-		fmt.Println("Error generating API key:", err)
+		slog.Error("Error generating API key:", "error", err)
 		return APIKey{}, err
 	}
 	return APIKey{
