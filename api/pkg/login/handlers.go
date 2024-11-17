@@ -1,7 +1,6 @@
 package login
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"log/slog"
@@ -36,6 +35,7 @@ func (lh *LoginHandler) HandleLogin(c *gin.Context) {
 		return
 	}
 	oauthStateString := generateStateString()
+	c.SetSameSite(http.SameSiteNoneMode)
 	c.SetCookie(
 		OauthStateCookieName,
 		oauthStateString,
@@ -46,6 +46,7 @@ func (lh *LoginHandler) HandleLogin(c *gin.Context) {
 		true,
 	)
 	url := oauthConfig.Config.AuthCodeURL(oauthStateString)
+
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
@@ -65,14 +66,14 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	}
 
 	code := c.Query("code")
-	token, err := oauthConfig.Config.Exchange(context.Background(), code)
+	token, err := oauthConfig.Config.Exchange(c, code)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to exchange token")
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to exchange token", http.StatusInternalServerError))
 		return
 	}
 
-	client := oauthConfig.Config.Client(context.Background(), token)
+	client := oauthConfig.Config.Client(c, token)
 	userResponse, err := client.Get(oauthConfig.UserInfoURL)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to get user info")
@@ -150,13 +151,13 @@ func GetUser(c *gin.Context) (model.User, error) {
 func (lh *LoginHandler) HandleLoginUser(c *gin.Context) {
 	token, _ := c.Cookie(AuthTokenCookieName)
 	if token == "" {
-		c.JSON(http.StatusNoContent, nil)
+		c.AbortWithStatusJSON(http.StatusNoContent, nil)
 		return
 	}
 	user, err := ReadJWTToken(token)
 	if err != nil {
 		slog.Error("Token not valid", "JWT", token, "error", err)
-		c.JSON(http.StatusUnauthorized, "JWT not vaid")
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Token not valid", http.StatusUnauthorized))
 		return
 	}
 
@@ -169,9 +170,10 @@ func (lh *LoginHandler) HandleLogout(c *gin.Context) {
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   isSecureCookie(),
+		Secure:   true,
 		MaxAge:   -1, // Deletes the cookie
 	}
+	c.SetSameSite(http.SameSiteNoneMode)
 	http.SetCookie(c.Writer, &cookie)
 	c.JSON(http.StatusOK, gin.H{"message": "You have successfully logged out"})
 }
@@ -179,17 +181,18 @@ func (lh *LoginHandler) HandleLogout(c *gin.Context) {
 func (lh *LoginHandler) HandleDeleteLoginUser(c *gin.Context) {
 	token, _ := c.Cookie(AuthTokenCookieName)
 	if token == "" {
-		c.JSON(http.StatusNoContent, nil)
+		c.AbortWithStatusJSON(http.StatusNoContent, nil)
 		return
 	}
 	user, err := ReadJWTToken(token)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, "JWT not vaid")
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Token not valid", http.StatusUnauthorized))
 		return
 	}
 	err = lh.dao.DeleteUser(c, user.ID)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, "Error deleting user")
+		instrumentation.LogError(c, err, "Failed to delete user info", "user", user)
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Error deleting user", http.StatusUnauthorized))
 		return
 	}
 	lh.HandleLogout(c)
