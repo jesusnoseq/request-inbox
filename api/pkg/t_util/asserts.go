@@ -6,6 +6,20 @@ import (
 	"testing"
 )
 
+func AssertEquals[T comparable](t *testing.T, actual, expected T) {
+	t.Helper()
+	if actual != expected {
+		t.Errorf("Expected: %v\nActual: %v", expected, actual)
+	}
+}
+
+func AssertNotEquals[T comparable](t *testing.T, actual, expected T) {
+	t.Helper()
+	if actual == expected {
+		t.Errorf("Expected: %v\nActual: %v", expected, actual)
+	}
+}
+
 func AssertStringNotEquals(t *testing.T, actual, expected string) {
 	t.Helper()
 	if actual == expected {
