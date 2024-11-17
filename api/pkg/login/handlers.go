@@ -11,25 +11,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/login/provider"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
 type LoginHandler struct {
 	dao database.InboxDAO
+	pm  provider.IProviderManager
 }
 
 func NewLoginHandler(dao database.InboxDAO) *LoginHandler {
 	return &LoginHandler{
 		dao: dao,
+		pm:  provider.NewProviderManager(),
 	}
 }
 
 func (lh *LoginHandler) HandleLogin(c *gin.Context) {
 	p := c.Param("provider")
-	oauthConfig, exists := provider.GetOAuthConfig(p)
+	oauthConfig, exists := lh.pm.GetOAuthConfig(p)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Provider not supported"})
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Provider not supported", http.StatusBadRequest))
 		return
 	}
 	oauthStateString := generateStateString()
@@ -39,7 +42,7 @@ func (lh *LoginHandler) HandleLogin(c *gin.Context) {
 		3600,
 		"/",
 		config.GetString(config.AuthCookieDomain),
-		isSecureCookie(),
+		true,
 		true,
 	)
 	url := oauthConfig.Config.AuthCodeURL(oauthStateString)
@@ -48,55 +51,61 @@ func (lh *LoginHandler) HandleLogin(c *gin.Context) {
 
 func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	p := c.Param("provider")
-	oauthConfig, exists := provider.GetOAuthConfig(p)
+	oauthConfig, exists := lh.pm.GetOAuthConfig(p)
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Provider not supported"})
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Provider not supported", http.StatusBadRequest))
 		return
 	}
 
 	oauthState, _ := c.Cookie(OauthStateCookieName)
 	state := c.Query("state")
 	if state != oauthState {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid state"})
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Invalid state", http.StatusUnauthorized))
 		return
 	}
 
 	code := c.Query("code")
 	token, err := oauthConfig.Config.Exchange(context.Background(), code)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token"})
+		instrumentation.LogError(c, err, "Failed to exchange token")
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to exchange token", http.StatusInternalServerError))
 		return
 	}
 
 	client := oauthConfig.Config.Client(context.Background(), token)
 	userResponse, err := client.Get(oauthConfig.UserInfoURL)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info"})
+		instrumentation.LogError(c, err, "Failed to get user info")
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to get user info", http.StatusInternalServerError))
 		return
 	}
 	defer userResponse.Body.Close()
 	body, err := io.ReadAll(userResponse.Body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read user info"})
+		instrumentation.LogError(c, err, "Failed to read user info")
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to read user info", http.StatusInternalServerError))
 		return
 	}
 	slog.Info("BODY ", "user", body)
 	slog.Info("token ", "token", token)
 
-	user, err := provider.ExtractUser(p, token, body)
+	user, err := lh.pm.ExtractUser(p, token, body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse user info"})
+		instrumentation.LogError(c, err, "Failed to parse user info")
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to parse user info", http.StatusInternalServerError))
 		return
 	}
 	err = lh.dao.UpsertUser(c.Request.Context(), user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save user"})
+		instrumentation.LogError(c, err, "Failed to save user", "user", user)
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to save user", http.StatusInternalServerError))
 		return
 	}
 	slog.Info("Logging user ", "ip", c.ClientIP(), "user", user.Email)
 	jwtToken, err := GenerateJWT(user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate jwt with user info"})
+		instrumentation.LogError(c, err, "Failed to generate jwt with user info", "user", user)
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to generate jwt with user info", http.StatusInternalServerError))
 		return
 	}
 
@@ -107,7 +116,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		60*60,
 		"/",
 		config.GetString(config.AuthCookieDomain),
-		isSecureCookie(),
+		true,
 		true,
 	)
 	c.Redirect(http.StatusTemporaryRedirect, config.GetString(config.FrontendApplicationURL))
@@ -138,16 +147,6 @@ func GetUser(c *gin.Context) (model.User, error) {
 	return user, nil
 }
 
-func ReadJWTToken(token string) (model.User, error) {
-	claims, err := ParseToken(token)
-	if err != nil {
-		slog.Error("Token not valid", "JWT", token)
-		return model.User{}, err
-	}
-	user := claims.User
-	return user, nil
-}
-
 func (lh *LoginHandler) HandleLoginUser(c *gin.Context) {
 	token, _ := c.Cookie(AuthTokenCookieName)
 	if token == "" {
@@ -170,7 +169,7 @@ func (lh *LoginHandler) HandleLogout(c *gin.Context) {
 		Value:    "",
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   isSecureCookie(),
 		MaxAge:   -1, // Deletes the cookie
 	}
 	http.SetCookie(c.Writer, &cookie)

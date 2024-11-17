@@ -17,7 +17,7 @@ func MustRequest(t *testing.T, method, url string, body io.Reader) *http.Request
 	return req
 }
 
-func AssertStatusCode(t *testing.T, expected, actual int) {
+func AssertStatusCode(t *testing.T, actual, expected int) {
 	t.Helper()
 
 	if expected != actual {
@@ -25,7 +25,7 @@ func AssertStatusCode(t *testing.T, expected, actual int) {
 	}
 }
 
-func AssertSameID(t *testing.T, expected, actual uuid.UUID) {
+func AssertSameID(t *testing.T, actual, expected uuid.UUID) {
 	t.Helper()
 	if expected != actual {
 		t.Errorf("Expected ID %v but got %v", expected, actual)
