@@ -48,10 +48,11 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
     }
 
     const canEdit = inbox.OwnerID === '00000000-0000-0000-0000-000000000000' || (isLoggedIn() && inbox.OwnerID === user.ID)
-
+    const canChangeVisibility = isLoggedIn() && inbox.OwnerID === user.ID
+    console.log("Inbox is editable?", canEdit)
     return (
         <Paper sx={{ padding: 2 }}>
-            <TextInlineEditor initialValue={inbox.Name} label='Inbox' onSave={handleSaveInboxName} />
+            <TextInlineEditor initialValue={inbox.Name} label='Inbox' onSave={handleSaveInboxName} readonly={!canEdit} />
             <Box
                 display="flex"
                 justifyContent="space-between"
@@ -62,7 +63,7 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
                 <Typography color="textSecondary">
                     Open since {moment(inbox.Timestamp).format('LLL')}
                 </Typography>
-                {canEdit &&
+                {canChangeVisibility &&
                     <InboxVisibilityToggle defaultPublic={!inbox.IsPrivate} onChange={handleSaveIsPublic} />
                 }
             </Box>

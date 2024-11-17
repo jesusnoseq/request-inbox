@@ -48,6 +48,11 @@ func (ih *InboxHandler) CreateInbox(c *gin.Context) {
 		newInbox.OwnerID = user.ID
 	}
 
+	if newInbox.IsPrivate && newInbox.OwnerID == uuid.Nil {
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("An anonymous inbox can not be private", http.StatusBadRequest))
+		return
+	}
+
 	inbox, err := ih.dao.CreateInbox(c, newInbox)
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
@@ -168,6 +173,11 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 	var updatedInbox model.Inbox
 	if err := c.ShouldBindJSON(&updatedInbox); err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("inbox not valid", err, http.StatusBadRequest))
+		return
+	}
+
+	if updatedInbox.IsPrivate && updatedInbox.OwnerID == uuid.Nil {
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("An anonymous inbox can not be private", http.StatusBadRequest))
 		return
 	}
 

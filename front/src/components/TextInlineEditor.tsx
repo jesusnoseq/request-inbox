@@ -7,13 +7,14 @@ import ClearIcon from '@mui/icons-material/Clear';
 
 type TextInlineEditorProps = {
     initialValue: string;
-    label: string
+    label: string;
+    readonly: boolean;
     onSave: (val: string) => void;
 };
 
 
 
-const TextInlineEditor: React.FC<TextInlineEditorProps> = ({ initialValue, label, onSave }) => {
+const TextInlineEditor: React.FC<TextInlineEditorProps> = ({ initialValue, label, readonly, onSave }) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const [previousValue, setPreviousValue] = useState<string>(initialValue);
     const [value, setValue] = useState<string>(initialValue);
@@ -51,9 +52,11 @@ const TextInlineEditor: React.FC<TextInlineEditorProps> = ({ initialValue, label
                     }}>
                         {label}  {value}
                     </Typography>
-                    <IconButton aria-label="edit inbox name" size="small" onClick={enableEditMode}>
-                        <ModeEditIcon fontSize="large" />
-                    </IconButton>
+                    {!readonly &&
+                        <IconButton aria-label="edit inbox name" size="small" onClick={enableEditMode}>
+                            <ModeEditIcon fontSize="large" />
+                        </IconButton>
+                    }
                 </Box >
             }
             {
@@ -79,16 +82,18 @@ const TextInlineEditor: React.FC<TextInlineEditorProps> = ({ initialValue, label
                             </InputAdornment>
                         ),
                         endAdornment: (
-                            <InputAdornment position="end">
-                                <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                    <IconButton aria-label="Cancel" size="small" onClick={handleCancel}>
-                                        <ClearIcon fontSize="medium" />
-                                    </IconButton>
-                                    <IconButton aria-label="Save" size="small" onClick={handleSave} disabled={error}>
-                                        <DoneIcon fontSize="medium" />
-                                    </IconButton>
-                                </ButtonGroup>
-                            </InputAdornment>
+                            <>
+                                < InputAdornment position="end" >
+                                    <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                        <IconButton aria-label="Cancel" size="small" onClick={handleCancel}>
+                                            <ClearIcon fontSize="medium" />
+                                        </IconButton>
+                                        <IconButton aria-label="Save" size="small" onClick={handleSave} disabled={error}>
+                                            <DoneIcon fontSize="medium" />
+                                        </IconButton>
+                                    </ButtonGroup>
+                                </InputAdornment >
+                            </>
                         )
                     }}
                 />
