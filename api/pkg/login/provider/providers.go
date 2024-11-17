@@ -14,8 +14,6 @@ import (
 
 type OAuthConfig struct {
 	Config      *oauth2.Config
-	AuthURL     string
-	TokenURL    string
 	UserInfoURL string
 }
 
