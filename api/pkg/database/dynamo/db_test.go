@@ -14,6 +14,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
 	"github.com/jesusnoseq/request-inbox/pkg/database/dynamo"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
+	"github.com/jesusnoseq/request-inbox/pkg/t_util"
 )
 
 func setupTest() (dynamo.InboxDAO, context.Context) {
@@ -456,12 +457,12 @@ func TestListInboxByUser(t *testing.T) {
 	if len(allUserInboxes) != 2 {
 		t.Errorf("Expected len(allInboxes) to be 2 but got %d.", len(allUserInboxes))
 	}
-	if allUserInboxes[0].ID != createdInbox2.ID {
-		t.Errorf("Expected inbox.ID to be inbox2.ID %q but got %q.", inbox2.ID, allUserInboxes[0].ID)
-	}
-	if allUserInboxes[1].ID != createdInbox3.ID {
-		t.Errorf("Expected inbox.ID to be inbox3.ID %q but got %q.", inbox3.ID, allUserInboxes[1].ID)
-	}
+	t_util.AssertSliceContains(t, allUserInboxes, createdInbox2, InboxSameID)
+	t_util.AssertSliceContains(t, allUserInboxes, createdInbox3, InboxSameID)
+}
+
+func InboxSameID(a, b model.Inbox) bool {
+	return a.ID == b.ID
 }
 
 func expectJSONEquals[T any](t *testing.T, a, b T) {
