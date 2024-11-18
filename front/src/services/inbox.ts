@@ -46,7 +46,6 @@ export const newInbox = async () => {
         throw new Error('API response error ', await resp.json());
     }
     const inbox = (await resp.json()) as Inbox;
-    console.log("newInbox", inbox);
     return inbox;
 }
 
@@ -147,7 +146,6 @@ export const acceptCookies = async () => {
     if (!resp.ok) {
         throw new Error('API response error ', await resp.json());
     }
-    console.log("Cookies accepted");
     return
 }
 

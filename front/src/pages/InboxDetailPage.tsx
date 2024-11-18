@@ -96,7 +96,6 @@ const InboxDetailPage: React.FC = () => {
     };
 
     const openDeleteRequestsDialog = () => {
-        console.log("deleting requests");
         setConfirmDialogOpen(true);
     };
 
@@ -105,7 +104,6 @@ const InboxDetailPage: React.FC = () => {
         if (!inboxId) {
             return;
         }
-        console.log("deleting requests confirm");
         setLoading(true);
         const ok = await deleteInboxRequests(inboxId);
         if (ok) {
