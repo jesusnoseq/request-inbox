@@ -49,12 +49,12 @@ func Handler(
 		router, closer := getRouter()
 		ginLambda = ginadapter.New(router)
 		go func() {
-			log.Println("Closing lambda server")
+			slog.Info("Closing lambda server")
 			quit := make(chan os.Signal, 1)
 			signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 			<-quit
 			closer()
-			log.Println("Lambda server closed!")
+			slog.Info("Lambda server closed!")
 		}()
 	}
 

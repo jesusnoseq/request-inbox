@@ -87,8 +87,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to read user info", http.StatusInternalServerError))
 		return
 	}
-	slog.Info("BODY ", "user", body)
-	slog.Info("token ", "token", token)
+	slog.Debug("HandleCallback get userinfo", "body", body)
 
 	user, err := lh.pm.ExtractUser(p, token, body)
 	if err != nil {
