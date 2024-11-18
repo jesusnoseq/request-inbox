@@ -5,7 +5,6 @@ import ThemeSwitch from '../components/ThemeSwitch';
 import LoginDialog from '../components/LoginDialog';
 import Login from '../components/Login';
 import { useUser } from '../context/UserContext';
-// import { Inbox as InboxIcon } from '@mui/icons-material';
 
 export default function Header() {
     const [open, setOpen] = useState(false);
