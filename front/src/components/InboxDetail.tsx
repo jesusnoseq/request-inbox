@@ -49,7 +49,7 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
 
     const canEdit = inbox.OwnerID === '00000000-0000-0000-0000-000000000000' || (isLoggedIn() && inbox.OwnerID === user.ID)
     const canChangeVisibility = isLoggedIn() && inbox.OwnerID === user.ID
-    console.log("Inbox is editable?", canEdit)
+
     return (
         <Paper sx={{ padding: 2 }}>
             <TextInlineEditor initialValue={inbox.Name} label='Inbox' onSave={handleSaveInboxName} readonly={!canEdit} />
