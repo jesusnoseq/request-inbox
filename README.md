@@ -73,11 +73,12 @@ request-inbox
 * Open API documentation
 * Inbox search
 * Request auto refresh
+* Users & Authentication
+* Private inboxes
+* API keys
 
 ## TODO
 
-* Users & Authentication
-  * private inboxes
 * Request on response
   * Measure time
 * Request test
@@ -85,3 +86,8 @@ request-inbox
 * Dynamic response
 * Response conditions
 * File viewer
+* Limits
+  * Request
+  * Inbox
+  * Refresh time
+* 
