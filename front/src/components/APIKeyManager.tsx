@@ -23,6 +23,7 @@ import { LoadingButton } from '@mui/lab';
 import { useError } from '../context/ErrorContext';
 import { getAPIKeyList, deleteAPIKey, createAPIKey } from '../services/inbox';
 import { type APIKey } from "../types/inbox";
+import moment from 'moment';
 
 
 type ExpirationOption = '1 week' | '1 month' | '3 months' | '1 year' | 'No expiration';
@@ -170,8 +171,8 @@ export default function APIKeyManager() {
                                         {visibleKeys[apiKey.ID] ? <VisibilityOffIcon /> : <VisibilityIcon />}
                                     </IconButton>
                                 </TableCell>
-                                <TableCell>{apiKey.CreationDate.toLocaleDateString()}</TableCell>
-                                <TableCell>{apiKey.ExpiryDate ? apiKey.ExpiryDate.toLocaleDateString() : 'Never'}</TableCell>
+                                <TableCell>{moment(apiKey.CreationDate).format('LLL')}</TableCell>
+                                <TableCell>{apiKey.ExpiryDate ? moment(apiKey.ExpiryDate).format('LLL') : 'Never'}</TableCell>
                                 <TableCell>{apiKey.Name}</TableCell>
                                 <TableCell>
                                     <CopyToClipboardButton textToCopy={apiKey.ID} />

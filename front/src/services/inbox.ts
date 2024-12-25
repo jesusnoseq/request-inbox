@@ -1,5 +1,6 @@
 
 import { type InboxList, type Inbox, type APIKey, APIKeyList } from "../types/inbox";
+import moment from 'moment';
 
 const BASE_URL = process.env.REACT_APP_REQUEST_INBOX_API_URL;
 
@@ -165,11 +166,11 @@ export const getAPIKeyList = async () => {
 }
 
 export const createAPIKey = async (name: string, expiryDate: Date | null) => {
-    const resp = await fetch(`${BASE_URL}/api/v1/api-keys/`, {
+    const resp = await fetch(`${BASE_URL}/api/v1/api-keys`, {
         method: "POST",
         headers: defaultHeaders,
         credentials: 'include',
-        body: `{"name": "${name}", "expiryDate": "${expiryDate}"}`
+        body: `{"name": "${name}", "expiryDate": "${moment(expiryDate).format('YYYY-MM-DDTHH:mm:ss')}Z"}` // 
     });
     //resp.status === 200
     return (await resp.json()) as APIKey;
