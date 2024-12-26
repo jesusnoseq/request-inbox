@@ -5,7 +5,6 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
@@ -120,10 +119,6 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		true,
 	)
 	c.Redirect(http.StatusTemporaryRedirect, config.GetString(config.FrontendApplicationURL))
-}
-
-func isSecureCookie() bool {
-	return strings.HasPrefix("https", config.GetString(config.FrontendApplicationURL))
 }
 
 func IsUserLoggedIn(c *gin.Context) bool {
