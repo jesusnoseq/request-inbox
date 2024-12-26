@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-    Button,
     TextField,
     Table,
     TableBody,
@@ -19,14 +18,12 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import CopyToClipboardButton from './CopyToClipboardButton';
+import { LoadingButton } from '@mui/lab';
+import { useError } from '../context/ErrorContext';
+import { getAPIKeyList, deleteAPIKey, createAPIKey } from '../services/inbox';
+import { type APIKey } from "../types/inbox";
+import moment from 'moment';
 
-
-interface APIKey {
-    key: string;
-    creationDate: Date;
-    expirationDate: Date | null;
-    description: string;
-}
 
 type ExpirationOption = '1 week' | '1 month' | '3 months' | '1 year' | 'No expiration';
 
@@ -35,11 +32,26 @@ export default function APIKeyManager() {
     const [newKeyDescription, setNewKeyDescription] = useState('');
     const [newKeyExpiration, setNewKeyExpiration] = useState<ExpirationOption>('1 month');
     const [visibleKeys, setVisibleKeys] = useState<{ [key: string]: boolean }>({});
+    //const [isLoading, setLoading] = useState<boolean>(false);
+    const [isNewKeyLoading, setNewKeyLoading] = useState<boolean>(false);
+    const { setError, clearError } = useError();
 
-    const generateAPIKey = () => {
-        // This is a simple example. In a real application, you'd generate this on the server.
-        return 'ak_' + Math.random().toString(36).substr(2, 9);
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                //setLoading(true);
+                const apiKeyListResponse = await getAPIKeyList();
+                setApiKeys(apiKeyListResponse);
+                clearError();
+            } catch (err) {
+                setError('Failed to load inboxes');
+            } finally {
+                //setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [setError, clearError]);
 
     const calculateExpirationDate = (option: ExpirationOption): Date | null => {
         const now = new Date();
@@ -57,20 +69,24 @@ export default function APIKeyManager() {
         }
     };
 
-    const requestNewKey = () => {
-        const newKey: APIKey = {
-            key: generateAPIKey(),
-            creationDate: new Date(),
-            expirationDate: calculateExpirationDate(newKeyExpiration),
-            description: newKeyDescription,
-        };
-        setApiKeys([...apiKeys, newKey]);
+    const requestNewKey = async () => {
+        try {
+            setNewKeyLoading(true);
+            const apiKeyListResponse = await createAPIKey(newKeyDescription, calculateExpirationDate(newKeyExpiration));
+            setApiKeys([apiKeyListResponse, ...apiKeys]);
+            clearError();
+        } catch (err) {
+            setError('Failed to load inboxes');
+        } finally {
+            setNewKeyLoading(false);
+        }
         setNewKeyDescription('');
         setNewKeyExpiration('1 month');
     };
 
-    const deleteKey = (keyToDelete: string) => {
-        setApiKeys(apiKeys.filter((key) => key.key !== keyToDelete));
+    const deleteKey = async (keyToDelete: string) => {
+        await deleteAPIKey(keyToDelete);
+        setApiKeys(apiKeys.filter((key) => key.ID !== keyToDelete));
     };
 
     const toggleKeyVisibility = (key: string) => {
@@ -120,15 +136,16 @@ export default function APIKeyManager() {
                         </FormControl>
                     </Grid2>
                     <Grid2 size={3}>
-                        <Button
+                        <LoadingButton
                             variant="contained"
                             color="primary"
                             startIcon={<AddIcon />}
                             onClick={requestNewKey}
                             fullWidth
+                            loading={isNewKeyLoading}
                         >
                             Create API Key
-                        </Button>
+                        </LoadingButton>
                     </Grid2>
                 </Grid2>
             </Paper>
@@ -146,19 +163,19 @@ export default function APIKeyManager() {
                     </TableHead>
                     <TableBody>
                         {apiKeys.map((apiKey) => (
-                            <TableRow key={apiKey.key}>
+                            <TableRow key={apiKey.ID}>
                                 <TableCell>
-                                    {visibleKeys[apiKey.key] ? apiKey.key : maskKey(apiKey.key)}
-                                    <IconButton onClick={() => toggleKeyVisibility(apiKey.key)}>
-                                        {visibleKeys[apiKey.key] ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                    {visibleKeys[apiKey.ID] ? apiKey.APIKey : maskKey(apiKey.APIKey)}
+                                    <IconButton onClick={() => toggleKeyVisibility(apiKey.ID)}>
+                                        {visibleKeys[apiKey.ID] ? <VisibilityOffIcon /> : <VisibilityIcon />}
                                     </IconButton>
                                 </TableCell>
-                                <TableCell>{apiKey.creationDate.toLocaleDateString()}</TableCell>
-                                <TableCell>{apiKey.expirationDate ? apiKey.expirationDate.toLocaleDateString() : 'Never'}</TableCell>
-                                <TableCell>{apiKey.description}</TableCell>
+                                <TableCell>{moment(apiKey.CreationDate).format('LLL')}</TableCell>
+                                <TableCell>{apiKey.ExpiryDate ? moment(apiKey.ExpiryDate).format('LLL') : 'Never'}</TableCell>
+                                <TableCell>{apiKey.Name}</TableCell>
                                 <TableCell>
-                                    <CopyToClipboardButton textToCopy={apiKey.key} />
-                                    <IconButton onClick={() => deleteKey(apiKey.key)}>
+                                    <CopyToClipboardButton textToCopy={apiKey.ID} />
+                                    <IconButton onClick={() => deleteKey(apiKey.ID)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </TableCell>

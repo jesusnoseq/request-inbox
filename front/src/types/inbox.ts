@@ -3,6 +3,11 @@ export type InboxList = {
     results: Inbox[];
 }
 
+export type APIKeyList = {
+    count: number;
+    results: APIKey[];
+}
+
 export type Inbox = {
     ID: string;
     Name: string;
@@ -36,9 +41,19 @@ export type InboxResponse = {
 }
 
 export type User = {
-    ID: number;
+    ID: string;
     Name: string;
     Email: string;
     Organization: string;
     AvatarURL: string;
+}
+
+export type APIKey = {
+    ID: string;
+    Name: string;
+    OwnerID: string;
+    APIKey: string;
+    CreationDate: Date;
+    ExpiryDate: Date | null;
+    IsActive: boolean;
 }

@@ -5,7 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
@@ -102,7 +102,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		return
 	}
 	slog.Info("Logging user ", "ip", c.ClientIP(), "user", user.Email)
-	jwtToken, err := GenerateJWT(user)
+	jwtToken, err := GenerateJWT(user, 24*time.Hour)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to generate jwt with user info", "user", user)
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to generate jwt with user info", http.StatusInternalServerError))
@@ -122,10 +122,6 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, config.GetString(config.FrontendApplicationURL))
 }
 
-func isSecureCookie() bool {
-	return strings.HasPrefix("https", config.GetString(config.FrontendApplicationURL))
-}
-
 func IsUserLoggedIn(c *gin.Context) bool {
 	return c.GetBool(IS_LOGGED_IN_CONTEXT_KEY)
 }
@@ -135,6 +131,9 @@ func GetUser(c *gin.Context) (model.User, error) {
 	err, _ := errVal.(error)
 	if err != nil {
 		return model.User{}, err
+	}
+	if !c.GetBool(IS_LOGGED_IN_CONTEXT_KEY) {
+		return model.User{}, fmt.Errorf("the user is not logged in")
 	}
 	userVal, exists := c.Get(USER_CONTEXT_KEY)
 	if !exists {
