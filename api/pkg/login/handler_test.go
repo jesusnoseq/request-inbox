@@ -331,7 +331,7 @@ func TestHandleLoginUser(t *testing.T) {
 	config.LoadConfig(config.Test)
 	lh := &LoginHandler{}
 	user := model.NewUser("test@mail.dev")
-	jwt, err := GenerateJWT(user)
+	jwt, err := GenerateJWT(user, 24*time.Hour)
 	t_util.RequireNoError(t, err)
 
 	testCases := []struct {

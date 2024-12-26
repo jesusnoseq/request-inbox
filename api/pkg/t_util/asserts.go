@@ -6,6 +6,20 @@ import (
 	"testing"
 )
 
+func AssertNil(t *testing.T, value any) {
+	t.Helper()
+	if value != nil {
+		t.Errorf("Expected nil, but got: %v", value)
+	}
+}
+
+func AssertNotNil(t *testing.T, value any) {
+	t.Helper()
+	if value == nil {
+		t.Error("Expected value to not be nil")
+	}
+}
+
 func AssertEquals[T comparable](t *testing.T, actual, expected T) {
 	t.Helper()
 	if actual != expected {
@@ -34,6 +48,12 @@ func AssertStringEquals(t *testing.T, actual, expected string) {
 	}
 }
 
+func AssertStringContains(t *testing.T, str string, substr string) {
+	if !strings.Contains(str, substr) {
+		t.Errorf("Expected %q to contain %q", str, substr)
+	}
+}
+
 func AssertTrue(t *testing.T, condition bool, message ...string) {
 	t.Helper()
 
@@ -46,7 +66,7 @@ func AssertFalse(t *testing.T, condition bool, message ...string) {
 	t.Helper()
 
 	if condition {
-		t.Errorf("Expected true but got false: %s", strings.Join(message, ", "))
+		t.Errorf("Expected false but got true: %s", strings.Join(message, ", "))
 	}
 }
 

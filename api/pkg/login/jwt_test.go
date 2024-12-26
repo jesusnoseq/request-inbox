@@ -24,7 +24,7 @@ func TestGenerateJWT(t *testing.T) {
 		Provider:     model.UserProvider{},
 		Timestamp:    time.Now().Unix(),
 	}
-	jwt, err := GenerateJWT(user)
+	jwt, err := GenerateJWT(user, 24*time.Hour)
 	t_util.AssertNoError(t, err)
 	t_util.AssertStringNotEquals(t, jwt, "")
 	parts := strings.Split(jwt, ".")
@@ -52,7 +52,7 @@ func TestReadJWTToken(t *testing.T) {
 		ID:    uuid.New(),
 		Email: "test@mail.dev",
 	}
-	jwt, err := GenerateJWT(user)
+	jwt, err := GenerateJWT(user, 24*time.Hour)
 	t_util.AssertNoError(t, err)
 
 	testCases := []struct {
