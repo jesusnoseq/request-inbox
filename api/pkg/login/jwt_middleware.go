@@ -22,6 +22,9 @@ func JWTMiddleware() gin.HandlerFunc {
 		c.Set(IS_LOGGED_IN_CONTEXT_KEY, false)
 		c.Set(LOGIN_ERROR_CONTEXT_KEY, nil)
 		c.Set(USER_CONTEXT_KEY, nil)
+		c.Set(IS_LOGGED_WITH_COOKIE_CONTEXT_KEY, false)
+		c.Set(IS_LOGGED_WITH_API_KEY_CONTEXT_KEY, false)
+
 		token, _ := c.Cookie(AuthTokenCookieName)
 		if token == "" {
 			return
@@ -43,6 +46,9 @@ func APIKeyMiddleware(dao database.InboxDAO) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		code := c.GetHeader("X-API-KEY")
 		if code == "" {
+			return
+		}
+		if c.GetBool(IS_LOGGED_WITH_COOKIE_CONTEXT_KEY) {
 			return
 		}
 		valid, err := validation.IsAPIKey(code)
