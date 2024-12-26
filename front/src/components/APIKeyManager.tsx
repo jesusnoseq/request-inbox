@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Button,
     TextField,
     Table,
     TableBody,
@@ -33,26 +32,26 @@ export default function APIKeyManager() {
     const [newKeyDescription, setNewKeyDescription] = useState('');
     const [newKeyExpiration, setNewKeyExpiration] = useState<ExpirationOption>('1 month');
     const [visibleKeys, setVisibleKeys] = useState<{ [key: string]: boolean }>({});
-    const [isLoading, setLoading] = useState<boolean>(false);
+    //const [isLoading, setLoading] = useState<boolean>(false);
     const [isNewKeyLoading, setNewKeyLoading] = useState<boolean>(false);
     const { setError, clearError } = useError();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true);
+                //setLoading(true);
                 const apiKeyListResponse = await getAPIKeyList();
                 setApiKeys(apiKeyListResponse);
                 clearError();
             } catch (err) {
                 setError('Failed to load inboxes');
             } finally {
-                setLoading(false);
+                //setLoading(false);
             }
         };
 
         fetchData();
-    }, []);
+    }, [setError, clearError]);
 
     const calculateExpirationDate = (option: ExpirationOption): Date | null => {
         const now = new Date();
