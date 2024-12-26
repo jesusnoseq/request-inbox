@@ -1,11 +1,13 @@
 
-import { type InboxList, type Inbox } from "../types/inbox";
+import { type InboxList, type Inbox, type APIKey, APIKeyList } from "../types/inbox";
+import moment from 'moment';
 
 const BASE_URL = process.env.REACT_APP_REQUEST_INBOX_API_URL;
 
 const defaultHeaders = {
     "Content-Type": "application/json",
 }
+
 
 export const getInboxList = async () => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes`, {
@@ -148,6 +150,43 @@ export const acceptCookies = async () => {
     }
     return
 }
+
+export const getAPIKeyList = async () => {
+    const resp = await fetch(`${BASE_URL}/api/v1/api-keys`, {
+        method: "GET",
+        headers: defaultHeaders,
+        credentials: 'include',
+    });
+    if (!resp.ok) {
+        throw new Error('API response error ', await resp.json());
+    }
+    const { results: apikeys } = (await resp.json()) as APIKeyList
+    const sortedAPIKeys = apikeys.sort((a, b) => b.CreationDate.getUTCMilliseconds() - a.CreationDate.getUTCMilliseconds());
+    return sortedAPIKeys
+}
+
+export const createAPIKey = async (name: string, expiryDate: Date | null) => {
+    const resp = await fetch(`${BASE_URL}/api/v1/api-keys`, {
+        method: "POST",
+        headers: defaultHeaders,
+        credentials: 'include',
+        body: `{"name": "${name}", "expiryDate": "${moment(expiryDate).format('YYYY-MM-DDTHH:mm:ss')}Z"}` // 
+    });
+    //resp.status === 200
+    return (await resp.json()) as APIKey;
+}
+
+export const deleteAPIKey = async (ID: string) => {
+    const resp = await fetch(`${BASE_URL}/api/v1/api-keys/${ID}`, {
+        method: "DELETE",
+        headers: defaultHeaders,
+        credentials: 'include',
+    });
+    return resp.status === 200;
+}
+
+
+
 
 
 

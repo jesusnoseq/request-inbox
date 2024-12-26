@@ -16,7 +16,7 @@ import {
 } from '@mui/material'
 import { Person, Email, DeleteForever } from '@mui/icons-material'
 import { User } from '../types/inbox';
-// APIKeyManager from './APIKeyManager';
+import APIKeyManager from './APIKeyManager';
 
 interface ProfileProps {
     user: User;
@@ -77,7 +77,7 @@ export default function Profile({ user, onDeleteAccount }: ProfileProps) {
 
             <Divider sx={{ my: 3 }} />
 
-            {/*<APIKeyManager />*/}
+            <APIKeyManager />
 
             <Divider sx={{ my: 3 }} />
             <Box sx={{ mt: 2 }}>

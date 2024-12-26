@@ -30,9 +30,9 @@ func calculateJTI(id uuid.UUID, now time.Time) string {
 	return hex.EncodeToString(hash[:])
 }
 
-func GenerateJWT(user model.User) (string, error) {
+func GenerateJWT(user model.User, period time.Duration) (string, error) {
 	var jwtSecret = []byte(config.GetString(config.JWTSecret))
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(period)
 	now := time.Now()
 
 	claims := &JWTClaims{

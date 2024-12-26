@@ -12,7 +12,7 @@ import {
     Link
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-// import GoogleIcon from '@mui/icons-material/Google';
+import GoogleIcon from '@mui/icons-material/Google';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { buildLoginURL } from '../services/inbox';
 
@@ -29,9 +29,9 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
         window.location.href = buildLoginURL(provider);
     }
 
-    // const handleGoogleLogin = () => {
-    //     redirectToProvider('google');
-    // };
+    const handleGoogleLogin = () => {
+        redirectToProvider('google');
+    };
 
     const handleGitHubLogin = () => {
         redirectToProvider('github');
@@ -62,7 +62,7 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
                 <DialogContentText>
                     Please choose a method to log in:
                 </DialogContentText>
-                {/* <Button
+                <Button
                     variant="contained"
                     startIcon={<GoogleIcon />}
                     onClick={handleGoogleLogin}
@@ -71,7 +71,7 @@ export default function LoginDialog({ open, onClose }: LoginDialogProps) {
                     disabled={!checked}
                 >
                     Login with Google
-                </Button> */}
+                </Button>
                 <Button
                     variant="contained"
                     startIcon={<GitHubIcon />}

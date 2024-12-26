@@ -18,6 +18,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/handler"
+	"github.com/jesusnoseq/request-inbox/pkg/handler/apikey"
 	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/route"
@@ -124,6 +125,10 @@ func getRouter() (*gin.Engine, func()) {
 
 	ih := handler.NewInboxHandler(dao)
 	route.SetInboxRoutes(r, ih)
+
+	akh := apikey.NewAPIKeyHandler(dao)
+	route.SetAPIKeyRoutes(r, akh)
+
 	route.SetUtilityRoutes(r, ih)
 
 	return r, closer
