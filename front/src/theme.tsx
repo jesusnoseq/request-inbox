@@ -30,6 +30,14 @@ export const CustomThemeProvider = ({ children }: { children: ReactNode }) => {
             createTheme({
                 palette: {
                     mode: isDarkMode ? 'dark' : 'light',
+                    ...(isDarkMode
+                        ? {}
+                        : {
+                            background: {
+                                default: "#e4e6ea",
+                                paper: "#eeeeee",
+                            }
+                        }),
                 },
             }),
         [isDarkMode]
