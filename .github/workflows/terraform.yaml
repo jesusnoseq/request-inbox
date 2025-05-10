@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Connect to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
