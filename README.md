@@ -91,3 +91,5 @@ request-inbox
   * Inbox
   * Refresh time
 * Alerts
+* Export request
+* Export & import inbox
