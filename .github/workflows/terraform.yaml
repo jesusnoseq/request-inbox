@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
+          token: ${{ secrets.DEPLOY_MODULE_GITHUB_TOKEN }}
       - name: Connect to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
