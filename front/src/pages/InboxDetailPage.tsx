@@ -24,7 +24,7 @@ const InboxDetailPage: React.FC = () => {
     const [inbox, setInbox] = useState<Inbox | null>(null);
     const [isLoading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [autoUpdate, setAutoUpdate] = useState(false);
+    const [autoUpdate, setAutoUpdate] = useState(true);
     const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
 
     useEffect(() => {

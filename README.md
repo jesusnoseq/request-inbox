@@ -13,7 +13,7 @@ You can try it at [request-inbox.com](https://request-inbox.com/)
 Execute back and front applications with in an embeded DB
 
 ```sh
-docker-compose -f docker-compose.yml up --build
+docker-compose -f docker-compose.yml -f docker-compose-local.yml up --build
 ```
 
 ### Makefile
@@ -90,4 +90,6 @@ request-inbox
   * Request
   * Inbox
   * Refresh time
-* 
+* Alerts
+* Export request
+* Export & import inbox
