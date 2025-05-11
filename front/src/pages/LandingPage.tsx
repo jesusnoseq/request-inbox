@@ -35,8 +35,13 @@ export default function LandingPage() {
                         "name": "Request Inbox",
                         "url": "https://request-inbox.com/",
                         "potentialAction": {
-                            "@type": "CreateAction",
-                            "urlTemplate": "https://request-inbox.com/inbox/{inboxID}"
+                            "@type": "Action",
+                            "name": "Create Inbox",
+                            "target": {
+                                "@type": "EntryPoint",
+                                "urlTemplate": "https://request-inbox.com/inbox/{inboxID}",
+                                "inLanguage": "en"
+                            }
                         }
                     })}
                 </script>
