@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -85,6 +86,11 @@ func LoadConfig(app App) {
 	viper.AutomaticEnv()
 	if app == Test {
 		gin.SetMode(gin.TestMode)
+		randomSubdir, err := os.MkdirTemp(os.TempDir(), "subdir-*")
+		if err != nil {
+			panic(fmt.Sprintf("failed to create subdirectory: %v", err))
+		}
+		Set(DBBadgerPath, randomSubdir)
 	}
 	PrintConfig()
 }
