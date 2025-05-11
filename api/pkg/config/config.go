@@ -86,9 +86,9 @@ func LoadConfig(app App) {
 	viper.AutomaticEnv()
 	if app == Test {
 		gin.SetMode(gin.TestMode)
-		randomSubdir, err := os.MkdirTemp(os.TempDir(), "subdir-*")
+		randomSubdir, err := os.MkdirTemp(os.TempDir(), "db-*")
 		if err != nil {
-			panic(fmt.Sprintf("failed to create subdirectory: %v", err))
+			panic(fmt.Sprintf("failed to create DB subdirectory: %v", err))
 		}
 		Set(DBBadgerPath, randomSubdir)
 	}
