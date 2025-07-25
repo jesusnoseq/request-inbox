@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { InboxRequest } from '../types/inbox';
 import { Typography, Card, CardContent, Button, List, ListItem, ListItemText, Collapse, Box } from '@mui/material';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import BodyView from './BodyView';
+
+dayjs.extend(localizedFormat);
 
 type RequestDetailProps = {
     request: InboxRequest;
@@ -30,7 +33,7 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
             <CardContent>
                 <Typography color="textSecondary" gutterBottom>
                     Nº {request.ID + 1}<br />
-                    {moment(request.Timestamp).format('LLL')}
+                    {dayjs(request.Timestamp).format('LLL')}
                 </Typography>
                 <Typography variant="h6">
                     <code>{request.Protocol} {request.Method} </code>

@@ -22,7 +22,7 @@ import { LoadingButton } from '@mui/lab';
 import { useError } from '../context/ErrorContext';
 import { getAPIKeyList, deleteAPIKey, createAPIKey } from '../services/inbox';
 import { type APIKey } from "../types/inbox";
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 
 type ExpirationOption = '1 week' | '1 month' | '3 months' | '1 year' | 'No expiration';
@@ -44,7 +44,8 @@ export default function APIKeyManager() {
                 setApiKeys(apiKeyListResponse);
                 clearError();
             } catch (err) {
-                setError('Failed to load inboxes');
+                setError('Failed to load API keys');
+                console.error('Error fetching API keys:', err);
             } finally {
                 //setLoading(false);
             }
@@ -76,7 +77,7 @@ export default function APIKeyManager() {
             setApiKeys([apiKeyListResponse, ...apiKeys]);
             clearError();
         } catch (err) {
-            setError('Failed to load inboxes');
+            setError('Failed to create a new API key');
         } finally {
             setNewKeyLoading(false);
         }
@@ -96,6 +97,13 @@ export default function APIKeyManager() {
 
     const maskKey = (key: string) => {
         return key.slice(0, 3) + '*'.repeat(key.length - 6) + key.slice(-3);
+    };
+
+    const formatDate = (dateValue: any, fallback: string) => {
+        console.log('formatDate called with:', dateValue, fallback);
+        if (!dateValue) return fallback;
+        const d = dayjs(dateValue);
+        return d.isValid() ? d.format('LLL') : fallback;
     };
 
     return (
@@ -170,8 +178,8 @@ export default function APIKeyManager() {
                                         {visibleKeys[apiKey.ID] ? <VisibilityOffIcon /> : <VisibilityIcon />}
                                     </IconButton>
                                 </TableCell>
-                                <TableCell>{moment(apiKey.CreationDate).format('LLL')}</TableCell>
-                                <TableCell>{apiKey.ExpiryDate ? moment(apiKey.ExpiryDate).format('LLL') : 'Never'}</TableCell>
+                                <TableCell>{formatDate(apiKey.CreationDate, 'Unknown')}</TableCell>
+                                <TableCell>{formatDate(apiKey.ExpiryDate, 'Never')}</TableCell>
                                 <TableCell>{apiKey.Name}</TableCell>
                                 <TableCell>
                                     <CopyToClipboardButton textToCopy={apiKey.ID} />

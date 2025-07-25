@@ -1,6 +1,6 @@
 
 import { type InboxList, type Inbox, type APIKey, APIKeyList } from "../types/inbox";
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 const BASE_URL = process.env.REACT_APP_REQUEST_INBOX_API_URL;
 
@@ -161,7 +161,11 @@ export const getAPIKeyList = async () => {
         throw new Error('API response error ', await resp.json());
     }
     const { results: apikeys } = (await resp.json()) as APIKeyList
-    const sortedAPIKeys = apikeys.sort((a, b) => b.CreationDate.getUTCMilliseconds() - a.CreationDate.getUTCMilliseconds());
+    const sortedAPIKeys = apikeys.sort((a, b) => {
+        const dateA = new Date(a.CreationDate);
+        const dateB = new Date(b.CreationDate);
+        return dateB.getTime() - dateA.getTime();
+    });
     return sortedAPIKeys
 }
 
@@ -170,7 +174,7 @@ export const createAPIKey = async (name: string, expiryDate: Date | null) => {
         method: "POST",
         headers: defaultHeaders,
         credentials: 'include',
-        body: `{"name": "${name}", "expiryDate": "${moment(expiryDate).format('YYYY-MM-DDTHH:mm:ss')}Z"}` // 
+        body: `{"name": "${name}", "expiryDate": "${dayjs(expiryDate).format('YYYY-MM-DDTHH:mm:ss')}Z"}` // 
     });
     //resp.status === 200
     return (await resp.json()) as APIKey;
