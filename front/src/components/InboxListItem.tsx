@@ -2,9 +2,12 @@ import React from 'react';
 import { Inbox } from '../types/inbox';
 import { Card, CardContent, Typography, CardActions, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+
+dayjs.extend(relativeTime);
 
 type InboxListItemProps = {
     inbox: Inbox;
@@ -38,7 +41,7 @@ const InboxListItem: React.FC<InboxListItemProps> = ({ inbox, onDelete }) => {
                     Requests: {requestsCount}
                 </Typography> */}
                 <Typography color="textSecondary">
-                    Last Updated: {moment(inbox.Timestamp).fromNow()}
+                    Last Updated: {dayjs(inbox.Timestamp).fromNow()}
                 </Typography>
                 <Typography component="p">
                     Response Code: {inbox.Response.Code}

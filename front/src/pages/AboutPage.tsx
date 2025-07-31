@@ -7,6 +7,7 @@ import {
     Grid2,
     useTheme,
     useMediaQuery,
+    Link, // added Link import
 } from '@mui/material';
 import {
     Timeline,
@@ -16,7 +17,7 @@ import {
     TimelineContent,
     TimelineDot,
 } from '@mui/lab';
-import { Code as CodeIcon, Cloud as CloudIcon, Speed as SpeedIcon } from '@mui/icons-material';
+import { Code as CodeIcon, Cloud as CloudIcon, Speed as SpeedIcon, GitHub as GitHubIcon } from '@mui/icons-material';
 import LoginDialog from '../components/LoginDialog';
 import SignUpButton from '../components/SignUpButton';
 
@@ -160,6 +161,23 @@ export default function AboutPage() {
                 </Box>
 
                 <LoginDialog open={open} onClose={handleClose} />
+
+                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+                    <Link
+                        href="https://github.com/jesusnoseq/request-inbox"
+                        target="_blank"
+                        rel="noopener"
+                        underline="none"
+                        sx={{ display: 'inline-flex', alignItems: 'center' }}
+                    >
+                        <Paper elevation={2} sx={{ p: 1.5, display: 'flex', alignItems: 'center', bgcolor: 'background.paper', borderRadius: 2, transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 6 } }}>
+                            <GitHubIcon sx={{ mr: 1 }} />
+                            <Typography variant="button" color="textPrimary">
+                                View on GitHub
+                            </Typography>
+                        </Paper>
+                    </Link>
+                </Box>
             </Box>
         </Container>
     );
