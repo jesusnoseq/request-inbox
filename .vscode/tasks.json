@@ -1,0 +1,32 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Frontend",
+			"type": "shell",
+			"command": "npm start",
+			"group": "build",
+			"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}/front"
+			},
+			"problemMatcher": [
+				"$tsc"
+			]
+		}
+		,
+		{
+			"label": "Start Backend",
+			"type": "shell",
+			"command": "go run main.go",
+			"group": "build",
+			"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}/back/cmd"
+			},
+			"problemMatcher": [
+				"$go"
+			]
+		}
+	]
+}
