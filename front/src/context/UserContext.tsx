@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getUser, logout as postLogout } from '../services/inbox';
+import { User } from '../types/inbox';
 
 
 interface UserContextType {
-    user: any;
+    user: User | null;
     logout: () => void;
     isLoggedIn: () => boolean;
+    isAdmin: () => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -15,7 +17,7 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,6 +36,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         return user !== null;
     };
 
+    const isAdmin = (): boolean => {
+        return user !== null && user.Role === 'admin';
+    };
+
     const logout = async () => {
         const resp = await postLogout();
         console.log(resp);
@@ -41,7 +47,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     };
 
     return (
-        <UserContext.Provider value={{ user, logout, isLoggedIn }}>
+        <UserContext.Provider value={{ user, logout, isLoggedIn, isAdmin }}>
             {children}
         </UserContext.Provider>
     );

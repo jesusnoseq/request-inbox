@@ -46,6 +46,7 @@ export type User = {
     Email: string;
     Organization: string;
     AvatarURL: string;
+    Role: string;
 }
 
 export type APIKey = {
