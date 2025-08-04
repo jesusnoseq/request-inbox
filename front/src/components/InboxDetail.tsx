@@ -49,8 +49,8 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
         setInbox(resp);
     }
 
-    const canEdit = inbox.OwnerID === '00000000-0000-0000-0000-000000000000' || (isLoggedIn() && inbox.OwnerID === user.ID)
-    const canChangeVisibility = isLoggedIn() && inbox.OwnerID === user.ID
+    const canEdit = inbox.OwnerID === '00000000-0000-0000-0000-000000000000' || (isLoggedIn() && user && inbox.OwnerID === user.ID)
+    const canChangeVisibility = isLoggedIn() && user && inbox.OwnerID === user.ID
 
     return (
         <Paper sx={{ padding: 2 }}>
