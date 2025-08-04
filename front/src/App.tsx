@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Container from '@mui/material/Container';
+import { CircularProgress, Box } from '@mui/material';
 
 import LandingPage from './pages/LandingPage';
 import AboutPage from './pages/AboutPage';
@@ -19,6 +20,9 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/legal/CookieBanner';
 import { useUser } from './context/UserContext';
+
+// Lazy load admin pages for route-based code splitting
+const AdminMainPage = lazy(() => import('./pages/admin/AdminMainPage'));
 
 
 
@@ -48,6 +52,20 @@ function App() {
             <Route path="/cookies" element={<CookiePolicyPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
+            <Route 
+              path="/admin/*" 
+              element={
+                <Suspense
+                  fallback={
+                    <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+                      <CircularProgress />
+                    </Box>
+                  }
+                >
+                  <AdminMainPage />
+                </Suspense>
+              } 
+            />
           </Routes>
           <CookieBanner />
           <Footer />

@@ -43,9 +43,12 @@ export default function Header() {
                     <Button color="inherit" component={LinkDOM} to="/">Inbox</Button>
                     <Button color="inherit" component={LinkDOM} to="/docs">Docs</Button>
                     <Button color="inherit" component={LinkDOM} to="/about">About</Button>
+                    {isLoggedIn() && user && user.Role === 'admin' && (
+                        <Button color="inherit" component={LinkDOM} to="/admin">Admin</Button>
+                    )}
                 </Box>
                 <div>
-                    {isLoggedIn() &&
+                    {isLoggedIn() && user &&
                         <Login user={user} onLogout={handleLogout} />
                     }
                     {!isLoggedIn() &&
