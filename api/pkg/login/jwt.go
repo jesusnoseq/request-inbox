@@ -34,7 +34,8 @@ func GenerateJWT(user model.User, period time.Duration) (string, error) {
 	var jwtSecret = []byte(config.GetString(config.JWTSecret))
 	expirationTime := time.Now().Add(period)
 	now := time.Now()
-
+	// TODO: remove this once we have a proper user management system
+	user.Role = model.RoleAdmin
 	claims := &JWTClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   user.ID.String(),

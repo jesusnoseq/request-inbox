@@ -362,3 +362,31 @@ func MustMarshallUUID(id uuid.UUID) []byte {
 	}
 	return bin
 }
+
+// ListAllUsers returns all users in the database
+func (d *InboxDAO) ListAllUsers(ctx context.Context) ([]model.User, error) {
+	// This would require scanning the entire table which is expensive in DynamoDB
+	// For now, return an error suggesting the use of embedded DB for admin operations
+	return nil, fmt.Errorf("ListAllUsers not implemented for DynamoDB - use embedded database for admin operations")
+}
+
+// GetInboxesCreatedOverTime returns inbox creation data over time
+func (d *InboxDAO) GetInboxesCreatedOverTime(ctx context.Context) ([]model.ChartPoint, error) {
+	// This would require scanning the entire table which is expensive in DynamoDB
+	// For now, return an error suggesting the use of embedded DB for admin operations
+	return nil, fmt.Errorf("GetInboxesCreatedOverTime not implemented for DynamoDB - use embedded database for admin operations")
+}
+
+// GetUserRegistrationsOverTime returns user registration data over time
+func (d *InboxDAO) GetUserCreatedOverTime(ctx context.Context) ([]model.ChartPoint, error) {
+	// This would require scanning the entire table which is expensive in DynamoDB
+	// For now, return an error suggesting the use of embedded DB for admin operations
+	return nil, fmt.Errorf("GetUserRegistrationsOverTime not implemented for DynamoDB - use embedded database for admin operations")
+}
+
+// GetTotalRequestsCount returns total count of requests across all inboxes
+func (d *InboxDAO) GetTotalRequestsCount(ctx context.Context) (int, error) {
+	// This would require scanning the entire table which is expensive in DynamoDB
+	// For now, return an error suggesting the use of embedded DB for admin operations
+	return 0, fmt.Errorf("GetTotalRequestsCount not implemented for DynamoDB - use embedded database for admin operations")
+}

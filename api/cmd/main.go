@@ -129,6 +129,9 @@ func getRouter() (*gin.Engine, func()) {
 	akh := apikey.NewAPIKeyHandler(dao)
 	route.SetAPIKeyRoutes(r, akh)
 
+	ah := handler.NewAdminHandler(dao)
+	route.SetAdminRoutes(r, ah)
+
 	route.SetUtilityRoutes(r, ih)
 
 	return r, closer

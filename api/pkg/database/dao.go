@@ -21,6 +21,10 @@ type InboxDAO interface {
 	UpsertUser(context.Context, model.User) error
 	GetUser(context.Context, uuid.UUID) (model.User, error)
 	DeleteUser(context.Context, uuid.UUID) error
+	ListAllUsers(context.Context) ([]model.User, error)
+	GetUserCreatedOverTime(context.Context) ([]model.ChartPoint, error)
+	GetInboxesCreatedOverTime(context.Context) ([]model.ChartPoint, error)
+	GetTotalRequestsCount(context.Context) (int, error)
 
 	CreateAPIKey(context.Context, model.APIKey) error
 	GetAPIKey(context.Context, uuid.UUID) (model.APIKey, error)

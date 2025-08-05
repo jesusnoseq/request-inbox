@@ -60,3 +60,16 @@ func SetAPIKeyRoutes(r gin.IRouter, ah apikey.IAPIKeyHandler) {
 		}
 	}
 }
+
+func SetAdminRoutes(r gin.IRouter, ah *handler.AdminHandler) {
+	v1 := r.Group(APIBasePath)
+	{
+		admin := v1.Group("/admin")
+		admin.Use(ah.RequireAdmin())
+		{
+			// Dashboard endpoints
+			admin.GET("/stats", ah.GetDashboardStats)
+			admin.GET("/chart-data", ah.GetChartData)
+		}
+	}
+}

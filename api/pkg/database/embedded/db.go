@@ -299,3 +299,178 @@ func (ib *InboxBadger) DeleteAPIKey(ctx context.Context, apiKeyID uuid.UUID) err
 	}
 	return nil
 }
+
+// ListAllUsers returns all users in the database
+func (ib *InboxBadger) ListAllUsers(ctx context.Context) ([]model.User, error) {
+	var users []model.User
+	prefix := []byte(userPrefix)
+
+	err := ib.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = true
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			item := it.Item()
+			var valCopy []byte
+			err := item.Value(func(val []byte) error {
+				valCopy = append([]byte{}, val...)
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+
+			user, err := decode[model.User](valCopy)
+			if err != nil {
+				return err
+			}
+			users = append(users, user)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+// GetInboxesCreatedOverTime returns inbox creation data over time
+func (ib *InboxBadger) GetInboxesCreatedOverTime(ctx context.Context) ([]model.ChartPoint, error) {
+	monthCounts := make(map[string]int)
+	prefix := []byte(inboxPrefix)
+
+	err := ib.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = true
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			item := it.Item()
+			var valCopy []byte
+			err := item.Value(func(val []byte) error {
+				valCopy = append([]byte{}, val...)
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+
+			inbox, err := decode[model.Inbox](valCopy)
+			if err != nil {
+				return err
+			}
+
+			// Convert timestamp to month format (YYYY-MM)
+			t := time.Unix(inbox.Timestamp/1000, 0)
+			monthKey := t.Format("2006-01")
+			monthCounts[monthKey]++
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert map to sorted slice
+	var chartPoints []model.ChartPoint
+	for month, count := range monthCounts {
+		chartPoints = append(chartPoints, model.ChartPoint{
+			Date:  month,
+			Count: count,
+		})
+	}
+
+	return chartPoints, nil
+}
+
+// GetUserRegistrationsOverTime returns user registration data over time
+func (ib *InboxBadger) GetUserCreatedOverTime(ctx context.Context) ([]model.ChartPoint, error) {
+	monthCounts := make(map[string]int)
+	prefix := []byte(userPrefix)
+
+	err := ib.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = true
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			item := it.Item()
+			var valCopy []byte
+			err := item.Value(func(val []byte) error {
+				valCopy = append([]byte{}, val...)
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+
+			user, err := decode[model.User](valCopy)
+			if err != nil {
+				return err
+			}
+
+			// Convert timestamp to month format (YYYY-MM)
+			t := time.Unix(user.Timestamp, 0)
+			monthKey := t.Format("2006-01")
+			monthCounts[monthKey]++
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert map to sorted slice
+	var chartPoints []model.ChartPoint
+	for month, count := range monthCounts {
+		chartPoints = append(chartPoints, model.ChartPoint{
+			Date:  month,
+			Count: count,
+		})
+	}
+
+	return chartPoints, nil
+}
+
+// GetTotalRequestsCount returns total count of requests across all inboxes
+func (ib *InboxBadger) GetTotalRequestsCount(ctx context.Context) (int, error) {
+	totalRequests := 0
+	prefix := []byte(inboxPrefix)
+
+	err := ib.db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = true
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			item := it.Item()
+			var valCopy []byte
+			err := item.Value(func(val []byte) error {
+				valCopy = append([]byte{}, val...)
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+
+			inbox, err := decode[model.Inbox](valCopy)
+			if err != nil {
+				return err
+			}
+
+			totalRequests += len(inbox.Requests)
+		}
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return totalRequests, nil
+}
