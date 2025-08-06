@@ -1,10 +1,11 @@
 // ErrorContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { usePostHog } from 'posthog-js/react';
 import ErrorAlert from '../components/ErrorAlert';
 
 interface ErrorContextType {
-    error: string | null;
-    setError: (message: string) => void;
+    error: Error | string | null;
+    setError: (error: Error | string) => void;
     clearError: () => void;
 }
 
@@ -23,10 +24,20 @@ interface ErrorProviderProps {
 }
 
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<Error | string | null>(null);
+    const posthog = usePostHog();
 
-    const handleSetError = (message: string) => {
-        setError(message);
+    const handleSetError = (error: Error | string) => {
+        setError(error);
+        
+        // Send exception to PostHog
+        if (posthog) {
+            if (error instanceof Error) {
+                posthog.captureException(error);
+            } else {
+                posthog.captureException(new Error(error));
+            }
+        }
     }
 
     const handleClearError = () => setError(null);
