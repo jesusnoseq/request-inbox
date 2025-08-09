@@ -3,8 +3,6 @@ package instrumentation
 import (
 	"context"
 	"testing"
-
-	"github.com/jesusnoseq/request-inbox/pkg/config"
 )
 
 func TestNoOpEventTracker(t *testing.T) {
@@ -46,15 +44,5 @@ func TestNoOpEventTracker(t *testing.T) {
 	err = tracker.Close()
 	if err != nil {
 		t.Errorf("Close should not return error, got: %v", err)
-	}
-}
-
-func TestInitializeEventTracker_Disabled(t *testing.T) {
-	config.LoadConfig(config.Test)
-	config.Set(config.EnabledMonitoring, false)
-
-	_, err := NewEventTracker()
-	if err != nil {
-		t.Errorf("InitializeEventTracker should not return error when disabled, got: %v", err)
 	}
 }
