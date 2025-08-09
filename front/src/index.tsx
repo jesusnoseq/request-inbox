@@ -5,8 +5,9 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { CustomThemeProvider } from './theme';
 import { UserProvider } from './context/UserContext';
-import { ErrorProvider } from './context/ErrorContext';
 import { PostHogProvider } from 'posthog-js/react';
+import ErrorBoundary from './components/ErrorBoundary';
+import { ErrorProvider } from './context/ErrorContext';
 
 
 const root = ReactDOM.createRoot(
@@ -18,6 +19,7 @@ const posthogHost = process.env.REACT_APP_POSTHOG_HOST || 'https://eu.i.posthog.
 
 root.render(
   <React.StrictMode>
+
     <PostHogProvider
       apiKey={posthogKey}
       options={{
@@ -27,14 +29,17 @@ root.render(
         debug: process.env.NODE_ENV === 'development',
       }}
     >
-      <UserProvider>
-        <CustomThemeProvider>
-          <ErrorProvider>
-            <App />
-          </ErrorProvider>
-        </CustomThemeProvider>
-      </UserProvider>
+      <ErrorBoundary>
+        <UserProvider>
+          <CustomThemeProvider>
+            <ErrorProvider>
+              <App />
+            </ErrorProvider>
+          </CustomThemeProvider>
+        </UserProvider>
+      </ErrorBoundary>
     </PostHogProvider>
+
   </React.StrictMode>
 );
 
