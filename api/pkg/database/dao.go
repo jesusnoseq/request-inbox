@@ -18,7 +18,7 @@ type InboxDAO interface {
 	DeleteInboxRequests(ctx context.Context, ID uuid.UUID) error
 	AddRequestToInbox(context.Context, uuid.UUID, model.Request) error
 
-	UpsertUser(context.Context, model.User) error
+	UpsertUser(context.Context, model.User) (bool, error)
 	GetUser(context.Context, uuid.UUID) (model.User, error)
 	DeleteUser(context.Context, uuid.UUID) error
 

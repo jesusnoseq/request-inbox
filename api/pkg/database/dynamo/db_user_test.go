@@ -23,15 +23,21 @@ func TestUpsertUser(t *testing.T) {
 	inboxDAO, ctx := setupTest()
 	t.Run("Create user", func(t *testing.T) {
 		user := model.GenerateUser()
-		err := inboxDAO.UpsertUser(ctx, user)
+		isNewUser, err := inboxDAO.UpsertUser(ctx, user)
 		defer DeleteUser(t, inboxDAO, user.ID)
 		if err != nil {
 			t.Errorf("Expected no error error but got %s.", err)
 		}
+		if !isNewUser {
+			t.Errorf("Expected new user to be true but got false")
+		}
 		user.Name = "other name"
-		err = inboxDAO.UpsertUser(ctx, user)
+		isNewUser, err = inboxDAO.UpsertUser(ctx, user)
 		if err != nil {
 			t.Errorf("Expected no error error but got %s.", err)
+		}
+		if isNewUser {
+			t.Errorf("Expected new user to be false but got true")
 		}
 		gotUser, err := inboxDAO.GetUser(ctx, user.ID)
 		if err != nil {
@@ -40,7 +46,7 @@ func TestUpsertUser(t *testing.T) {
 		expectJSONEquals(t, user, gotUser)
 
 		user.Provider = model.GenerateUserProvider()
-		err = inboxDAO.UpsertUser(ctx, user)
+		_, err = inboxDAO.UpsertUser(ctx, user)
 		if err != nil {
 			t.Errorf("Expected no error error but got %s.", err)
 		}
@@ -55,7 +61,7 @@ func TestUpsertUser(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	inboxDAO, ctx := setupTest()
 	user := model.GenerateUserWithProvider()
-	err := inboxDAO.UpsertUser(ctx, user)
+	_, err := inboxDAO.UpsertUser(ctx, user)
 	defer DeleteUser(t, inboxDAO, user.ID)
 	if err != nil {
 		t.Errorf("Expected no error but got %s.", err)
@@ -70,7 +76,7 @@ func TestGetUser(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	inboxDAO, ctx := setupTest()
 	user := model.GenerateUserWithProvider()
-	err := inboxDAO.UpsertUser(ctx, user)
+	_, err := inboxDAO.UpsertUser(ctx, user)
 	if err != nil {
 		t.Errorf("Expected no error but got %s.", err)
 	}

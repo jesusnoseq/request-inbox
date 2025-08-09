@@ -60,7 +60,7 @@ type APIKeyParams struct {
 func mustCreateAndSetLoggedUser(t *testing.T, ctx *gin.Context, dao database.InboxDAO, email string) model.User {
 	t.Helper()
 	user := model.NewUser(email)
-	err := dao.UpsertUser(ctx, user)
+	_, err := dao.UpsertUser(ctx, user)
 	if err != nil {
 		panic(err)
 	}

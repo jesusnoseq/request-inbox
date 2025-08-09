@@ -95,13 +95,17 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to parse user info", http.StatusInternalServerError))
 		return
 	}
-	err = lh.dao.UpsertUser(c.Request.Context(), user)
+	isNewUser, err := lh.dao.UpsertUser(c.Request.Context(), user)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to save user", "user", user)
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to save user", http.StatusInternalServerError))
 		return
 	}
-	slog.Info("Logging user ", "ip", c.ClientIP(), "user", user.Email)
+	if isNewUser {
+		slog.Info("New user registered", "ip", c.ClientIP(), "user", user.Email)
+	} else {
+		slog.Info("Existing user logged in", "ip", c.ClientIP(), "user", user.Email)
+	}
 	jwtToken, err := GenerateJWT(user, 24*time.Hour)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to generate jwt with user info", "user", user)

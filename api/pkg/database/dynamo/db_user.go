@@ -13,25 +13,28 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-func (d *InboxDAO) UpsertUser(ctx context.Context, user model.User) error {
+func (d *InboxDAO) UpsertUser(ctx context.Context, user model.User) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	userItem := toUserItem(user)
 
 	item, err := attributevalue.MarshalMap(userItem)
 	if err != nil {
-		return fmt.Errorf("error marshaling request to db: %w", err)
+		return false, fmt.Errorf("error marshaling request to db: %w", err)
 	}
 
-	_, err = d.dbclient.PutItem(ctx, &dynamodb.PutItemInput{
+	result, err := d.dbclient.PutItem(ctx, &dynamodb.PutItemInput{
 		TableName:    aws.String(d.tableName),
 		Item:         item,
 		ReturnValues: types.ReturnValueAllOld,
 	})
 	if err != nil {
-		return err
+		return false, err
 	}
-	return err
+
+	isNewUser := len(result.Attributes) == 0
+
+	return isNewUser, nil
 }
 
 func (d *InboxDAO) GetUser(ctx context.Context, ID uuid.UUID) (model.User, error) {

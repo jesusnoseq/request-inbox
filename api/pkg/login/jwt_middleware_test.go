@@ -108,7 +108,7 @@ func TestAPIKeyMiddlewareOK(t *testing.T) {
 	defer closer()
 
 	user := model.GenerateUser()
-	err := dao.UpsertUser(c, user)
+	_, err := dao.UpsertUser(c, user)
 	t_util.RequireNoError(t, err)
 	apiKey, err := model.NewAPIKey(user.ID)
 	t_util.RequireNoError(t, err)
@@ -137,7 +137,7 @@ func TestAPIKeyMiddlewareExpired(t *testing.T) {
 	defer closer()
 
 	user := model.GenerateUser()
-	err := dao.UpsertUser(c, user)
+	_, err := dao.UpsertUser(c, user)
 	t_util.RequireNoError(t, err)
 	apiKey, err := model.NewAPIKey(user.ID)
 	apiKey.ExpiryDate = time.Now().Add(-time.Hour)

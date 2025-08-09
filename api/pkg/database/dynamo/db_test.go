@@ -381,14 +381,14 @@ func TestListInboxByUser(t *testing.T) {
 	inboxDAO, ctx := setupTest()
 
 	user := model.GenerateUser()
-	err := inboxDAO.UpsertUser(ctx, user)
+	_, err := inboxDAO.UpsertUser(ctx, user)
 	if err != nil {
 		t.Errorf("Expected no error but got %s.", err)
 	}
 	defer DeleteUser(t, inboxDAO, user.ID)
 
 	otherUser := model.GenerateUser()
-	err = inboxDAO.UpsertUser(ctx, otherUser)
+	_, err = inboxDAO.UpsertUser(ctx, otherUser)
 	if err != nil {
 		t.Errorf("Expected no error but got %s.", err)
 	}
