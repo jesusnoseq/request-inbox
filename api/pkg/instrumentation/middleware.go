@@ -1,6 +1,8 @@
 package instrumentation
 
 import (
+	"log/slog"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
@@ -16,7 +18,9 @@ func MonitoringMiddleware(et EventTracker) gin.HandlerFunc {
 				StatusCode: c.Writer.Status(),
 				BaseEvent:  BaseEvent{UserID: userID},
 			}
-			et.Track(c, event)
+			if err := et.Track(c, event); err != nil {
+				slog.Error("failed to track request", slog.Any("event", event), slog.Any("error", err))
+			}
 		}()
 	}
 }
