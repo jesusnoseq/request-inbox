@@ -9,7 +9,6 @@ func MonitoringMiddleware(et EventTracker) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := getUserIDFromContext(c)
 		c.Next()
-
 		go func() {
 			event := APIRequestEvent{
 				Method:     c.Request.Method,

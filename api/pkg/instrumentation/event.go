@@ -35,10 +35,10 @@ func (e APIRequestEvent) GetEventType() Event {
 
 func (e APIRequestEvent) ToProperties() map[string]any {
 	return map[string]any{
-		"method":      e.Method,
-		"endpoint":    e.Endpoint,
-		"status_code": e.StatusCode,
-		"user_id":     e.UserID,
+		"method":       e.Method,
+		"$current_url": e.Endpoint,
+		"status_code":  e.StatusCode,
+		"user_id":      e.UserID,
 	}
 }
 

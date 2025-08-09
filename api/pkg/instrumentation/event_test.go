@@ -25,10 +25,10 @@ func TestAPIRequestEvent(t *testing.T) {
 	// Test ToProperties
 	properties := event.ToProperties()
 	expectedProperties := map[string]any{
-		"method":      "GET",
-		"endpoint":    "/api/v1/test",
-		"status_code": 200,
-		"user_id":     "user123",
+		"method":       "GET",
+		"$current_url": "/api/v1/test",
+		"status_code":  200,
+		"user_id":      "user123",
 	}
 
 	for key, expectedValue := range expectedProperties {
