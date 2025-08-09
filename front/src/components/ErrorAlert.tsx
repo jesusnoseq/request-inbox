@@ -3,7 +3,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
 interface ErrorSnackbarProps {
-    error: string | null;
+    error: Error | string | null;
     onClose: () => void;
 }
 
@@ -26,7 +26,7 @@ const ErrorAlert: React.FC<ErrorSnackbarProps> = ({ error, onClose }) => {
     return (
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
             <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                {error}
+                {error instanceof Error ? error.message : error}
             </Alert>
         </Snackbar>
     );

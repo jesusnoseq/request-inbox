@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Grid2, CircularProgress, Button, Box, Alert } from '@mui/material';
+import { Container, Typography, Grid2, CircularProgress, Box, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Inbox } from '../types/inbox';
-import { getInboxList, newInbox, deleteInbox } from '../services/inbox';
+import { getInboxList, deleteInbox } from '../services/inbox';
 import InboxListItem from '../components/InboxListItem';
 import SearchBar from '../components/SearchBar';
+import CreateInboxButton from '../components/CreateNewInboxButton';
 
 const InboxListPage: React.FC = () => {
     const [inboxes, setInboxes] = useState<Inbox[]>([]);
@@ -29,25 +30,6 @@ const InboxListPage: React.FC = () => {
 
         fetchData();
     }, []);
-
-    const handleCreateInbox = async () => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const inbox = await newInbox();
-                inboxes.push(inbox)
-                setInboxes(inboxes);
-                setError(null);
-                navigate(`inbox/${inbox.ID}`);
-            } catch (err) {
-                setError('Failed to load inboxes');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    };
 
     const handleDeleteInbox = async (inboxID: string) => {
         const deleteData = async () => {
@@ -100,9 +82,9 @@ const InboxListPage: React.FC = () => {
             </Typography>
 
             <Box width="100%" display="flex" justifyContent="space-between">
-                <Button variant="contained" color="primary" onClick={handleCreateInbox} sx={{ marginBottom: 2 }}>
+                <CreateInboxButton variant="contained" color="primary" source="inbox-list-page" sx={{ marginBottom: 2 }}>
                     Create New Inbox
-                </Button>
+                </CreateInboxButton>
                 <SearchBar onChange={handleSearch} />
             </Box>
 

@@ -74,6 +74,13 @@ const (
 	UserJTISalt                   Key    = "USER_JTI_SALT"
 	UserJTISaltDefault            string = "AcL30zFxQf"
 
+	EnabledMonitoring        Key    = "ENABLED_MONITORING"
+	EnabledMonitoringDefault bool   = true
+	PostHogURL               Key    = "POSTHOG_URL"
+	PostHogURLDefault        string = "https://eu.i.posthog.com"
+	PostHogAPIKey            Key    = "POSTHOG_API_KEY"
+	PostHogAPIKeyDefault     string = "phc_lbluzxMcaNGnDqTwTgptNLh8YBR7d89t2x63b3RsvBh"
+
 	// Features
 	EnableListingPublicInbox  Key  = "ENABLE_LISTING_PUBLIC_INBOX"
 	EnableListingInboxDefault bool = false
@@ -131,6 +138,10 @@ func setDefaults(app App) {
 	// FEATURES
 	setDefault(EnableListingPublicInbox, EnableListingInboxDefault)
 	setDefault(EnablePrintConfig, EnableListingInboxDefault)
+
+	setDefault(EnabledMonitoring, EnabledMonitoringDefault)
+	setDefault(PostHogURL, PostHogURLDefault)
+	setDefault(PostHogAPIKey, PostHogAPIKeyDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {

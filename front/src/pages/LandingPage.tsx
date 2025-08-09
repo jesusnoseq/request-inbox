@@ -70,7 +70,7 @@ export default function LandingPage() {
                         Or jump straight into action and create a new Request Inbox anonymously.
                     </Typography>
                     <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                        <CreateInboxButton variant="contained" color="inherit" size="large" />
+                        <CreateInboxButton variant="contained" color="inherit" size="large" source="landing-page-anonymous" />
                     </Box>
                 </Container>
 

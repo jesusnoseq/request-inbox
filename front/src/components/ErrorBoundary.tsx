@@ -1,5 +1,6 @@
 import React, { ErrorInfo, ReactNode } from 'react';
 import { Alert, Container } from '@mui/material';
+import posthog from 'posthog-js';
 
 interface ErrorBoundaryProps {
     children: ReactNode;
@@ -22,6 +23,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error('Uncaught error:', error, errorInfo);
+        
+        if (posthog) {
+            posthog.captureException(error, {
+                errorInfo: errorInfo.componentStack,
+            });
+        }
     }
 
     render() {

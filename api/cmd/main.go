@@ -31,6 +31,10 @@ func main() {
 		log.Fatal("error configuring log", err)
 	}
 
+	if err != nil {
+		slog.Warn("Failed to initialize event tracker, continuing with NoOp tracker", slog.String("error", err.Error()))
+	}
+
 	mode := config.GetString(config.APIMode)
 	if mode == config.APIModeLambda {
 		lambda.Start(Handler)
@@ -118,8 +122,15 @@ func getRouter() (*gin.Engine, func()) {
 		log.Fatal("failed to obtain InboxDAO:", err)
 	}
 
+	eventTracker, err := instrumentation.NewEventTracker()
+	if err != nil {
+		log.Fatal("failed to initialize EventTracker:", err)
+	}
+
 	r.Use(login.JWTMiddleware())
 	r.Use(login.APIKeyMiddleware(dao))
+	r.Use(instrumentation.MonitoringMiddleware(eventTracker))
+
 	lh := login.NewLoginHandler(dao)
 	route.SetLoginRoutes(r, lh)
 
