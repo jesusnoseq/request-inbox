@@ -27,6 +27,7 @@ root.render(
         api_host: posthogHost,
         defaults: '2025-05-24',
         capture_exceptions: true,
+        capture_performance: true,
         debug: process.env.NODE_ENV === 'development',
       }}
     >
