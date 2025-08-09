@@ -14,8 +14,9 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
+const posthogHost = process.env.REACT_APP_POSTHOG_HOST || '';
 const posthogKey = process.env.REACT_APP_POSTHOG_KEY || '';
-const posthogHost = process.env.REACT_APP_POSTHOG_HOST || 'https://eu.i.posthog.com';
+
 
 root.render(
   <React.StrictMode>
