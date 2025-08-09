@@ -11,9 +11,10 @@ WEB_DIR = front
 DEPLOY_DIR = deploy
 LINTER_ARGS = run -c .golangci.yml --timeout 5m
 CGO_CFLAGS = ""
-CMD_FILE=$(CURDIR)/$(API_DIR)/cmd/main.go
+CMD_FOLDER=$(CURDIR)/$(API_DIR)/cmd
+CMD_FILE=$(CMD_FOLDER)/main.go
 BIN_OUTPUT=..
-AIR_FILE=cmd/air.toml
+AIR_FILE=air.toml
 
 
 
@@ -78,7 +79,7 @@ run-api:	## Run API
 
 .PHONY: run-api-hot
 run-api-hot:	## Run API with hot reloading
-	cd $(API_DIR) && godotenv -f .env.development air -c $(AIR_FILE)
+	cd $(CMD_FOLDER) && godotenv -f ../.env.development air -c $(AIR_FILE)
 
 .PHONY: show-version
 show-version:	## Shows API version
