@@ -4,6 +4,8 @@ import (
 	"log/slog"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jesusnoseq/request-inbox/pkg/collection"
+	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
@@ -11,6 +13,10 @@ func MonitoringMiddleware(et EventTracker) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := getUserIDFromContext(c)
 		c.Next()
+		included_methods := config.GetStringSlice(config.MonitoringTrackedMethods)
+		if !collection.SliceContains(included_methods, c.Request.Method) {
+			return
+		}
 		go func() {
 			event := APIRequestEvent{
 				Method:     c.Request.Method,
