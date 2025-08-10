@@ -35,7 +35,6 @@ download-tools:	## Download all required tools to validate and generate document
 	@echo "Installing tools on $(GO_PATH)/bin"
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
 	go install golang.org/x/tools/cmd/goimports@v0.14.0
-	go install go.uber.org/mock/mockgen@v0.3.0
 	go install github.com/cosmtrek/air@v1.49.0
 	go install github.com/joho/godotenv/cmd/godotenv@latest
 
