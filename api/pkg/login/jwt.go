@@ -77,8 +77,8 @@ func ParseToken(jwtToken string) (JWTClaims, error) {
 	if err != nil {
 		return claims, fmt.Errorf("error parsing exp: %w", err)
 	}
-	if exp.Time.Unix() < time.Now().Unix() {
-		slog.Error("token expired", "exp", exp.Time.Unix())
+	if exp.Unix() < time.Now().Unix() {
+		slog.Error("token expired", "exp", exp.Unix())
 		return claims, fmt.Errorf("%s", TokenExpiredError)
 	}
 
@@ -111,8 +111,8 @@ func ParseToken(jwtToken string) (JWTClaims, error) {
 	if err != nil {
 		return claims, fmt.Errorf("error parsing nbf: %w", err)
 	}
-	if nbf.Time.Unix() > time.Now().Unix() {
-		slog.Error("token is not valid yet", "nbf", nbf.Time.Unix())
+	if nbf.Unix() > time.Now().Unix() {
+		slog.Error("token is not valid yet", "nbf", nbf.Unix())
 		return claims, fmt.Errorf("token not valid yet")
 	}
 
@@ -120,8 +120,8 @@ func ParseToken(jwtToken string) (JWTClaims, error) {
 	if err != nil {
 		return claims, fmt.Errorf("error parsing iat: %w", err)
 	}
-	if iat.Time.Unix() > time.Now().Unix() {
-		slog.Error("a time-travelling token!", "iat", iat.Time.Unix())
+	if iat.Unix() > time.Now().Unix() {
+		slog.Error("a time-travelling token!", "iat", iat.Unix())
 		return claims, fmt.Errorf("token not valid")
 	}
 

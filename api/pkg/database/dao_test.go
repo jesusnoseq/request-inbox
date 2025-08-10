@@ -21,7 +21,10 @@ func MustGetDB() (database.InboxDAO, closer) {
 		panic(err)
 	}
 	return db, func(ctx context.Context) {
-		db.Close(ctx)
+		err := db.Close(ctx)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 

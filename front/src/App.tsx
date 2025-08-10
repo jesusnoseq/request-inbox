@@ -18,6 +18,7 @@ import ScrollConsistencyLayout from './components/ScrollConsistencyLayout';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/legal/CookieBanner';
+import PageTracker from './components/PageTracker';
 import { useUser } from './context/UserContext';
 
 
@@ -28,6 +29,7 @@ function App() {
   return (
     <ScrollConsistencyLayout>
       <Router>
+        <PageTracker />
         <Container>
           <Header />
           <Routes>

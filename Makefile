@@ -11,9 +11,9 @@ WEB_DIR = front
 DEPLOY_DIR = deploy
 LINTER_ARGS = run -c .golangci.yml --timeout 5m
 CGO_CFLAGS = ""
-CMD_FILE=$(CURDIR)/$(API_DIR)/cmd/main.go
+CMD_FOLDER=$(CURDIR)/$(API_DIR)/cmd
+CMD_FILE=$(CMD_FOLDER)/main.go
 BIN_OUTPUT=..
-AIR_FILE=cmd/air.toml
 
 
 
@@ -35,7 +35,6 @@ download-tools:	## Download all required tools to validate and generate document
 	@echo "Installing tools on $(GO_PATH)/bin"
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
 	go install golang.org/x/tools/cmd/goimports@v0.14.0
-	go install go.uber.org/mock/mockgen@v0.3.0
 	go install github.com/cosmtrek/air@v1.49.0
 	go install github.com/joho/godotenv/cmd/godotenv@latest
 
@@ -78,7 +77,7 @@ run-api:	## Run API
 
 .PHONY: run-api-hot
 run-api-hot:	## Run API with hot reloading
-	cd $(API_DIR) && godotenv -f .env.development air -c $(AIR_FILE)
+	cd $(API_DIR) && godotenv -f .env.development air
 
 .PHONY: show-version
 show-version:	## Shows API version

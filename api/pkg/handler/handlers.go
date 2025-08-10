@@ -14,17 +14,21 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
 	"github.com/jesusnoseq/request-inbox/pkg/dynamic_response"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation/event"
 	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
 type InboxHandler struct {
 	dao database.InboxDAO
+	et  event.EventTracker
 }
 
-func NewInboxHandler(dao database.InboxDAO) *InboxHandler {
+func NewInboxHandler(dao database.InboxDAO, et event.EventTracker) *InboxHandler {
 	return &InboxHandler{
 		dao: dao,
+		et:  et,
 	}
 }
 
@@ -57,6 +61,18 @@ func (ih *InboxHandler) CreateInbox(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
 		return
+	}
+
+	userID := newInbox.OwnerID.String()
+	if newInbox.OwnerID == uuid.Nil {
+		userID = "anonymous"
+	}
+	event := event.CreateNewInboxEvent{
+		BaseEvent: event.BaseEvent{UserID: userID},
+		InboxID:   inbox.ID.String(),
+	}
+	if err := ih.et.Track(c, event); err != nil {
+		instrumentation.LogError(c, err, "Failed to track create inbox event")
 	}
 
 	c.JSON(http.StatusCreated, inbox)

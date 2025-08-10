@@ -27,7 +27,10 @@ func mustGetAPIKeyHandler() (*APIKeyHandler, func()) {
 		panic(err)
 	}
 	return NewAPIKeyHandler(dao), func() {
-		dao.Close(ctx)
+		err := dao.Close(ctx)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -60,7 +63,7 @@ type APIKeyParams struct {
 func mustCreateAndSetLoggedUser(t *testing.T, ctx *gin.Context, dao database.InboxDAO, email string) model.User {
 	t.Helper()
 	user := model.NewUser(email)
-	err := dao.UpsertUser(ctx, user)
+	_, err := dao.UpsertUser(ctx, user)
 	if err != nil {
 		panic(err)
 	}
@@ -111,7 +114,10 @@ func TestCreateAPIKey(t *testing.T) {
 	handler.CreateAPIKey(ginCtx)
 
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	t_util.AssertStatusCode(t, http.StatusCreated, resp.StatusCode)
 	createdAPIKey := mustParseAPIKey(w.Body.Bytes())
 	t_util.AssertSameID(t, createdAPIKey.ID, model.NewAPIKeyID(createdAPIKey.APIKey))
@@ -145,7 +151,10 @@ func TestCreateAPIKeyUnauthorized(t *testing.T) {
 	handler.CreateAPIKey(ginCtx)
 
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	t_util.AssertStatusCode(t, http.StatusUnauthorized, resp.StatusCode)
 }
 

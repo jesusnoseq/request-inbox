@@ -28,7 +28,10 @@ func TestInboxHealth(t *testing.T) {
 	ginCtx.Request = req
 	ih.Health(ginCtx)
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected StatusOK, got %v", resp.StatusCode)
 	}

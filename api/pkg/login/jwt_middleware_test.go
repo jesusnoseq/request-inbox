@@ -94,7 +94,10 @@ func mustGetInboxDao() (database.InboxDAO, func()) {
 		panic(err)
 	}
 	return dao, func() {
-		dao.Close(ctx)
+		err := dao.Close(ctx)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -108,7 +111,7 @@ func TestAPIKeyMiddlewareOK(t *testing.T) {
 	defer closer()
 
 	user := model.GenerateUser()
-	err := dao.UpsertUser(c, user)
+	_, err := dao.UpsertUser(c, user)
 	t_util.RequireNoError(t, err)
 	apiKey, err := model.NewAPIKey(user.ID)
 	t_util.RequireNoError(t, err)
@@ -137,7 +140,7 @@ func TestAPIKeyMiddlewareExpired(t *testing.T) {
 	defer closer()
 
 	user := model.GenerateUser()
-	err := dao.UpsertUser(c, user)
+	_, err := dao.UpsertUser(c, user)
 	t_util.RequireNoError(t, err)
 	apiKey, err := model.NewAPIKey(user.ID)
 	apiKey.ExpiryDate = time.Now().Add(-time.Hour)
@@ -158,7 +161,10 @@ func TestAPIKeyMiddlewareExpired(t *testing.T) {
 	t_util.AssertStructIsEmpty(t, context_user)
 
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	t_util.AssertStatusCode(t, resp.StatusCode, http.StatusUnauthorized)
 	t_util.AssertStringContains(t, w.Body.String(), "API key has expired")
 }
@@ -184,6 +190,9 @@ func TestAPIKeyMiddlewareNoToken(t *testing.T) {
 	t_util.AssertStringContains(t, err.Error(), "the user is not logged in")
 
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	t_util.AssertStatusCode(t, resp.StatusCode, http.StatusOK)
 }

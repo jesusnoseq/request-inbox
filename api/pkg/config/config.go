@@ -74,11 +74,20 @@ const (
 	UserJTISalt                   Key    = "USER_JTI_SALT"
 	UserJTISaltDefault            string = "AcL30zFxQf"
 
+	PostHogURL                      Key    = "POSTHOG_URL"
+	PostHogURLDefault               string = "https://eu.i.posthog.com"
+	PostHogAPIKey                   Key    = "POSTHOG_API_KEY"
+	PostHogAPIKeyDefault            string = "phc_lbluzxMcaNGnDqTwTgptNLh8YBR7d89t2x63b3RsvBh"
+	MonitoringTrackedMethods        Key    = "MONITORING_TRACKED_METHODS"
+	MonitoringTrackedMethodsDefault string = "POST PUT PATCH DELETE"
+
 	// Features
 	EnableListingPublicInbox  Key  = "ENABLE_LISTING_PUBLIC_INBOX"
 	EnableListingInboxDefault bool = false
 	EnablePrintConfig         Key  = "PRINT_CONFIG"
 	EnablePrintConfigDefault  bool = false
+	EnabledMonitoring         Key  = "ENABLED_MONITORING"
+	EnabledMonitoringDefault  bool = false
 )
 
 func LoadConfig(app App) {
@@ -115,6 +124,10 @@ func setDefaults(app App) {
 
 	setDefault(SnapshotVersion, SnapshotVersionDefault)
 
+	setDefault(PostHogURL, PostHogURLDefault)
+	setDefault(PostHogAPIKey, PostHogAPIKeyDefault)
+	setDefault(MonitoringTrackedMethods, MonitoringTrackedMethodsDefault)
+
 	// AUTH
 	setDefault(FrontendApplicationURL, FrontendApplicationURLDefault)
 	setDefault(AuthCookieDomain, AuthCookieDomainDefault)
@@ -131,6 +144,8 @@ func setDefaults(app App) {
 	// FEATURES
 	setDefault(EnableListingPublicInbox, EnableListingInboxDefault)
 	setDefault(EnablePrintConfig, EnableListingInboxDefault)
+	setDefault(EnabledMonitoring, EnabledMonitoringDefault)
+
 }
 
 func setDefault[T string | int | bool](k Key, v T) {

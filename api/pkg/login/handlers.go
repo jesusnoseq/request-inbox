@@ -11,6 +11,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation/event"
 	"github.com/jesusnoseq/request-inbox/pkg/login/provider"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
@@ -18,12 +19,14 @@ import (
 type LoginHandler struct {
 	dao database.InboxDAO
 	pm  provider.IProviderManager
+	et  event.EventTracker
 }
 
-func NewLoginHandler(dao database.InboxDAO) *LoginHandler {
+func NewLoginHandler(dao database.InboxDAO, et event.EventTracker) *LoginHandler {
 	return &LoginHandler{
 		dao: dao,
 		pm:  provider.NewProviderManager(),
+		et:  et,
 	}
 }
 
@@ -61,6 +64,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	oauthState, _ := c.Cookie(OauthStateCookieName)
 	state := c.Query("state")
 	if state != oauthState {
+		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "state"}, Provider: p, Success: false})
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Invalid state", http.StatusUnauthorized))
 		return
 	}
@@ -69,6 +73,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	token, err := oauthConfig.Config.Exchange(c, code)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to exchange token")
+		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "exchange"}, Provider: p, Success: false})
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to exchange token", http.StatusInternalServerError))
 		return
 	}
@@ -77,10 +82,16 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	userResponse, err := client.Get(oauthConfig.UserInfoURL)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to get user info")
+		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "userinfo"}, Provider: p, Success: false})
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to get user info", http.StatusInternalServerError))
 		return
 	}
-	defer userResponse.Body.Close()
+	defer func() {
+		err := userResponse.Body.Close()
+		if err != nil {
+			instrumentation.LogError(c, err, "Failed to close user info response body")
+		}
+	}()
 	body, err := io.ReadAll(userResponse.Body)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to read user info")
@@ -95,13 +106,26 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to parse user info", http.StatusInternalServerError))
 		return
 	}
-	err = lh.dao.UpsertUser(c.Request.Context(), user)
+	isNewUser, err := lh.dao.UpsertUser(c.Request.Context(), user)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to save user", "user", user)
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to save user", http.StatusInternalServerError))
 		return
 	}
-	slog.Info("Logging user ", "ip", c.ClientIP(), "user", user.Email)
+	if isNewUser {
+		lh.et.Track(c, event.UserSignupEvent{
+			BaseEvent: event.BaseEvent{UserID: user.ID.String()},
+			Provider:  user.Provider.Provider,
+		})
+		slog.Info("New user registered", "ip", c.ClientIP(), "user", user.ID.String())
+	} else {
+		lh.et.Track(c, event.UserLoginEvent{
+			BaseEvent: event.BaseEvent{UserID: user.ID.String()},
+			Provider:  user.Provider.Provider,
+			Success:   true,
+		})
+		slog.Info("Existing user logged in", "ip", c.ClientIP(), "user", user.ID.String())
+	}
 	jwtToken, err := GenerateJWT(user, 24*time.Hour)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to generate jwt with user info", "user", user)

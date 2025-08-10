@@ -24,7 +24,10 @@ func TestNewInboxDB(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			inboxDB, err := NewInboxDB(tc.path, tc.memoryOnly)
 			defer func() {
-				inboxDB.Close(ctx)
+				err := inboxDB.Close(ctx)
+				if err != nil {
+					panic(err)
+				}
 			}()
 			if tc.expectedErr {
 				if err == nil {

@@ -178,16 +178,24 @@ func (ib *InboxBadger) listInbox(ctx context.Context, filter func(model.Inbox) b
 	return inboxList, err
 }
 
-func (ib *InboxBadger) UpsertUser(ctx context.Context, user model.User) error {
+func (ib *InboxBadger) UpsertUser(ctx context.Context, user model.User) (bool, error) {
 	data, err := encode(user)
 	if err != nil {
-		return err
+		return false, err
 	}
 
+	var isNewUser bool
 	err = ib.db.Update(func(txn *badger.Txn) error {
+		_, err := txn.Get(ib.getUserKey(user.ID))
+		if err == badger.ErrKeyNotFound {
+			isNewUser = true
+		} else if err != nil {
+			return err
+		}
+
 		return txn.Set(ib.getUserKey(user.ID), data)
 	})
-	return err
+	return isNewUser, err
 }
 
 func (ib *InboxBadger) DeleteUser(ctx context.Context, ID uuid.UUID) error {

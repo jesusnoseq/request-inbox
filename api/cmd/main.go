@@ -118,12 +118,19 @@ func getRouter() (*gin.Engine, func()) {
 		log.Fatal("failed to obtain InboxDAO:", err)
 	}
 
+	eventTracker, err := instrumentation.NewEventTracker()
+	if err != nil {
+		log.Fatal("failed to initialize EventTracker:", err)
+	}
+
 	r.Use(login.JWTMiddleware())
 	r.Use(login.APIKeyMiddleware(dao))
-	lh := login.NewLoginHandler(dao)
+	r.Use(instrumentation.MonitoringMiddleware(eventTracker))
+
+	lh := login.NewLoginHandler(dao, eventTracker)
 	route.SetLoginRoutes(r, lh)
 
-	ih := handler.NewInboxHandler(dao)
+	ih := handler.NewInboxHandler(dao, eventTracker)
 	route.SetInboxRoutes(r, ih)
 
 	akh := apikey.NewAPIKeyHandler(dao)
