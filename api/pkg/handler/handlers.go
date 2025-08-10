@@ -70,7 +70,9 @@ func (ih *InboxHandler) CreateInbox(c *gin.Context) {
 		BaseEvent: instrumentation.BaseEvent{UserID: userID},
 		InboxID:   inbox.ID.String(),
 	}
-	ih.et.Track(c, event)
+	if err := ih.et.Track(c, event); err != nil {
+		instrumentation.LogError(c, err, "Failed to track create inbox event")
+	}
 
 	c.JSON(http.StatusCreated, inbox)
 }

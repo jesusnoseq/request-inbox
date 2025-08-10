@@ -63,7 +63,9 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	oauthState, _ := c.Cookie(OauthStateCookieName)
 	state := c.Query("state")
 	if state != oauthState {
-		lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "state"}, Provider: p, Success: false})
+		if err := lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "state"}, Provider: p, Success: false}); err != nil {
+			instrumentation.LogError(c, err, "Failed to track login event")
+		}
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Invalid state", http.StatusUnauthorized))
 		return
 	}
@@ -72,7 +74,9 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	token, err := oauthConfig.Config.Exchange(c, code)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to exchange token")
-		lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "exchange"}, Provider: p, Success: false})
+		if err := lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "exchange"}, Provider: p, Success: false}); err != nil {
+			instrumentation.LogError(c, err, "Failed to track login event")
+		}
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to exchange token", http.StatusInternalServerError))
 		return
 	}
@@ -81,7 +85,9 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	userResponse, err := client.Get(oauthConfig.UserInfoURL)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to get user info")
-		lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "userinfo"}, Provider: p, Success: false})
+		if err := lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "userinfo"}, Provider: p, Success: false}); err != nil {
+			instrumentation.LogError(c, err, "Failed to track login event")
+		}
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to get user info", http.StatusInternalServerError))
 		return
 	}
@@ -107,17 +113,21 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		return
 	}
 	if isNewUser {
-		lh.et.Track(c, instrumentation.UserSignupEvent{
+		if err := lh.et.Track(c, instrumentation.UserSignupEvent{
 			BaseEvent: instrumentation.BaseEvent{UserID: user.ID.String()},
 			Provider:  user.Provider.Provider,
-		})
+		}); err != nil {
+			instrumentation.LogError(c, err, "Failed to track signup event")
+		}
 		slog.Info("New user registered", "ip", c.ClientIP(), "user", user.Email)
 	} else {
-		lh.et.Track(c, instrumentation.UserLoginEvent{
+		if err := lh.et.Track(c, instrumentation.UserLoginEvent{
 			BaseEvent: instrumentation.BaseEvent{UserID: user.ID.String()},
 			Provider:  user.Provider.Provider,
 			Success:   true,
-		})
+		}); err != nil {
+			instrumentation.LogError(c, err, "Failed to track login event")
+		}
 		slog.Info("Existing user logged in", "ip", c.ClientIP(), "user", user.Email)
 	}
 	jwtToken, err := GenerateJWT(user, 24*time.Hour)
