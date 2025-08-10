@@ -112,22 +112,18 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		return
 	}
 	if isNewUser {
-		if err := lh.et.Track(c, instrumentation.UserSignupEvent{
+		lh.et.Track(c, instrumentation.UserSignupEvent{
 			BaseEvent: instrumentation.BaseEvent{UserID: user.ID.String()},
 			Provider:  user.Provider.Provider,
-		}); err != nil {
-			instrumentation.LogError(c, err, "Failed to track signup event")
-		}
-		slog.Info("New user registered", "ip", c.ClientIP(), "user", user.Email)
+		})
+		slog.Info("New user registered", "ip", c.ClientIP(), "user", user.ID.String())
 	} else {
-		if err := lh.et.Track(c, instrumentation.UserLoginEvent{
+		lh.et.Track(c, instrumentation.UserLoginEvent{
 			BaseEvent: instrumentation.BaseEvent{UserID: user.ID.String()},
 			Provider:  user.Provider.Provider,
 			Success:   true,
-		}); err != nil {
-			instrumentation.LogError(c, err, "Failed to track login event")
-		}
-		slog.Info("Existing user logged in", "ip", c.ClientIP(), "user", user.Email)
+		})
+		slog.Info("Existing user logged in", "ip", c.ClientIP(), "user", user.ID.String())
 	}
 	jwtToken, err := GenerateJWT(user, 24*time.Hour)
 	if err != nil {
