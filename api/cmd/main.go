@@ -131,10 +131,10 @@ func getRouter() (*gin.Engine, func()) {
 	r.Use(login.APIKeyMiddleware(dao))
 	r.Use(instrumentation.MonitoringMiddleware(eventTracker))
 
-	lh := login.NewLoginHandler(dao)
+	lh := login.NewLoginHandler(dao, eventTracker)
 	route.SetLoginRoutes(r, lh)
 
-	ih := handler.NewInboxHandler(dao)
+	ih := handler.NewInboxHandler(dao, eventTracker)
 	route.SetInboxRoutes(r, ih)
 
 	akh := apikey.NewAPIKeyHandler(dao)

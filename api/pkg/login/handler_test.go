@@ -15,6 +15,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/login/provider"
 	"github.com/jesusnoseq/request-inbox/pkg/login/provider/provider_mock"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
@@ -28,7 +29,11 @@ func mustGetLoginHandler() (*LoginHandler, func()) {
 	if err != nil {
 		panic(err)
 	}
-	return NewLoginHandler(dao), func() {
+	et, err := instrumentation.NewEventTracker()
+	if err != nil {
+		panic(err)
+	}
+	return NewLoginHandler(dao, et), func() {
 		dao.Close(ctx)
 	}
 }

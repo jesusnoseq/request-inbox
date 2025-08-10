@@ -15,6 +15,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/handler"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 	"github.com/jesusnoseq/request-inbox/pkg/t_util"
 )
@@ -25,7 +26,11 @@ func mustGetInboxHandler() (*handler.InboxHandler, func()) {
 	if err != nil {
 		panic(err)
 	}
-	return handler.NewInboxHandler(dao), func() {
+	et, err := instrumentation.NewEventTracker()
+	if err != nil {
+		panic(err)
+	}
+	return handler.NewInboxHandler(dao, et), func() {
 		dao.Close(ctx)
 	}
 }

@@ -78,7 +78,6 @@ func TestUserSignupEvent(t *testing.T) {
 	event := UserSignupEvent{
 		BaseEvent: BaseEvent{UserID: "user789"},
 		Provider:  "github",
-		Email:     "test@example.com",
 	}
 
 	// Test GetEventType
@@ -96,7 +95,6 @@ func TestUserSignupEvent(t *testing.T) {
 	expectedProperties := map[string]any{
 		"user_id":  "user789",
 		"provider": "github",
-		"email":    "test@example.com",
 	}
 
 	for key, expectedValue := range expectedProperties {
@@ -112,7 +110,6 @@ func TestUserSignupEventWithoutEmail(t *testing.T) {
 	event := UserSignupEvent{
 		BaseEvent: BaseEvent{UserID: "user000"},
 		Provider:  "facebook",
-		Email:     "",
 	}
 
 	// Test ToProperties with empty email
@@ -120,7 +117,6 @@ func TestUserSignupEventWithoutEmail(t *testing.T) {
 	expectedProperties := map[string]any{
 		"user_id":  "user000",
 		"provider": "facebook",
-		"email":    "",
 	}
 
 	for key, expectedValue := range expectedProperties {

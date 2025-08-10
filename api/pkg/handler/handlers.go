@@ -14,17 +14,20 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
 	"github.com/jesusnoseq/request-inbox/pkg/dynamic_response"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
 type InboxHandler struct {
 	dao database.InboxDAO
+	et  instrumentation.EventTracker
 }
 
-func NewInboxHandler(dao database.InboxDAO) *InboxHandler {
+func NewInboxHandler(dao database.InboxDAO, et instrumentation.EventTracker) *InboxHandler {
 	return &InboxHandler{
 		dao: dao,
+		et:  et,
 	}
 }
 
@@ -58,6 +61,16 @@ func (ih *InboxHandler) CreateInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
 		return
 	}
+
+	userID := newInbox.OwnerID.String()
+	if newInbox.OwnerID == uuid.Nil {
+		userID = "anonymous"
+	}
+	event := instrumentation.CreateNewInboxEvent{
+		BaseEvent: instrumentation.BaseEvent{UserID: userID},
+		InboxID:   inbox.ID.String(),
+	}
+	ih.et.Track(c, event)
 
 	c.JSON(http.StatusCreated, inbox)
 }

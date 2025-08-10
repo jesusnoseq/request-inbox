@@ -34,7 +34,6 @@ func TestNoOpEventTracker(t *testing.T) {
 	signupEvent := UserSignupEvent{
 		BaseEvent: BaseEvent{UserID: "test-user"},
 		Provider:  "google",
-		Email:     "test@example.com",
 	}
 	err = tracker.Track(ctx, signupEvent)
 	if err != nil {

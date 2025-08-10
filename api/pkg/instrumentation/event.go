@@ -3,9 +3,10 @@ package instrumentation
 type Event string
 
 const (
-	APIRequest Event = "api_request"
-	UserLogin  Event = "user_login"
-	UserSignup Event = "user_signup"
+	APIRequest     Event = "api_request"
+	UserLogin      Event = "user_login"
+	UserSignup     Event = "user_signup"
+	CreateNewInbox Event = "create_new_inbox"
 )
 
 type TrackedEvent interface {
@@ -63,7 +64,6 @@ func (e UserLoginEvent) ToProperties() map[string]any {
 type UserSignupEvent struct {
 	BaseEvent
 	Provider string `json:"provider"`
-	Email    string `json:"email,omitempty"`
 }
 
 func (e UserSignupEvent) GetEventType() Event {
@@ -74,6 +74,21 @@ func (e UserSignupEvent) ToProperties() map[string]any {
 	return map[string]any{
 		"user_id":  e.UserID,
 		"provider": e.Provider,
-		"email":    e.Email,
+	}
+}
+
+type CreateNewInboxEvent struct {
+	BaseEvent
+	InboxID string `json:"inbox_id"`
+}
+
+func (e CreateNewInboxEvent) GetEventType() Event {
+	return CreateNewInbox
+}
+
+func (e CreateNewInboxEvent) ToProperties() map[string]any {
+	return map[string]any{
+		"user_id":  e.UserID,
+		"inbox_id": e.InboxID,
 	}
 }

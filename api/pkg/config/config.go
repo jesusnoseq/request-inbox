@@ -75,7 +75,7 @@ const (
 	UserJTISaltDefault            string = "AcL30zFxQf"
 
 	EnabledMonitoring        Key    = "ENABLED_MONITORING"
-	EnabledMonitoringDefault bool   = true
+	EnabledMonitoringDefault bool   = false
 	PostHogURL               Key    = "POSTHOG_URL"
 	PostHogURLDefault        string = "https://eu.i.posthog.com"
 	PostHogAPIKey            Key    = "POSTHOG_API_KEY"
