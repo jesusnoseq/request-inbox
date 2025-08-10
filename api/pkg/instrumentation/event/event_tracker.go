@@ -1,10 +1,10 @@
-package instrumentation
+package event
 
 import (
 	"context"
 )
 
-//go:generate mockgen -source=event_tracker.go -destination=event_tracker_mock/event_tracker_mock.go -package=instrumentation_mock EventTracker
+//go:generate mockgen -source=event_tracker.go -destination=event_tracker_mock/event_tracker_mock.go -package=event_tracker_mock EventTracker
 
 type EventTracker interface {
 	Track(ctx context.Context, event TrackedEvent) error

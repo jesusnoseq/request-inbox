@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/jesusnoseq/request-inbox/pkg/config"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation/event"
 )
 
 func TestNewPostHogEventTracker_MissingAPIKey(t *testing.T) {
@@ -53,8 +54,8 @@ func TestPostHogEventTracker_Track(t *testing.T) {
 
 	ctx := context.Background()
 
-	testEvent := APIRequestEvent{
-		BaseEvent:  BaseEvent{UserID: "test_user"},
+	testEvent := event.APIRequestEvent{
+		BaseEvent:  event.BaseEvent{UserID: "test_user"},
 		Method:     "GET",
 		Endpoint:   "/test",
 		StatusCode: 200,

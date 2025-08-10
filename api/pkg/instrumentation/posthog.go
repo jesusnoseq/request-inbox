@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/jesusnoseq/request-inbox/pkg/config"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation/event"
 	"github.com/posthog/posthog-go"
 )
 
@@ -36,7 +37,7 @@ func NewPostHogEventTracker() (*PostHogEventTracker, error) {
 	}, nil
 }
 
-func (p *PostHogEventTracker) Track(ctx context.Context, event TrackedEvent) error {
+func (p *PostHogEventTracker) Track(ctx context.Context, event event.TrackedEvent) error {
 	err := p.client.Enqueue(posthog.Capture{
 		DistinctId: event.GetUserID(),
 		Event:      string(event.GetEventType()),

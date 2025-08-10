@@ -1,4 +1,4 @@
-package instrumentation
+package event
 
 import (
 	"context"

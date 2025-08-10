@@ -1,4 +1,4 @@
-package instrumentation
+package event
 
 type Event string
 

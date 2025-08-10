@@ -6,10 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/collection"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation/event"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-func MonitoringMiddleware(et EventTracker) gin.HandlerFunc {
+func MonitoringMiddleware(et event.EventTracker) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID := getUserIDFromContext(c)
 		c.Next()
@@ -18,11 +19,11 @@ func MonitoringMiddleware(et EventTracker) gin.HandlerFunc {
 			return
 		}
 		go func() {
-			event := APIRequestEvent{
+			event := event.APIRequestEvent{
 				Method:     c.Request.Method,
 				Endpoint:   c.FullPath(),
 				StatusCode: c.Writer.Status(),
-				BaseEvent:  BaseEvent{UserID: userID},
+				BaseEvent:  event.BaseEvent{UserID: userID},
 			}
 			err := et.Track(c, event)
 			if err != nil {

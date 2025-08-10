@@ -11,6 +11,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation/event"
 	"github.com/jesusnoseq/request-inbox/pkg/login/provider"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
@@ -18,10 +19,10 @@ import (
 type LoginHandler struct {
 	dao database.InboxDAO
 	pm  provider.IProviderManager
-	et  instrumentation.EventTracker
+	et  event.EventTracker
 }
 
-func NewLoginHandler(dao database.InboxDAO, et instrumentation.EventTracker) *LoginHandler {
+func NewLoginHandler(dao database.InboxDAO, et event.EventTracker) *LoginHandler {
 	return &LoginHandler{
 		dao: dao,
 		pm:  provider.NewProviderManager(),
@@ -63,7 +64,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	oauthState, _ := c.Cookie(OauthStateCookieName)
 	state := c.Query("state")
 	if state != oauthState {
-		lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "state"}, Provider: p, Success: false}) //nolint:errcheck
+		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "state"}, Provider: p, Success: false}) //nolint:errcheck
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Invalid state", http.StatusUnauthorized))
 		return
 	}
@@ -72,7 +73,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	token, err := oauthConfig.Config.Exchange(c, code)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to exchange token")
-		lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "exchange"}, Provider: p, Success: false}) //nolint:errcheck
+		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "exchange"}, Provider: p, Success: false}) //nolint:errcheck
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to exchange token", http.StatusInternalServerError))
 		return
 	}
@@ -81,7 +82,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	userResponse, err := client.Get(oauthConfig.UserInfoURL)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to get user info")
-		lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "userinfo"}, Provider: p, Success: false}) //nolint:errcheck
+		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "userinfo"}, Provider: p, Success: false}) //nolint:errcheck
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to get user info", http.StatusInternalServerError))
 		return
 	}
@@ -112,14 +113,14 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 		return
 	}
 	if isNewUser {
-		lh.et.Track(c, instrumentation.UserSignupEvent{
-			BaseEvent: instrumentation.BaseEvent{UserID: user.ID.String()},
+		lh.et.Track(c, event.UserSignupEvent{
+			BaseEvent: event.BaseEvent{UserID: user.ID.String()},
 			Provider:  user.Provider.Provider,
 		})
 		slog.Info("New user registered", "ip", c.ClientIP(), "user", user.ID.String())
 	} else {
-		lh.et.Track(c, instrumentation.UserLoginEvent{
-			BaseEvent: instrumentation.BaseEvent{UserID: user.ID.String()},
+		lh.et.Track(c, event.UserLoginEvent{
+			BaseEvent: event.BaseEvent{UserID: user.ID.String()},
 			Provider:  user.Provider.Provider,
 			Success:   true,
 		})

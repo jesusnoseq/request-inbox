@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/jesusnoseq/request-inbox/pkg/config"
+	"github.com/jesusnoseq/request-inbox/pkg/instrumentation/event"
 )
 
 func TestNewEventTracker_Disabled(t *testing.T) {
@@ -19,7 +20,7 @@ func TestNewEventTracker_Disabled(t *testing.T) {
 		t.Error("NewEventTracker() should return a tracker instance, got nil")
 	}
 
-	if _, ok := tracker.(*NoOpEventTracker); !ok {
+	if _, ok := tracker.(*event.NoOpEventTracker); !ok {
 		t.Errorf("NewEventTracker() should return *NoOpEventTracker when disabled, got: %T", tracker)
 	}
 }
@@ -39,7 +40,7 @@ func TestNewEventTracker_Enabled_MissingAPIKey(t *testing.T) {
 	if tracker == nil {
 		t.Error("NewEventTracker() should return a tracker instance, got nil")
 	}
-	if _, ok := tracker.(*NoOpEventTracker); !ok {
+	if _, ok := tracker.(*event.NoOpEventTracker); !ok {
 		t.Errorf("NewEventTracker() should return *NoOpEventTracker as fallback, got: %T", tracker)
 	}
 }
@@ -59,7 +60,7 @@ func TestNewEventTracker_Enabled_MissingURL(t *testing.T) {
 	if tracker == nil {
 		t.Error("NewEventTracker() should return a tracker instance, got nil")
 	}
-	if _, ok := tracker.(*NoOpEventTracker); !ok {
+	if _, ok := tracker.(*event.NoOpEventTracker); !ok {
 		t.Errorf("NewEventTracker() should return *NoOpEventTracker as fallback, got: %T", tracker)
 	}
 }
