@@ -18,8 +18,9 @@ func MonitoringMiddleware(et EventTracker) gin.HandlerFunc {
 				StatusCode: c.Writer.Status(),
 				BaseEvent:  BaseEvent{UserID: userID},
 			}
-			if err := et.Track(c, event); err != nil {
-				slog.Error("failed to track request", slog.Any("event", event), slog.Any("error", err))
+			err := et.Track(c, event)
+			if err != nil {
+				slog.Error("Failed to track API request", "error", err)
 			}
 		}()
 	}

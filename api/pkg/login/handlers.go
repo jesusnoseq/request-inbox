@@ -63,9 +63,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	oauthState, _ := c.Cookie(OauthStateCookieName)
 	state := c.Query("state")
 	if state != oauthState {
-		if err := lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "state"}, Provider: p, Success: false}); err != nil {
-			instrumentation.LogError(c, err, "Failed to track login event")
-		}
+		lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "state"}, Provider: p, Success: false}) //nolint:errcheck
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Invalid state", http.StatusUnauthorized))
 		return
 	}
@@ -74,9 +72,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	token, err := oauthConfig.Config.Exchange(c, code)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to exchange token")
-		if err := lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "exchange"}, Provider: p, Success: false}); err != nil {
-			instrumentation.LogError(c, err, "Failed to track login event")
-		}
+		lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "exchange"}, Provider: p, Success: false}) //nolint:errcheck
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to exchange token", http.StatusInternalServerError))
 		return
 	}
@@ -85,13 +81,16 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	userResponse, err := client.Get(oauthConfig.UserInfoURL)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to get user info")
-		if err := lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "userinfo"}, Provider: p, Success: false}); err != nil {
-			instrumentation.LogError(c, err, "Failed to track login event")
-		}
+		lh.et.Track(c, instrumentation.UserLoginEvent{BaseEvent: instrumentation.BaseEvent{UserID: "userinfo"}, Provider: p, Success: false}) //nolint:errcheck
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to get user info", http.StatusInternalServerError))
 		return
 	}
-	defer userResponse.Body.Close()
+	defer func() {
+		err := userResponse.Body.Close()
+		if err != nil {
+			instrumentation.LogError(c, err, "Failed to close user info response body")
+		}
+	}()
 	body, err := io.ReadAll(userResponse.Body)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to read user info")

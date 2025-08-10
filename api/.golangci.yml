@@ -1,5 +1,7 @@
-run:
-  concurrency: 4
+version: "2"
 
 linters:
-  disable-all: false
+  settings:
+    errcheck:
+      exclude-functions:
+        - (*github.com/jesusnoseq/request-inbox/pkg/instrumentation.EventTracker).Track

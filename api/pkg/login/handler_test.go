@@ -34,7 +34,10 @@ func mustGetLoginHandler() (*LoginHandler, func()) {
 		panic(err)
 	}
 	return NewLoginHandler(dao, et), func() {
-		dao.Close(ctx)
+		err := dao.Close(ctx)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -56,10 +59,13 @@ func TestHandleLogout(t *testing.T) {
 	lh.HandleLogout(c)
 
 	resp := w.Result()
-	resp.Body.Close()
+	err := resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	t_util.AssertStatusCode(t, resp.StatusCode, http.StatusOK)
 	var response map[string]string
-	err := json.Unmarshal(w.Body.Bytes(), &response)
+	err = json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal response body: %v", err)
 	}
@@ -188,7 +194,10 @@ func TestHandleLogin(t *testing.T) {
 			lh.HandleLogin(ginCtx)
 
 			resp := w.Result()
-			resp.Body.Close()
+			err := resp.Body.Close()
+			if err != nil {
+				panic(err)
+			}
 			t_util.AssertStatusCode(t, resp.StatusCode, tc.expectedStatus)
 
 			if tc.expectedStatus != http.StatusTemporaryRedirect {
@@ -299,7 +308,11 @@ func TestHandleCallback(t *testing.T) {
 			lh.HandleCallback(ginCtx)
 
 			resp := w.Result()
-			resp.Body.Close()
+			err := resp.Body.Close()
+			if err != nil {
+				t.Fatalf("Failed to close response body: %v", err)
+			}
+
 			t_util.AssertStringEquals(t, w.Body.String(), tc.expectedBody)
 			t_util.AssertStatusCode(t, resp.StatusCode, tc.expectedStatus)
 
@@ -386,7 +399,10 @@ func TestHandleLoginUser(t *testing.T) {
 			lh.HandleLoginUser(ginCtx)
 
 			resp := w.Result()
-			resp.Body.Close()
+			err := resp.Body.Close()
+			if err != nil {
+				t.Fatalf("Failed to close response body: %v", err)
+			}
 
 			t_util.AssertStatusCode(t, resp.StatusCode, tc.expectedStatus)
 			if !strings.HasPrefix(w.Body.String(), tc.expectedBody) {

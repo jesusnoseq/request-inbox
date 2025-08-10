@@ -32,9 +32,9 @@ func TestNewPostHogEventTracker_Success(t *testing.T) {
 	if tracker == nil {
 		t.Error("Expected non-nil tracker")
 	}
-
-	if tracker != nil {
-		defer tracker.Close()
+	err = tracker.Close()
+	if err != nil {
+		t.Fatalf("Failed to close PostHog tracker: %v", err)
 	}
 }
 
@@ -50,11 +50,14 @@ func TestPostHogEventTracker_Track(t *testing.T) {
 	if tracker == nil {
 		t.Skip("Skipping PostHog tests due to nil tracker")
 	}
-	defer tracker.Close()
+	defer func() {
+		if err := tracker.Close(); err != nil {
+			t.Fatalf("Failed to close PostHog tracker: %v", err)
+		}
+	}()
 
 	ctx := context.Background()
 
-	// Test Track method with a proper TrackedEvent
 	testEvent := APIRequestEvent{
 		BaseEvent:  BaseEvent{UserID: "test_user"},
 		Method:     "GET",
@@ -66,9 +69,8 @@ func TestPostHogEventTracker_Track(t *testing.T) {
 		t.Errorf("Track should not return error, got: %v", err)
 	}
 
-	// Test Close method
 	err = tracker.Close()
 	if err != nil {
-		t.Errorf("Close should not return error, got: %v", err)
+		t.Fatalf("Close should not return error, got: %v", err)
 	}
 }

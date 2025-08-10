@@ -31,7 +31,10 @@ func mustGetInboxHandler() (*handler.InboxHandler, func()) {
 		panic(err)
 	}
 	return handler.NewInboxHandler(dao, et), func() {
-		dao.Close(ctx)
+		err := dao.Close(ctx)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -73,7 +76,10 @@ func shoudlExistsInbox(t *testing.T, ih *handler.InboxHandler, i model.Inbox) mo
 	ginCtx.Request = req
 	ih.CreateInbox(ginCtx)
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		panic(err)
+	}
 	if resp.StatusCode != http.StatusCreated {
 		panic("inbox should be created")
 	}
@@ -102,7 +108,10 @@ func TestCreateInbox(t *testing.T) {
 	ih.CreateInbox(ginCtx)
 
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 
 	if resp.StatusCode != http.StatusCreated {
 		t.Errorf("Expected StatusCreated, got %v with body %s", resp.StatusCode, w.Body.String())
@@ -142,7 +151,10 @@ func TestListInbox(t *testing.T) {
 	ginCtx.Request = req
 	ih.ListInbox(ginCtx)
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected StatusOK, got %v", resp.StatusCode)
 	}
@@ -180,7 +192,10 @@ func TestDeleteInbox(t *testing.T) {
 	ginCtx.Request = req
 	ih.DeleteInbox(ginCtx)
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	if resp.StatusCode != http.StatusNoContent {
 		t.Errorf("Expected StatusNoContent, got %v with body %s", resp.StatusCode, w.Body.String())
 	}
@@ -206,7 +221,10 @@ func TestDeleteInboxRequests(t *testing.T) {
 	ginCtx.Request = req
 	ih.DeleteInboxRequests(ginCtx)
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	if resp.StatusCode != http.StatusNoContent {
 		t.Errorf("Expected StatusNoContent, got %v with body %s", resp.StatusCode, w.Body.String())
 	}
@@ -233,7 +251,10 @@ func TestGetInbox(t *testing.T) {
 	ginCtx.Request = req
 	ih.GetInbox(ginCtx)
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected StatusOK, got %v with body %s", resp.StatusCode, w.Body.String())
 	}
@@ -276,7 +297,10 @@ func TestUpdateInbox(t *testing.T) {
 	ginCtx.Request = req
 	ih.UpdateInbox(ginCtx)
 	resp := w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected StatusOK, got %v with body %s", resp.StatusCode, w.Body.String())
@@ -306,7 +330,10 @@ func TestUpdateInbox(t *testing.T) {
 	ginCtx.Request = req
 	ih.GetInbox(ginCtx)
 	resp = w.Result()
-	resp.Body.Close()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected StatusOK, got %v with body %s", resp.StatusCode, w.Body.String())
 	}

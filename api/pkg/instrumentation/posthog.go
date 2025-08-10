@@ -56,5 +56,9 @@ func (p *PostHogEventTracker) Track(ctx context.Context, event TrackedEvent) err
 }
 
 func (p *PostHogEventTracker) Close() error {
-	return p.client.Close()
+	err := p.client.Close()
+	if err != nil {
+		slog.Error("Failed to close PostHog client", "error", err)
+	}
+	return err
 }
