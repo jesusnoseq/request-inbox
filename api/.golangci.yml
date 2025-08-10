@@ -4,4 +4,4 @@ linters:
   settings:
     errcheck:
       exclude-functions:
-        - (*github.com/jesusnoseq/request-inbox/pkg/instrumentation.EventTracker).Track
+        - (github.com/jesusnoseq/request-inbox/pkg/instrumentation/event.EventTracker).Track
