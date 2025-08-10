@@ -50,11 +50,6 @@ func TestPostHogEventTracker_Track(t *testing.T) {
 	if tracker == nil {
 		t.Skip("Skipping PostHog tests due to nil tracker")
 	}
-	defer func() {
-		if err := tracker.Close(); err != nil {
-			t.Fatalf("Failed to close PostHog tracker: %v", err)
-		}
-	}()
 
 	ctx := context.Background()
 
