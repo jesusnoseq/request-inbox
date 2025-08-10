@@ -31,10 +31,6 @@ func main() {
 		log.Fatal("error configuring log", err)
 	}
 
-	if err != nil {
-		slog.Warn("Failed to initialize event tracker, continuing with NoOp tracker", slog.String("error", err.Error()))
-	}
-
 	mode := config.GetString(config.APIMode)
 	if mode == config.APIModeLambda {
 		lambda.Start(Handler)
