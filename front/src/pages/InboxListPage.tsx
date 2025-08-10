@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Grid2, CircularProgress, Box, Alert } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { Inbox } from '../types/inbox';
 import { getInboxList, deleteInbox } from '../services/inbox';
 import InboxListItem from '../components/InboxListItem';
