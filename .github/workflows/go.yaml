@@ -24,7 +24,7 @@ jobs:
         run: go build -tags=jsoniter -v ./...
         working-directory: ./api
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
           working-directory: api
       - name: Connect to AWS
