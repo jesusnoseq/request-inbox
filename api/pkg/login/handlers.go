@@ -64,7 +64,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	oauthState, _ := c.Cookie(OauthStateCookieName)
 	state := c.Query("state")
 	if state != oauthState {
-		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "state"}, Provider: p, Success: false}) //nolint:errcheck
+		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "state"}, Provider: p, Success: false})
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Invalid state", http.StatusUnauthorized))
 		return
 	}
@@ -73,7 +73,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	token, err := oauthConfig.Config.Exchange(c, code)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to exchange token")
-		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "exchange"}, Provider: p, Success: false}) //nolint:errcheck
+		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "exchange"}, Provider: p, Success: false})
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to exchange token", http.StatusInternalServerError))
 		return
 	}
@@ -82,7 +82,7 @@ func (lh *LoginHandler) HandleCallback(c *gin.Context) {
 	userResponse, err := client.Get(oauthConfig.UserInfoURL)
 	if err != nil {
 		instrumentation.LogError(c, err, "Failed to get user info")
-		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "userinfo"}, Provider: p, Success: false}) //nolint:errcheck
+		lh.et.Track(c, event.UserLoginEvent{BaseEvent: event.BaseEvent{UserID: "userinfo"}, Provider: p, Success: false})
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("Failed to get user info", http.StatusInternalServerError))
 		return
 	}
