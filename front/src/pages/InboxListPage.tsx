@@ -12,7 +12,6 @@ const InboxListPage: React.FC = () => {
     const [isLoading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<string>("");
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
