@@ -15,8 +15,11 @@ import {
     InputLabel,
     Grid2,
     Typography,
+    Alert,
+    Box,
+    Button,
 } from '@mui/material';
-import { Add as AddIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Add as AddIcon, Delete as DeleteIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
 import CopyToClipboardButton from './CopyToClipboardButton';
 import { LoadingButton } from '@mui/lab';
 import { useError } from '../context/ErrorContext';
@@ -31,9 +34,9 @@ export default function APIKeyManager() {
     const [apiKeys, setApiKeys] = useState<APIKey[]>([]);
     const [newKeyDescription, setNewKeyDescription] = useState('');
     const [newKeyExpiration, setNewKeyExpiration] = useState<ExpirationOption>('1 month');
-    const [visibleKeys, setVisibleKeys] = useState<{ [key: string]: boolean }>({});
-    //const [isLoading, setLoading] = useState<boolean>(false);
     const [isNewKeyLoading, setNewKeyLoading] = useState<boolean>(false);
+    const [newlyCreatedKey, setNewlyCreatedKey] = useState<APIKey | null>(null);
+    const [unmaskedNewKey, setUnmaskedNewKey] = useState<boolean>(false);
     const { setError, clearError } = useError();
 
     useEffect(() => {
@@ -73,8 +76,12 @@ export default function APIKeyManager() {
     const requestNewKey = async () => {
         try {
             setNewKeyLoading(true);
-            const apiKeyListResponse = await createAPIKey(newKeyDescription, calculateExpirationDate(newKeyExpiration));
-            setApiKeys([apiKeyListResponse, ...apiKeys]);
+            const newAPIKey = await createAPIKey(newKeyDescription, calculateExpirationDate(newKeyExpiration));
+            
+            setNewlyCreatedKey(newAPIKey);
+            setUnmaskedNewKey(false);
+            
+            // setApiKeys([newAPIKey, ...apiKeys]);
             clearError();
         } catch (err) {
             setError('Failed to create a new API key');
@@ -90,13 +97,8 @@ export default function APIKeyManager() {
         setApiKeys(apiKeys.filter((key) => key.ID !== keyToDelete));
     };
 
-    const toggleKeyVisibility = (key: string) => {
-        setVisibleKeys({ ...visibleKeys, [key]: !visibleKeys[key] });
-    };
-
-
-    const maskKey = (key: string) => {
-        return key.slice(0, 3) + '*'.repeat(key.length - 6) + key.slice(-3);
+    const toggleNewKeyVisibility = () => {
+        setUnmaskedNewKey(!unmaskedNewKey);
     };
 
     const formatDate = (dateValue: any, fallback: string) => {
@@ -111,6 +113,42 @@ export default function APIKeyManager() {
             <Typography variant="h5" gutterBottom>
                 API Key Management
             </Typography>
+
+            {newlyCreatedKey && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    <Typography variant="h6">New API Key Created!</Typography>
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                        Your new API key has been created.
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={unmaskedNewKey ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                            onClick={toggleNewKeyVisibility}
+                        >
+                            {unmaskedNewKey ? 'Hide' : 'Show'} API Key
+                        </Button>
+                        <CopyToClipboardButton textToCopy={newlyCreatedKey.APIKey} />
+                    </Box>
+                    {unmaskedNewKey && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography 
+                                variant="body1" 
+                                sx={{ 
+                                    fontFamily: 'monospace', 
+                                    backgroundColor: 'rgba(0,0,0,0.1)', 
+                                    padding: '4px 8px', 
+                                    borderRadius: 1,
+                                    wordBreak: 'break-all'
+                                }}
+                            >
+                                {newlyCreatedKey.APIKey}
+                            </Typography>
+                        </Box>
+                    )}
+                </Alert>
+            )}
 
             <Paper style={{ padding: '20px', marginBottom: '20px' }}>
                 <Typography variant="h6" gutterBottom>
@@ -173,16 +211,14 @@ export default function APIKeyManager() {
                         {apiKeys.map((apiKey) => (
                             <TableRow key={apiKey.ID}>
                                 <TableCell>
-                                    {visibleKeys[apiKey.ID] ? apiKey.APIKey : maskKey(apiKey.APIKey)}
-                                    <IconButton onClick={() => toggleKeyVisibility(apiKey.ID)}>
-                                        {visibleKeys[apiKey.ID] ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                    </IconButton>
+                                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                                        {apiKey.APIKey}
+                                    </Typography>
                                 </TableCell>
                                 <TableCell>{formatDate(apiKey.CreationDate, 'Unknown')}</TableCell>
                                 <TableCell>{formatDate(apiKey.ExpiryDate, 'Never')}</TableCell>
                                 <TableCell>{apiKey.Name}</TableCell>
                                 <TableCell>
-                                    <CopyToClipboardButton textToCopy={apiKey.ID} />
                                     <IconButton onClick={() => deleteKey(apiKey.ID)}>
                                         <DeleteIcon />
                                     </IconButton>
