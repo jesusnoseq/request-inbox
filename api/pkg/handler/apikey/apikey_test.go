@@ -186,7 +186,7 @@ func TestGetAPIKey(t *testing.T) {
 		t.Fatalf("expected valid API key JSON response, got error: %v", err)
 	}
 	t_util.AssertSameID(t, apiKey.ID, returnedAPIKey.ID)
-	if string(t_util.MustJson(t, apiKey)) != string(t_util.MustJson(t, returnedAPIKey)) {
+	if string(t_util.MustJson(t, apiKey.WithMaskedKey())) != string(t_util.MustJson(t, returnedAPIKey)) {
 		t.Fatalf("expected the same API key in the JSON response \n%+v\n --- \n%+v", apiKey, returnedAPIKey)
 	}
 }
@@ -223,13 +223,13 @@ func TestListAPIKeysByUser(t *testing.T) {
 		t.Fatalf("expected valid Item list of API key JSON response, got error: %v", err)
 	}
 	t_util.AssertTrue(t, len(apiKeys.Results) >= 2, "Results len should be at least 2")
-	if !collection.SliceOfAnyContains(apiKeys.Results, apiKey1, ApiKeyEquals) {
+	if !collection.SliceOfAnyContains(apiKeys.Results, apiKey1.WithMaskedKey(), ApiKeyEquals) {
 		t.Errorf("API key list does not contains apiKey1 %+v", apiKey1)
 	}
-	if !collection.SliceOfAnyContains(apiKeys.Results, apiKey2, ApiKeyEquals) {
+	if !collection.SliceOfAnyContains(apiKeys.Results, apiKey2.WithMaskedKey(), ApiKeyEquals) {
 		t.Errorf("API key list does not contains apiKey2 %+v", apiKey2)
 	}
-	if collection.SliceOfAnyContains(apiKeys.Results, otherApiKey, ApiKeyEquals) {
+	if collection.SliceOfAnyContains(apiKeys.Results, otherApiKey.WithMaskedKey(), ApiKeyEquals) {
 		t.Errorf("API key list contains otherApiKey %+v", otherApiKey)
 	}
 }
