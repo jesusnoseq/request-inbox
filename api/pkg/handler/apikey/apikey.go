@@ -80,7 +80,7 @@ func (h *APIKeyHandler) GetAPIKey(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, apiKey)
+	c.JSON(http.StatusOK, apiKey.WithMaskedKey())
 }
 
 func (h *APIKeyHandler) ListAPIKeysByUser(c *gin.Context) {
@@ -103,7 +103,12 @@ func (h *APIKeyHandler) ListAPIKeysByUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, model.NewItemList(apiKeys))
+	maskedAPIKeys := make([]model.APIKey, len(apiKeys))
+	for i, apiKey := range apiKeys {
+		maskedAPIKeys[i] = apiKey.WithMaskedKey()
+	}
+
+	c.JSON(http.StatusOK, model.NewItemList(maskedAPIKeys))
 }
 
 func (h *APIKeyHandler) DeleteAPIKey(c *gin.Context) {
