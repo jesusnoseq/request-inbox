@@ -33,6 +33,13 @@ type APIKey struct {
 	Permissions  APIKeyPermissions
 }
 
+func (ak APIKey) WithMaskedKey() APIKey {
+	if len(ak.APIKey) > 6 {
+		ak.APIKey = ak.APIKey[:3] + "***" + ak.APIKey[len(ak.APIKey)-3:]
+	}
+	return ak
+}
+
 func generateAPIKey() (string, error) {
 	return randomString(API_KEY_SIZE)
 }
