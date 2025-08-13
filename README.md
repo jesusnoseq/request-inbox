@@ -5,7 +5,7 @@
 ![Node Version](https://img.shields.io/badge/Node-20+-339933?logo=node.js)
 ![AWS](https://img.shields.io/badge/AWS-Lambda%20%7C%20DynamoDB-orange?logo=aws)
 
-A web application to collect and inspect HTTP requests for testing and debugging purposes. Request Inbox provides a simple  alternative to services like webhook.site and webhookinbox.com.
+A web application to collect and inspect HTTP requests for testing and debugging purposes. Request Inbox provides a simple and free alternative to services like webhook.site and webhookinbox.com.
 
 🔗 **Try it live at [request-inbox.com](https://request-inbox.com/)**
 
@@ -94,38 +94,38 @@ make help
 - **Development**: Local Docker containers
 - **Production**: Serverless AWS infrastructure with CI/CD via GitHub Actions
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 request-inbox/
-├── 📂 .github/workflows/     # CI/CD pipelines (GitHub Actions)
-├── 📂 api/                   # Backend application (Go)
-│   ├── 📂 cmd/              # Application entry points
-│   ├── 📂 pkg/              # Shared packages and business logic
-│   │   ├── 📂 handler/      # HTTP request handlers
-│   │   ├── 📂 model/        # Data models and validation
-│   │   ├── 📂 database/     # Database abstraction layer
-│   │   ├── 📂 login/        # Authentication & authorization
-│   │   └── 📂 route/        # API route definitions
+├── .github/workflows/       # CI/CD pipelines (GitHub Actions)
+├── api/                     # Backend application (Go)
+│   ├── cmd/                 # Application entry points
+│   ├── pkg/                 # Shared packages and business logic
+│   │   ├──  handler/        # HTTP request handlers
+│   │   ├──  model/          # Data models and validation
+│   │   ├──  database/       # Database abstraction layer
+│   │   ├──  login/          # Authentication & authorization
+│   │   └──  route/          # API route definitions
 │   ├── go.mod               # Go module dependencies
 │   └── air.toml             # Hot reload configuration
-├── 📂 front/                 # Frontend application (React + TypeScript)
-│   ├── 📂 src/              # Source code
-│   │   ├── 📂 components/   # Reusable UI components
-│   │   ├── 📂 pages/        # Application pages
-│   │   ├── 📂 services/     # API client services
-│   │   └── 📂 types/        # TypeScript type definitions
-│   ├── 📂 public/           # Static assets
+├── front/                   # Frontend application (React + TypeScript)
+│   ├── src/                 # Source code
+│   │   ├── components/      # Reusable UI components
+│   │   ├── pages/           # Application pages
+│   │   ├── services/        # API client services
+│   │   └── types/           # TypeScript type definitions
+│   ├── public/              # Static assets
 │   ├── package.json         # Node.js dependencies
 │   └── tsconfig.json        # TypeScript configuration
-├── 📂 deploy/                # Infrastructure as Code (Terraform)
+├── deploy/                  # Infrastructure as Code (Terraform)
 │   ├── back.tf              # Backend infrastructure
 │   ├── front.tf             # Frontend infrastructure
 │   ├── cert.tf              # SSL certificates
 │   └── variables.tf         # Configuration variables
-├── 📂 docs/                  # Documentation
+├── docs/                    # Documentation
 │   └── openapi.yaml         # API specification (OpenAPI 3.1)
-├── docker-compose-local.yml  # Local development environment
+├── docker-compose-local.yml # Local development environment
 ├── Dockerfile-api           # Backend container definition
 ├── Dockerfile-front         # Frontend container definition
 ├── Makefile                 # Development commands
