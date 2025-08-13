@@ -1,5 +1,6 @@
 # Request Inbox
 
+![CI/CD](https://github.com/jesusnoseq/request-inbox/actions/workflows/deploy_app.yaml/badge.svg)
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 ![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go)
 ![Node Version](https://img.shields.io/badge/Node-20+-339933?logo=node.js)
