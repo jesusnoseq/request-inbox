@@ -1,95 +1,238 @@
-# RequestInbox
+# Request Inbox
 
-Web Application to collects HTTP request for testing purposes.
+![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
+![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go)
+![Node Version](https://img.shields.io/badge/Node-20+-339933?logo=node.js)
+![AWS](https://img.shields.io/badge/AWS-Lambda%20%7C%20DynamoDB-orange?logo=aws)
 
-It tries to replace [webhookinbox.com](http://webhookinbox.com/) and be a simpler alternative to [webhook.site](http://webhook.site)
+A web application to collect and inspect HTTP requests for testing and debugging purposes. Request Inbox provides a simple  alternative to services like webhook.site and webhookinbox.com.
 
-You can try it at [request-inbox.com](https://request-inbox.com/)
+🔗 **Try it live at [request-inbox.com](https://request-inbox.com/)**
 
-## Quick start
+## ✨ Features
 
-### Docker Compose
+### Core Functionality
 
-Execute back and front applications with in an embeded DB
+- 📬 **Create, list, and delete inboxes** - Organize your inboxes
+- 🎯 **Endpoint collection** - Capture HTTP requests with detailed information
+- 🔧 **Custom responses** - Configure response headers and body content
+- 👀 **Request inspection** - View detailed request information including headers, body, and metadata
+- 🗑️ **Request management** - Remove requests from an inbox
 
-```sh
-docker-compose -f docker-compose.yml -f docker-compose-local.yml up --build
+### User Experience
+
+- 🌓 **Light and dark themes** - Choose your preferred interface style
+- 🔍 **Inbox search** - Quickly find your inboxes
+- ♻️ **Auto-refresh** - Real-time request updates
+- 📖 **JSON viewer** - Pretty-print and inspect request bodies
+- 📊 **OpenAPI documentation** - Complete API specification
+
+### Security & Access
+
+- 👤 **User authentication** - Secure login with GitHub and Google OAuth
+- 🔒 **Private inboxes** - Control access to your testing environments
+- 🔑 **API keys** - Programmatic access to your inboxes
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Go 1.24+ (for local development)
+- Node.js 20+ (for local development)
+
+### Using Docker Compose (Recommended)
+
+Run the complete application stack with an embedded database:
+
+```bash
+docker-compose -f docker-compose-local.yml up --build
 ```
 
-### Makefile
+This will start:
 
-There is also a `Makefile` that allows to excute multiple commands easily
+- **API server** on `http://localhost:8080`
+- **Frontend** on `http://localhost:3000`
 
-```sh
+### Local Development
+
+1. **Backend setup:**
+
+```bash
+cd api
+make install          # Download Go dependencies
+make run-api-hot      # Start with hot reloading
+```
+
+1. **Frontend setup:**
+
+```bash
+cd front
+npm install           # Install dependencies
+npm start            # Start development server
+```
+
+1. **View all available commands:**
+
+```bash
 make help
 ```
 
-## Tech stack
+## 🏗️ Architecture
 
-* Back → Golang (Gin). Expose a simple REST API
-* Front → React + Material UI. UI for listing request inboxs and requests made to an inbox.
-* IaC → Terraform (AWS)
+### Technology Stack
 
-## API doc
+- **Backend**: Go 1.24+ with Gin web framework
+- **Frontend**: React 18 with TypeScript and Material-UI
+- **Database**: BadgerDB (embedded) for local development, DynamoDB for production
+- **Infrastructure**: Terraform on AWS (Lambda, API Gateway, S3, CloudFront)
+- **Authentication**: JWT with OAuth2 (GitHub, Google)
+- **Monitoring**: PostHog analytics
 
-Check our [OpenAPI 3.1](https://github.com/jesusnoseq/request-inbox/blob/main/docs/openapi.yaml) specification
+### Deployment
 
-## Basic repository structure
+- **Development**: Local Docker containers
+- **Production**: Serverless AWS infrastructure with CI/CD via GitHub Actions
 
+## 📁 Project Structure
+
+```text
+request-inbox/
+├── 📂 .github/workflows/     # CI/CD pipelines (GitHub Actions)
+├── 📂 api/                   # Backend application (Go)
+│   ├── 📂 cmd/              # Application entry points
+│   ├── 📂 pkg/              # Shared packages and business logic
+│   │   ├── 📂 handler/      # HTTP request handlers
+│   │   ├── 📂 model/        # Data models and validation
+│   │   ├── 📂 database/     # Database abstraction layer
+│   │   ├── 📂 login/        # Authentication & authorization
+│   │   └── 📂 route/        # API route definitions
+│   ├── go.mod               # Go module dependencies
+│   └── air.toml             # Hot reload configuration
+├── 📂 front/                 # Frontend application (React + TypeScript)
+│   ├── 📂 src/              # Source code
+│   │   ├── 📂 components/   # Reusable UI components
+│   │   ├── 📂 pages/        # Application pages
+│   │   ├── 📂 services/     # API client services
+│   │   └── 📂 types/        # TypeScript type definitions
+│   ├── 📂 public/           # Static assets
+│   ├── package.json         # Node.js dependencies
+│   └── tsconfig.json        # TypeScript configuration
+├── 📂 deploy/                # Infrastructure as Code (Terraform)
+│   ├── back.tf              # Backend infrastructure
+│   ├── front.tf             # Frontend infrastructure
+│   ├── cert.tf              # SSL certificates
+│   └── variables.tf         # Configuration variables
+├── 📂 docs/                  # Documentation
+│   └── openapi.yaml         # API specification (OpenAPI 3.1)
+├── docker-compose-local.yml  # Local development environment
+├── Dockerfile-api           # Backend container definition
+├── Dockerfile-front         # Frontend container definition
+├── Makefile                 # Development commands
+└── README.md                # This file
 ```
-request-inbox
-├─ .github/workflows → contains pipelines to execute, build and deploy applications
-├─ docs → contains documentation related files
-├─ front → frontend application
-│  ├─ src → source code
-│  ├─ public → static assets
-│  ├─ tsconfig.json → typescript configuration
-│  └─ package.json → frontend dependencies
-├─ back → backend application
-│  ├─ cmd → entry points for go application
-│  ├─ pkg → shared packages
-│  ├─ .golangci.yaml → golang linter configuration
-│  └─ go.mod → backend dependencies
-├─ deploy → terraform code to deploy infrastructure
-│  ├─ .tflint.hlc → tflint linter configuration
-│  ├─ back.tf → backend infra
-│  ├─ cert → certificates related infra
-│  ├─ front → frontend related infra
-│  └─ variables.tf → varaibles related to the deployment to customize
-├─ Makefile → contains commands for back and front applications
-├─ docker-compose.yml → run the working environment of the application
-└── Readme.md → this file. Contains basic documentation about the project
+
+## 📚 API Documentation
+
+Our REST API is fully documented using OpenAPI 3.1 specification:
+
+- **Online**: [API Documentation](https://request-inbox.com/docs)
+- **Source**: [OpenAPI YAML](./docs/openapi.yaml)
+
+### Base URLs
+
+- **Production**: `https://api.request-inbox.com/api/v1`
+- **Local Development**: `http://localhost:8080/api/v1`
+
+## 🛠️ Development
+
+### Available Make Commands
+
+```bash
+# Backend
+make install             # Download Go dependencies
+make build-api           # Build API binary
+make run-api             # Run API server
+make run-api-hot         # Run API with hot reloading
+make test                # Run backend tests
+make lint                # Run Go linter
+make fmt                 # Format Go code
+
+# Frontend
+make install-web        # Install Node.js dependencies
+make run-web            # Start development server
+make build-web          # Build for production
+
+# Infrastructure
+make deploy             # Deploy to AWS
+make lint-deploy        # Validate Terraform configuration
+
+# Tools
+make download-tools     # Install development tools
+make help               # Show all commands
 ```
 
-## Features
+### Environment Variables
 
-* Create, list and delete inboxes
-* Endpoint that collects request
-* Change respose header and body
-* List request of an inbox
-* Remove request of an inbox
-* Request body viewer
-* Light and dark themes
-* Open API documentation
-* Inbox search
-* Request auto refresh
-* Users & Authentication
-* Private inboxes
-* API keys
+For local development, create `.env.development` in the `api/` directory:
 
-## TODO
+```bash
+# Database
+DB_ENGINE=embedded
 
-* Request on response
-  * Measure time
-* Request test
-* Response time
-* Dynamic response
-* Response conditions
-* File viewer
-* Limits
-  * Request
-  * Inbox
-  * Refresh time
-* Alerts
-* Export request
-* Export & import inbox
+# Server
+API_HTTP_PORT=8080
+API_MODE=server
+
+# CORS
+CORS_ALLOW_ORIGINS=http://localhost:3000
+
+# Authentication (optional for local development)
+LOGIN_GITHUB_CLIENT_ID=your_github_client_id
+LOGIN_GITHUB_CLIENT_SECRET=your_github_client_secret
+LOGIN_GOOGLE_CLIENT_ID=your_google_client_id
+LOGIN_GOOGLE_CLIENT_SECRET=your_google_client_secret
+JWT_SECRET=your_jwt_secret
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feat/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow Go best practices and run `make lint` and `make test`
+- Write tests for new functionality
+- Update documentation for API changes
+- Use conventional commit messages
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## 🗺️ Roadmap
+
+### Planned Features
+
+- **Performance**: Response time analytics
+- **Testing**: Request testing capabilities
+- **Limits**: Configurable request and inbox limits
+- **Alerts**: Notification system for new requests
+- **Export**: Request data export functionality
+- **Import/Export**: Inbox configuration backup and restore
+
+### Future Enhancements
+
+- WebSocket support for real-time updates
+- Custom domain support for inboxes
+- Advanced filtering and search
+- Request replay functionality
+- Performance monitoring and metrics
+
+---
+
+**Request Inbox** - Simplifying HTTP request testing and debugging 🚀
