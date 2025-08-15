@@ -135,7 +135,7 @@ request-inbox/
 
 ## 📚 API Documentation
 
-Our REST API is fully documented using OpenAPI 3.1 specification:
+Our REST API is documented using OpenAPI 3.1 specification:
 
 - **Online**: [API Documentation](https://request-inbox.com/docs)
 - **Source**: [OpenAPI YAML](./docs/openapi.yaml)
@@ -145,31 +145,17 @@ Our REST API is fully documented using OpenAPI 3.1 specification:
 - **Production**: `https://api.request-inbox.com/api/v1`
 - **Local Development**: `http://localhost:8080/api/v1`
 
+## 📄 Template Docs
+
+Responses can work as golang templates is the response is mark as dynamic.
+
+[Template documentation](https://request-inbox.com/docs)
+
 ## 🛠️ Development
 
 ### Available Make Commands
 
 ```bash
-# Backend
-make install             # Download Go dependencies
-make build-api           # Build API binary
-make run-api             # Run API server
-make run-api-hot         # Run API with hot reloading
-make test                # Run backend tests
-make lint                # Run Go linter
-make fmt                 # Format Go code
-
-# Frontend
-make install-web        # Install Node.js dependencies
-make run-web            # Start development server
-make build-web          # Build for production
-
-# Infrastructure
-make deploy             # Deploy to AWS
-make lint-deploy        # Validate Terraform configuration
-
-# Tools
-make download-tools     # Install development tools
 make help               # Show all commands
 ```
 

@@ -16,11 +16,11 @@ const UsersManualPage: React.FC = () => {
                 </Typography>
                 <Typography variant="body1" component="p">
                     Here you will find instructions on how to use each feature of our application.
-                    This is a work in progress so forgive me for the lack of completeness.
+                    This is a work in progress, so please forgive the lack of completeness.
                 </Typography>
 
                 <Typography variant="body1" component="p">
-                    Also, you can check our API docs for more detailed technical information and integration guidelines
+                    You can also check our API docs for more detailed technical information and integration guidelines.
                 </Typography>
 
 
@@ -35,7 +35,7 @@ const UsersManualPage: React.FC = () => {
 
                 <Accordion sx={{ maxWidth: 'md' }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                        <Typography variant="h5" component="h3" >Core concepts</Typography>
+                        <Typography variant="h5" component="h3" >Core Concepts</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <List>
@@ -90,11 +90,11 @@ const UsersManualPage: React.FC = () => {
 
                 <Accordion sx={{ maxWidth: 'md' }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                        <Typography variant="h5" component="h3" >Anonymous, Public, Private inboxes</Typography>
+                        <Typography variant="h5" component="h3" >Anonymous, Public and Private Inboxes</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography component="p">
-                            The application provides three types of inboxes; Anonymous, Public and Private. Each with distinct permissions for managing access to captured requests.
+                            The application provides three types of inboxes: Anonymous, Public and Private. Each has distinct permissions for managing access to captured requests.
                         </Typography>
                         <List>
                             <ListItem>
@@ -107,11 +107,11 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            An Anonymous Inbox is a type of Public Inbox with open access. Created by unregistered users.
+                                            An Anonymous Inbox is a type of Public Inbox with open access, created by unregistered users.
                                             Anyone can read, modify, or delete the contents of an Anonymous Inbox, making it completely open.
                                             Anonymous Inboxes are not listed within the web interface or API, making them accessible only via a direct link to their unique URL.
-                                            This makes them suitable for temporary testing needs where access control and visibility are not required,
-                                            but it's important to avoid using Anonymous Inboxes for sensitive or persistent data due to their lack of protection.
+                                            This makes them suitable for temporary testing needs where access control and visibility are not required.
+                                            However, it's important to avoid using Anonymous Inboxes for sensitive or persistent data due to their lack of protection.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -153,34 +153,34 @@ const UsersManualPage: React.FC = () => {
 
                 <Accordion sx={{ maxWidth: 'md' }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                        <Typography variant="h5" component="h3" >Dynamic responses</Typography>
+                        <Typography variant="h5" component="h3" >Dynamic Responses</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography component="p">
                             Dynamic responses can be activated for each inbox individually.
-                            This feature make that for each request sent to the inbox URL a specific response will be calculated by rendering templates.
-                            Once enabled, headers values and response body are threated as templates.
+                            This feature ensures that for each request sent to the inbox URL, a specific response will be calculated by rendering templates.
+                            Once enabled, header values and response body are treated as templates.
                         </Typography>
                         <Typography component="p">
-                            Status code template is a optional special field that can be filled once dynamic response is activated.
-                            It allows setup a template to calculate the status code of a response. The template should output an integer between 100 and 999.
-                            If the template renders a number successfully, it will rewrite the status code.
-                            Status code value will be use as fallback when renders status code template does not result in a valid HTTP status code number
+                            The status code template is an optional special field that can be filled once dynamic response is activated.
+                            It allows you to set up a template to calculate the status code of a response. The template should output an integer between 100 and 999.
+                            If the template renders a number successfully, it will override the status code.
+                            The status code value will be used as a fallback when rendering the status code template does not result in a valid HTTP status code number.
                         </Typography>
                         <Typography component="p">
-                            The rendering order of the response templates is: status code template, body and headers.
-                            In this way, for example, headers and body could use the result of rendering the status code template in status code field and headers cloud use a rendered response body.
+                            The rendering order of the response templates is: status code template, body, and headers.
+                            In this way, for example, headers and body can use the result of rendering the status code template in the status code field, and headers can use a rendered response body.
                         </Typography>
                         <Typography component="p">
-                            Request inbox templates are based on <ExternalLink href="https://pkg.go.dev/text/template">Golang templates</ExternalLink>.
-                            The documentation is wide and this manual will provide some examples.
+                            Request Inbox templates are based on <ExternalLink href="https://pkg.go.dev/text/template">Golang templates</ExternalLink>.
+                            The documentation is comprehensive, and this manual will provide some examples.
                         </Typography>
                         <Typography>
-                            Inbox and Request are variables available to use, both refers to the current inbox and request and have the same structure as they have in the REST API.
+                            Inbox and Request are variables available for use. Both refer to the current inbox and request and have the same structure as they have in the REST API.
                         </Typography>
                         <Typography>
-                            In adition to <ExternalLink href="https://pkg.go.dev/text/template">Golang templates</ExternalLink> features,
-                            the following functions have been implemented
+                            In addition to <ExternalLink href="https://pkg.go.dev/text/template">Golang templates</ExternalLink> features,
+                            the following functions have been implemented:
                         </Typography>
                         <List>
                             <ListItem>
@@ -193,8 +193,8 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Search values in a json document with a GJSON Path.
-                                            If the path is not found then the value is  <code>&lt;no value&gt;</code>
+                                            Searches for values in a JSON document with a GJSON Path.
+                                            If the path is not found, then the value is <code>&lt;no value&gt;</code>
                                         </Typography>
                                         <Typography sx={{ mt: 0.1 }}>
                                             Example
@@ -206,7 +206,7 @@ const UsersManualPage: React.FC = () => {
                                         </Paper >
 
                                         <Typography>
-                                            For more information about GJSON Path syntax expresions check <ExternalLink href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md">gjsonpath sintax</ExternalLink>
+                                            For more information about GJSON Path syntax expressions, check <ExternalLink href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md">GJSON Path syntax</ExternalLink>
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -221,7 +221,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Same as GJSON Path but it provides a way to set a fallback value
+                                            Same as GJSON Path, but it provides a way to set a fallback value
                                         </Typography>
                                         <Typography sx={{ mt: 0.1 }}>
                                             Example
@@ -252,7 +252,7 @@ const UsersManualPage: React.FC = () => {
                                         </Typography>
                                         <Paper >
                                             <code>
-                                                {'{{ toUpper "this will be in upper case"}}'}
+                                                {'{{ toUpper "this will be in uppercase"}}'}
                                             </code>
                                         </Paper >
 
@@ -278,7 +278,7 @@ const UsersManualPage: React.FC = () => {
                                         </Typography>
                                         <Paper >
                                             <code>
-                                                {'{{ toLower "THIS WILL BE IN LOWER CASE"}}'}
+                                                {'{{ toLower "THIS WILL BE IN LOWERCASE"}}'}
                                             </code>
                                         </Paper >
 
@@ -329,7 +329,7 @@ const UsersManualPage: React.FC = () => {
                                         </Typography>
                                         <Paper >
                                             <code>
-                                                {'{{ trimSpace " a string with spaces at the beginning and at end  " }}'}
+                                                {'{{ trimSpace " a string with spaces at the beginning and end  " }}'}
                                             </code>
                                         </Paper >
 
@@ -347,7 +347,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Get the current timestamp in seconds
+                                            Gets the current timestamp in seconds
                                         </Typography>
                                         <Typography sx={{ mt: 0.1 }}>
                                             Example
@@ -372,7 +372,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Get the current date and time with 2006-01-02 15:04:05 format
+                                            Gets the current date and time in 2006-01-02 15:04:05 format
                                         </Typography>
                                         <Typography sx={{ mt: 0.1 }}>
                                             Example
@@ -397,7 +397,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Get the current date with 2006-01-02 format
+                                            Gets the current date in 2006-01-02 format
                                         </Typography>
                                         <Typography sx={{ mt: 0.1 }}>
                                             Example
@@ -522,7 +522,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Generates a random UUID as string
+                                            Generates a random UUID as a string
                                         </Typography>
                                         <Typography sx={{ mt: 0.1 }}>
                                             Example
@@ -547,7 +547,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Sum two integers values
+                                            Sums two integer values
                                         </Typography>
                                         <Typography sx={{ mt: 0.1 }}>
                                             Example
@@ -572,7 +572,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            It performs subtraction on two integer values
+                                            Performs subtraction on two integer values
                                         </Typography>
                                         <Typography sx={{ mt: 0.1 }}>
                                             Example
@@ -598,7 +598,7 @@ const UsersManualPage: React.FC = () => {
                                             color="text.primary"
                                         >
                                             Converts a string representing an integer into an actual integer value.
-                                            It if fails return 0 as intenger
+                                            If it fails, returns 0 as an integer
                                         </Typography>
                                         <Typography sx={{ mt: 0.1 }}>
                                             Example
