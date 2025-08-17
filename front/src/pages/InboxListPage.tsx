@@ -87,7 +87,10 @@ const InboxListPage: React.FC = () => {
             </Box>
 
             <Grid2 container spacing={2}>
-                {inboxes.filter((inbox) => inbox.ID.includes(filter)).map((inbox) => (
+                {inboxes.filter((inbox) => 
+                    inbox.ID.toLowerCase().includes(filter.toLowerCase()) || 
+                    inbox.Name.toLowerCase().includes(filter.toLowerCase())
+                ).map((inbox) => (
                     <Grid2 size={{ xs: 12, sm: 6, md: 4, lg: 4 }} key={inbox.ID}>
                         <InboxListItem inbox={inbox} onDelete={handleDeleteInbox} />
                     </Grid2>
