@@ -83,7 +83,7 @@ make help
 
 ### Technology Stack
 
-- **Backend**: Go 1.24+ with Gin web framework
+- **Backend**: Go 1.24+ with Gin web framework. Can also work as an AWS lambda.
 - **Frontend**: React 18 with TypeScript and Material-UI
 - **Database**: BadgerDB (embedded) for local development, DynamoDB for production
 - **Infrastructure**: Terraform on AWS (Lambda, API Gateway, S3, CloudFront)
