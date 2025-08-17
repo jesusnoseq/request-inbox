@@ -29,7 +29,7 @@ const InboxListItem: React.FC<InboxListItemProps> = ({ inbox, onDelete }) => {
                     {inbox.ID}
                 </Typography>
                 {inbox.Name !== inbox.ID &&
-                    <Typography variant="h3" fontSize={'2rem'} sx={{
+                    <Typography variant="h3" fontSize={'1.2rem'} sx={{
                         overflowWrap: 'break-word',
                         wordBreak: 'break-word'
                     }}>
