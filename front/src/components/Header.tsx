@@ -33,7 +33,7 @@ export default function Header() {
             <Toolbar>
 
                 <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-                    <Link to="/" component={LinkDOM} color="inherit" underline="none">
+                    <Link to="/" component={LinkDOM} color="inherit" underline="none" sx={{ display: 'flex', alignItems: 'center' }}>
                         <img src="/logo128.png" alt="Request Inbox logo" style={{ marginRight: '16px', height: '30px' }} />
                         Request Inbox
                     </Link>
