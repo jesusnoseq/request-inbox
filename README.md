@@ -205,21 +205,15 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ### Planned Features
 
-- **Performance**: Response time analytics
-- **Testing**: Request testing capabilities
-- **Limits**: Configurable request and inbox limits
 - **Alerts**: Notification system for new requests
-- **Export**: Request data export functionality
-- **Import/Export**: Inbox configuration backup and restore
+- **Import/Export**: Inbox configuration backup and restore fromt github
+- **Testing**: Request testing capabilities. Mark request as Pass or Fail
+- **Limits**: Configurable request and inbox limits
 
 ### Future Enhancements
 
 - WebSocket support for real-time updates
 - Custom domain support for inboxes
 - Advanced filtering and search
-- Request replay functionality
+- Request passthrough
 - Performance monitoring and metrics
-
----
-
-**Request Inbox** - Simplifying HTTP request testing and debugging 🚀
