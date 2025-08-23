@@ -26,11 +26,11 @@ const TextInlineEditor: React.FC<TextInlineEditorProps> = ({ initialValue, label
     };
 
     const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(event.target.value.trim());
+        setValue(event.target.value);
     };
 
     useEffect(() => {
-        setError(value === '');
+        setError(value.trim() === '');
     }, [value]);
 
     const handleSave = () => {

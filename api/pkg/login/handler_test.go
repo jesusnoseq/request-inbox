@@ -76,7 +76,7 @@ func TestHandleLogout(t *testing.T) {
 	}
 
 	cookie := cookies[0]
-	t_util.AssertStringEquals(t, cookie, "auth_token=; Path=/; Max-Age=0; HttpOnly; Secure")
+	t_util.AssertStringEquals(t, cookie, "auth_token=; Path=/; Domain=request-inbox.com; Max-Age=0; HttpOnly; Secure")
 }
 
 // Based on https://www.devgem.io/posts/testing-oauth2-client-with-a-mock-tokenurl-endpoint

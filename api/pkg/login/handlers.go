@@ -191,6 +191,7 @@ func (lh *LoginHandler) HandleLogout(c *gin.Context) {
 		Name:     AuthTokenCookieName,
 		Value:    "",
 		Path:     "/",
+		Domain:   config.GetString(config.AuthCookieDomain),
 		HttpOnly: true,
 		Secure:   true,
 		MaxAge:   -1, // Deletes the cookie
