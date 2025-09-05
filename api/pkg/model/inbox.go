@@ -50,9 +50,9 @@ type Request struct {
 type PassThrough struct {
 	Enabled   bool              `dynamodbav:"enabled"`
 	IsDynamic bool              `dynamodbav:"isDynamic"`
+	PrefixURL string            `dynamodbav:"prefixURL"`
+	ToURL     string            `dynamodbav:"toURL"`
 	Method    string            `dynamodbav:"method"`
-	To        string            `dynamodbav:"to"`
-	PrefixURL string            `dynamodbav:"prefixUrl"`
 	Headers   map[string]string `dynamodbav:"headers"`
 	Body      string            `dynamodbav:"body"`
 }
@@ -72,5 +72,17 @@ func NewInbox() Inbox {
 		ObfuscateHeaderFields: []string{},
 		IsPrivate:             false,
 		OwnerID:               uuid.UUID{},
+	}
+}
+
+func NewPassThrough() PassThrough {
+	return PassThrough{
+		Enabled:   false,
+		IsDynamic: false,
+		Method:    "",
+		ToURL:     "",
+		PrefixURL: "",
+		Headers:   map[string]string{},
+		Body:      "",
 	}
 }
