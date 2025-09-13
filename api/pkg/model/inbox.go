@@ -34,17 +34,20 @@ type Response struct {
 	IsDynamic    bool
 }
 
+type PassThroughResponse Response
+
 type Request struct {
-	ID            int
-	Timestamp     int64 `dynamodbav:"unixTimestamp"`
-	URI           string
-	Host          string
-	RemoteAddr    string
-	Protocol      string
-	Headers       map[string][]string
-	Method        string `dynamodbav:"httpMethod"`
-	ContentLength int64
-	Body          string
+	ID                 int
+	Timestamp          int64 `dynamodbav:"unixTimestamp"`
+	URI                string
+	Host               string
+	RemoteAddr         string
+	Protocol           string
+	Headers            map[string][]string
+	Method             string `dynamodbav:"httpMethod"`
+	ContentLength      int64
+	Body               string
+	PassThroughResults []PassThroughResponse
 }
 
 type PassThrough struct {
