@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Paper, Grid2 } from '@mui/material';
+import { Typography, Paper, Grid } from '@mui/material';
 import CopyToClipboardButton from './CopyToClipboardButton';
 
 interface TextBodyViewerProps {
@@ -10,19 +10,19 @@ interface TextBodyViewerProps {
 const TextBodyViewer: React.FC<TextBodyViewerProps> = ({ data, title }) => {
     const body = JSON.stringify(data, null, 2);
     return (
-        <Grid2 container spacing={2}>
+        <Grid container spacing={2}>
             <Paper sx={{ p: 2 }}>
-                <Grid2 container spacing={2}>
-                    <Grid2 size={10}>
+                <Grid container spacing={2}>
+                    <Grid size={10}>
                         <Typography variant="h6">{title}</Typography>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <CopyToClipboardButton textToCopy={body} />
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
                 <pre>{body}</pre>
             </Paper>
-        </Grid2>
+        </Grid>
     );
 };
 

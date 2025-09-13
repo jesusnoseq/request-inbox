@@ -13,7 +13,7 @@ import {
     MenuItem,
     FormControl,
     InputLabel,
-    Grid2,
+    Grid,
     Typography,
     Alert,
     Box,
@@ -154,8 +154,8 @@ export default function APIKeyManager() {
                 <Typography variant="h6" gutterBottom>
                     Request new API key
                 </Typography>
-                <Grid2 container spacing={2} alignItems="flex-end">
-                    <Grid2 size={7}>
+                <Grid container spacing={2} alignItems="flex-end">
+                    <Grid size={7}>
                         <TextField
                             fullWidth
                             size='small'
@@ -163,8 +163,8 @@ export default function APIKeyManager() {
                             value={newKeyDescription}
                             onChange={(e) => setNewKeyDescription(e.target.value)}
                         />
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <FormControl fullWidth>
                             <InputLabel>Expiration</InputLabel>
                             <Select
@@ -180,8 +180,8 @@ export default function APIKeyManager() {
                                 <MenuItem value="No expiration">No expiration</MenuItem>
                             </Select>
                         </FormControl>
-                    </Grid2>
-                    <Grid2 size={3}>
+                    </Grid>
+                    <Grid size={3}>
                         <LoadingButton
                             variant="contained"
                             color="primary"
@@ -192,8 +192,8 @@ export default function APIKeyManager() {
                         >
                             Create API Key
                         </LoadingButton>
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
             </Paper>
 
             <TableContainer component={Paper}>
