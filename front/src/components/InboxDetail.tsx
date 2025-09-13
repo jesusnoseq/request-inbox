@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Inbox, InboxResponse } from '../types/inbox';
+import { Inbox, InboxResponse, InboxCallback } from '../types/inbox';
 import { Typography, Paper, Box } from '@mui/material';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -8,6 +8,7 @@ import { buildInboxURL, updateInbox } from '../services/inbox';
 import ResponseInlineEditor from '../components/ResponseInlineEditor';
 import TextInlineEditor from '../components/TextInlineEditor';
 import InboxVisibilityToggle from '../components/InboxVisibilityToggle';
+import CallbackManager from '../components/CallbackManager';
 import { useUser } from '../context/UserContext';
 
 dayjs.extend(localizedFormat);
@@ -49,6 +50,15 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
         setInbox(resp);
     }
 
+    const handleSaveCallbacks = async (callbacks: InboxCallback[]) => {
+        const updatedInbox = {
+            ...inbox,
+            Callback: callbacks
+        };
+        const resp = await updateInbox(updatedInbox)
+        setInbox(resp);
+    };
+
     const canEdit = inbox.OwnerID === '00000000-0000-0000-0000-000000000000' || (isLoggedIn() && inbox.OwnerID === user.ID)
     const canChangeVisibility = isLoggedIn() && inbox.OwnerID === user.ID
 
@@ -72,6 +82,12 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
             <HighlightURL url={inboxURL} />
 
             <ResponseInlineEditor response={inbox.Response} onSave={handleSaveResponse} readonly={!canEdit} />
+
+            <CallbackManager 
+                callbacks={inbox.Callbacks || []} 
+                onCallbacksChange={handleSaveCallbacks} 
+                readonly={!canEdit} 
+            />
         </Paper>
     );
 };

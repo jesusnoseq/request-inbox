@@ -12,6 +12,24 @@ export type Inbox = {
     ObfuscateHeaderFields: string[];
     IsPrivate: boolean;
     OwnerID: string;
+    Callbacks: InboxCallback[];
+}
+
+export type InboxCallback = {
+    IsEnabled: boolean;
+    IsDynamic: boolean;
+    ToURL: string;
+    Method: string;
+    Headers: Record<string, string>;
+    Body: string;
+}
+
+export type CallbackResponse = {
+    Code: number;
+    CodeTemplate: string;
+    Body: string;
+    Headers: Record<string, string>;
+    IsDynamic: boolean;
 }
 
 export type InboxRequest = {
@@ -25,6 +43,7 @@ export type InboxRequest = {
     Protocol: string;
     Method: string;
     ContentLength: number;
+    CallbackResponses?: CallbackResponse[];
 }
 
 export type InboxResponse = {
