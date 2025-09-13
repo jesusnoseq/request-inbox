@@ -51,13 +51,13 @@ type Request struct {
 }
 
 type Callback struct {
-	IsEnabled bool              `dynamodbav:"enabled"`
-	IsDynamic bool              `dynamodbav:"isDynamic"`
-	PrefixURL string            `dynamodbav:"prefixURL"`
-	ToURL     string            `dynamodbav:"toURL"`
-	Method    string            `dynamodbav:"method"`
-	Headers   map[string]string `dynamodbav:"headers"`
-	Body      string            `dynamodbav:"body"`
+	IsEnabled bool `dynamodbav:"enabled"`
+	IsDynamic bool `dynamodbav:"isDynamic"`
+	// PrefixURL string            `dynamodbav:"prefixURL"`
+	ToURL   string            `dynamodbav:"toURL"`
+	Method  string            `dynamodbav:"method"`
+	Headers map[string]string `dynamodbav:"headers"`
+	Body    string            `dynamodbav:"body"`
 }
 
 func NewInbox() Inbox {
@@ -85,8 +85,8 @@ func NewCallback() Callback {
 		IsDynamic: false,
 		Method:    "",
 		ToURL:     "",
-		PrefixURL: "",
-		Headers:   map[string]string{},
-		Body:      "",
+		// PrefixURL: "",
+		Headers: map[string]string{},
+		Body:    "",
 	}
 }

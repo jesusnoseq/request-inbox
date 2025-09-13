@@ -51,8 +51,7 @@ func GenerateInbox() Inbox {
 			{
 				IsEnabled: true,
 				IsDynamic: false,
-				PrefixURL: "https://",
-				ToURL:     "example.com/webhook",
+				ToURL:     "http://example.com/webhook",
 				Method:    "POST",
 				Headers: map[string]string{
 					"Content-Type": "application/json",

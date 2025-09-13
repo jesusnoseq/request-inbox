@@ -18,6 +18,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/instrumentation/event"
 	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
+	"github.com/jesusnoseq/request-inbox/pkg/model/validation"
 )
 
 type InboxHandler struct {
@@ -38,6 +39,12 @@ func (ih *InboxHandler) CreateInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox", err, http.StatusBadRequest))
 		return
 	}
+
+	if valid, err := validation.IsValidInbox(newInbox); !valid {
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusBadRequest))
+		return
+	}
+
 	if !login.IsUserLoggedIn(c) && newInbox.IsPrivate {
 		err := fmt.Errorf("you must be logged in to create a private inbox")
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusUnauthorized))
@@ -189,6 +196,11 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 	var updatedInbox model.Inbox
 	if err := c.ShouldBindJSON(&updatedInbox); err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("inbox not valid", err, http.StatusBadRequest))
+		return
+	}
+
+	if valid, err := validation.IsValidInbox(updatedInbox); !valid {
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusBadRequest))
 		return
 	}
 
