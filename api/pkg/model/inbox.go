@@ -16,14 +16,14 @@ const (
 
 type Inbox struct {
 	ID                    uuid.UUID
-	Name                  string      `dynamodbav:"alias"`
-	Timestamp             int64       `dynamodbav:"unixTimestamp"`
-	Response              Response    `dynamodbav:"resp"`
-	Requests              []Request   `dynamodbav:"req"`
-	ObfuscateHeaderFields []string    `dynamodbav:"ofuscate"`
-	OwnerID               uuid.UUID   `dynamodbav:"OwnerID"`
-	IsPrivate             bool        `dynamodbav:"IsPrivate"`
-	PassThrough           PassThrough `dynamodbav:"PassThrough"`
+	Name                  string     `dynamodbav:"alias"`
+	Timestamp             int64      `dynamodbav:"unixTimestamp"`
+	Response              Response   `dynamodbav:"resp"`
+	Requests              []Request  `dynamodbav:"req"`
+	ObfuscateHeaderFields []string   `dynamodbav:"ofuscate"`
+	Callback              []Callback `dynamodbav:"Callback"`
+	OwnerID               uuid.UUID  `dynamodbav:"OwnerID"`
+	IsPrivate             bool       `dynamodbav:"IsPrivate"`
 }
 
 type Response struct {
@@ -34,24 +34,24 @@ type Response struct {
 	IsDynamic    bool
 }
 
-type PassThroughResponse Response
+type CallbackResponse Response
 
 type Request struct {
-	ID                 int
-	Timestamp          int64 `dynamodbav:"unixTimestamp"`
-	URI                string
-	Host               string
-	RemoteAddr         string
-	Protocol           string
-	Headers            map[string][]string
-	Method             string `dynamodbav:"httpMethod"`
-	ContentLength      int64
-	Body               string
-	PassThroughResults []PassThroughResponse
+	ID                int
+	Timestamp         int64 `dynamodbav:"unixTimestamp"`
+	URI               string
+	Host              string
+	RemoteAddr        string
+	Protocol          string
+	Headers           map[string][]string
+	Method            string `dynamodbav:"httpMethod"`
+	ContentLength     int64
+	Body              string
+	CallbackResponses []CallbackResponse
 }
 
-type PassThrough struct {
-	Enabled   bool              `dynamodbav:"enabled"`
+type Callback struct {
+	IsEnabled bool              `dynamodbav:"enabled"`
 	IsDynamic bool              `dynamodbav:"isDynamic"`
 	PrefixURL string            `dynamodbav:"prefixURL"`
 	ToURL     string            `dynamodbav:"toURL"`
@@ -73,14 +73,15 @@ func NewInbox() Inbox {
 		},
 		Requests:              []Request{},
 		ObfuscateHeaderFields: []string{},
+		Callback:              []Callback{},
 		IsPrivate:             false,
 		OwnerID:               uuid.UUID{},
 	}
 }
 
-func NewPassThrough() PassThrough {
-	return PassThrough{
-		Enabled:   false,
+func NewCallback() Callback {
+	return Callback{
+		IsEnabled: false,
 		IsDynamic: false,
 		Method:    "",
 		ToURL:     "",

@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
@@ -16,6 +17,41 @@ type ValidationError struct {
 
 func (e *ValidationError) Error() string {
 	return e.message
+}
+
+func IsValidInbox(i model.Inbox) (bool, error) {
+	if i.ID == uuid.Nil {
+		return false, &ValidationError{message: "Inbox ID cannot be empty"}
+	}
+	if i.Name == "" {
+		return false, &ValidationError{message: "Inbox Name cannot be empty"}
+	}
+	if i.Timestamp == 0 {
+		return false, &ValidationError{message: "Inbox Timestamp cannot be empty"}
+	}
+	if _, err := IsHTTPStatusCode(i.Response.Code); err != nil {
+		return false, err
+	}
+	if len(i.Callback) > config.GetInt(config.MaxCallbacksKey) {
+		return false, &ValidationError{message: fmt.Sprintf("Inbox cannot have more than %d callbacks", config.GetInt(config.MaxCallbacksKey))}
+	}
+	for _, cb := range i.Callback {
+		if valid, err := IsValidCallback(cb); !valid {
+			return false, err
+		}
+	}
+
+	return true, nil
+}
+
+func IsValidCallback(cb model.Callback) (bool, error) {
+	if !cb.IsEnabled {
+		return true, nil
+	}
+	if _, err := IsValidCallbackURL(cb.ToURL); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func IsHTTPStatusCode(code int) (bool, error) {
@@ -32,26 +68,26 @@ func IsAPIKey(code string) (bool, error) {
 	return true, nil
 }
 
-func IsValidPassThroughURL(urlStr string) (bool, error) {
+func IsValidCallbackURL(urlStr string) (bool, error) {
 	if urlStr == "" {
-		return false, &ValidationError{message: "Pass-through URL cannot be empty"}
+		return false, &ValidationError{message: "Callback URL cannot be empty"}
 	}
 
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
-		return false, &ValidationError{message: "Pass-through URL is not a valid URL"}
+		return false, &ValidationError{message: "Callback URL is not a valid URL"}
 	}
 
 	if parsedURL.Scheme == "" || parsedURL.Host == "" {
-		return false, &ValidationError{message: "Pass-through URL is not a valid URL"}
+		return false, &ValidationError{message: "Callback URL is not a valid URL"}
 	}
 
 	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
-		return false, &ValidationError{message: "Pass-through URL must use HTTP or HTTPS scheme"}
+		return false, &ValidationError{message: "Callback URL must use HTTP or HTTPS scheme"}
 	}
 
 	if isSelfURL(parsedURL.Host) {
-		return false, &ValidationError{message: "Pass-through URL cannot point to the same service to prevent infinite loops"}
+		return false, &ValidationError{message: "Callback URL cannot point to the same service to prevent infinite loops"}
 	}
 
 	return true, nil

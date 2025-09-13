@@ -2,6 +2,8 @@ package validation
 
 import (
 	"testing"
+
+	"github.com/jesusnoseq/request-inbox/pkg/config"
 )
 
 func TestIsHTTPStatusCode(t *testing.T) {
@@ -54,7 +56,9 @@ func TestIsHTTPStatusCode(t *testing.T) {
 	}
 }
 
-func TestIsValidPassThroughURL(t *testing.T) {
+func TestIsValidCallbackURL(t *testing.T) {
+	config.LoadConfig(config.Test)
+
 	tests := []struct {
 		name        string
 		url         string
@@ -65,37 +69,37 @@ func TestIsValidPassThroughURL(t *testing.T) {
 			name:        "empty URL",
 			url:         "",
 			expectValid: false,
-			expectError: "Pass-through URL cannot be empty",
+			expectError: "Callback URL cannot be empty",
 		},
 		{
 			name:        "invalid URL",
 			url:         "not-a-url",
 			expectValid: false,
-			expectError: "Pass-through URL is not a valid URL",
+			expectError: "Callback URL is not a valid URL",
 		},
 		{
 			name:        "invalid scheme - ftp",
 			url:         "ftp://example.com",
 			expectValid: false,
-			expectError: "Pass-through URL must use HTTP or HTTPS scheme",
+			expectError: "Callback URL must use HTTP or HTTPS scheme",
 		},
 		{
 			name:        "self URL - service domain",
-			url:         "https://request-inbox.com/webhook",
+			url:         "https://api.request-inbox.com/webhook",
 			expectValid: false,
-			expectError: "Pass-through URL cannot point to the same service to prevent infinite loops",
+			expectError: "Callback URL cannot point to the same service to prevent infinite loops",
 		},
 		{
 			name:        "self URL - localhost",
 			url:         "http://localhost:8080/webhook",
 			expectValid: false,
-			expectError: "Pass-through URL cannot point to the same service to prevent infinite loops",
+			expectError: "Callback URL cannot point to the same service to prevent infinite loops",
 		},
 		{
 			name:        "self URL - loopback IP",
 			url:         "http://127.0.0.1:8080/webhook",
 			expectValid: false,
-			expectError: "Pass-through URL cannot point to the same service to prevent infinite loops",
+			expectError: "Callback URL cannot point to the same service to prevent infinite loops",
 		},
 		{
 			name:        "valid external URL - HTTPS",
@@ -121,7 +125,7 @@ func TestIsValidPassThroughURL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			valid, err := IsValidPassThroughURL(tt.url)
+			valid, err := IsValidCallbackURL(tt.url)
 
 			if tt.expectValid {
 				if !valid {
@@ -145,6 +149,8 @@ func TestIsValidPassThroughURL(t *testing.T) {
 }
 
 func TestIsSelfURL(t *testing.T) {
+	config.LoadConfig(config.Test)
+
 	tests := []struct {
 		name     string
 		host     string
@@ -152,18 +158,13 @@ func TestIsSelfURL(t *testing.T) {
 	}{
 		// Service domains
 		{
-			name:     "request-inbox.com",
-			host:     "request-inbox.com",
-			expected: true,
-		},
-		{
 			name:     "api.request-inbox.com",
 			host:     "api.request-inbox.com",
 			expected: true,
 		},
 		{
 			name:     "case insensitive - uppercase",
-			host:     "REQUEST-INBOX.COM",
+			host:     "API.REQUEST-INBOX.COM",
 			expected: true,
 		},
 		{
