@@ -32,10 +32,10 @@ func IsValidInbox(i model.Inbox) (bool, error) {
 	if _, err := IsHTTPStatusCode(i.Response.Code); err != nil {
 		return false, err
 	}
-	if len(i.Callback) > config.GetInt(config.MaxCallbacksKey) {
+	if len(i.Callbacks) > config.GetInt(config.MaxCallbacksKey) {
 		return false, &ValidationError{message: fmt.Sprintf("Inbox cannot have more than %d callbacks", config.GetInt(config.MaxCallbacksKey))}
 	}
-	for _, cb := range i.Callback {
+	for _, cb := range i.Callbacks {
 		if valid, err := IsValidCallback(cb); !valid {
 			return false, err
 		}

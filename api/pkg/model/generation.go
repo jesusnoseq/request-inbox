@@ -47,7 +47,7 @@ func GenerateInbox() Inbox {
 		},
 		Requests:              []Request{GenerateRequest(1), GenerateRequest(2)},
 		ObfuscateHeaderFields: []string{"Authorization"},
-		Callback: []Callback{
+		Callbacks: []Callback{
 			{
 				IsEnabled: true,
 				IsDynamic: false,
@@ -111,7 +111,7 @@ func CopyInbox(inbox Inbox) Inbox {
 	}
 
 	copy.ObfuscateHeaderFields = collection.CopySlice(inbox.ObfuscateHeaderFields)
-	copy.Callback = collection.CopySlice(inbox.Callback)
+	copy.Callbacks = collection.CopySlice(inbox.Callbacks)
 	return copy
 }
 
