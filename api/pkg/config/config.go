@@ -90,6 +90,8 @@ const (
 	EnablePrintConfigDefault  bool = false
 	EnabledMonitoring         Key  = "ENABLED_MONITORING"
 	EnabledMonitoringDefault  bool = false
+	MaxCallbacksKey           Key  = "MAX_CALLBACKS"
+	MaxCallbacksDefault       int  = 3
 )
 
 func LoadConfig(app App) {
@@ -150,7 +152,7 @@ func setDefaults(app App) {
 	setDefault(EnableListingPublicInbox, EnableListingInboxDefault)
 	setDefault(EnablePrintConfig, EnableListingInboxDefault)
 	setDefault(EnabledMonitoring, EnabledMonitoringDefault)
-
+	setDefault(MaxCallbacksKey, MaxCallbacksDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {
