@@ -27,7 +27,7 @@ import HeadersEditor, { Header, convertRecordToHeaders, convertHeadersToRecord }
 interface CallbackFormProps {
     open: boolean;
     onClose: () => void;
-    onSave: (callback: InboxCallback) => void;
+    onSave: (callback: InboxCallback) => Promise<void>;
     initialCallback?: InboxCallback;
     title?: string;
 }
@@ -53,6 +53,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
     const [callback, setCallback] = useState<InboxCallback>(initialCallback || defaultCallback);
     const [headers, setHeaders] = useState<Header[]>([]);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     useEffect(() => {
         if (initialCallback) {
@@ -63,6 +64,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
             setHeaders([]);
         }
         setErrors({});
+        setIsSubmitting(false);
     }, [initialCallback, open]);
 
     const validateForm = (): boolean => {
@@ -86,14 +88,22 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (validateForm()) {
-            const updatedCallback: InboxCallback = {
-                ...callback,
-                Headers: convertHeadersToRecord(headers)
-            };
-            onSave(updatedCallback);
-            onClose();
+            setIsSubmitting(true);
+            try {
+                const updatedCallback: InboxCallback = {
+                    ...callback,
+                    Headers: convertHeadersToRecord(headers)
+                };
+                await onSave(updatedCallback);
+                onClose();
+            } catch (error) {
+                // Don't close the popup on error - let the user see the error and try again
+                console.error('Failed to save callback:', error);
+            } finally {
+                setIsSubmitting(false);
+            }
         }
     };
 
@@ -101,6 +111,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
         setCallback(initialCallback || defaultCallback);
         setHeaders(convertRecordToHeaders((initialCallback?.Headers) || {}));
         setErrors({});
+        setIsSubmitting(false);
         onClose();
     };
 
@@ -233,8 +244,12 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleCancel}>Cancel</Button>
-                <Button onClick={handleSave} variant="contained">
-                    Save Callback
+                <Button 
+                    onClick={handleSave} 
+                    variant="contained"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? 'Saving...' : 'Save Callback'}
                 </Button>
             </DialogActions>
         </Dialog>

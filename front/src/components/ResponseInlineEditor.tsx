@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InboxResponse } from '../types/inbox';
 import {
-    Container, TextField, Box, FormControl, FormControlLabel, FormGroup, IconButton, Typography, Grid, Button,
-    ButtonGroup, InputAdornment, TextareaAutosize, Switch, Tooltip
+    Container, TextField, Box, FormControl, FormControlLabel, FormGroup, IconButton, Typography, Button,
+    InputAdornment, TextareaAutosize, Switch, Tooltip
 } from '@mui/material';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import DoneIcon from '@mui/icons-material/Done';
-import ClearIcon from '@mui/icons-material/Clear';
 import InfoIcon from '@mui/icons-material/Info';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -107,15 +105,17 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
         <>
             {!editMode &&
                 <Box sx={{ mb: 2 }}>
-                    <Box display="flex" alignItems="center" gap={1}>
-                        Response
+                    <Box display="flex" alignItems="center" gap={1} mb={2}>
+                        <Typography variant="h6">
+                            Response
+                        </Typography>
                         {!readonly &&
                             <IconButton aria-label="edit response" size="small" onClick={enableEditMode}>
                                 <ModeEditIcon fontSize="medium" />
                             </IconButton>
                         }
                     </Box>
-                    <Container>
+                    <Paper variant="outlined" sx={{ p: 2 }}>
                         <Box sx={{ display: 'flex', flexGrow: 1 }}>
                             <Box sx={{ width: "12ch", mr: 5 }}>
                                 <Typography color="textSecondary">
@@ -157,14 +157,19 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                         }
                         <BodyView data={body} />
 
-                    </Container>
+                    </Paper>
                 </Box >
             }
             {
                 editMode &&
-                <Box component="form">
-                    Response
-                    <Container>
+                <Box sx={{ mb: 2 }}>
+                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+                        <Typography variant="h6">
+                            Manage Response
+                        </Typography>
+                    </Box>
+
+                    <Paper variant="outlined" sx={{ p: 2 }}>
                         <FormControl fullWidth sx={{ m: 1 }}>
                             <Box sx={{ display: 'flex', flexGrow: 1 }}>
                                 <TextField
@@ -259,19 +264,24 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                                 </Tooltip>
                             </FormGroup>
                         </FormControl>
+                    </Paper>
 
-
-                        <Grid container justifyContent="flex-end">
-                            <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                <IconButton aria-label="Cancel" size="small" onClick={handleCancel}>
-                                    <ClearIcon fontSize="medium" />
-                                </IconButton>
-                                <IconButton aria-label="Save" size="small" onClick={handleSave} disabled={errors}>
-                                    <DoneIcon fontSize="medium" />
-                                </IconButton>
-                            </ButtonGroup>
-                        </Grid>
-                    </Container>
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button 
+                            onClick={handleCancel}
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            onClick={handleSave} 
+                            variant="contained"
+                            disabled={errors}
+                        >
+                            Save
+                        </Button>
+                    </Box>
                 </Box >
             }
         </>

@@ -19,7 +19,7 @@ import CallbackForm from './CallbackForm';
 
 interface CallbackManagerProps {
     callbacks: InboxCallback[];
-    onCallbacksChange: (callbacks: InboxCallback[]) => void;
+    onCallbacksChange: (callbacks: InboxCallback[]) => Promise<void>;
     readonly?: boolean;
 }
 
@@ -53,10 +53,10 @@ const CallbackManager: React.FC<CallbackManagerProps> = ({
         setDeleteDialogOpen(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (deleteIndex !== null) {
             const newCallbacks = callbacks.filter((_, i) => i !== deleteIndex);
-            onCallbacksChange(newCallbacks);
+            await onCallbacksChange(newCallbacks);
         }
         setDeleteDialogOpen(false);
         setDeleteIndex(null);
@@ -67,15 +67,15 @@ const CallbackManager: React.FC<CallbackManagerProps> = ({
         setDeleteIndex(null);
     };
 
-    const handleSaveCallback = (callback: InboxCallback) => {
+    const handleSaveCallback = async (callback: InboxCallback) => {
         if (editingIndex !== null) {
             // Editing existing callback
             const newCallbacks = [...callbacks];
             newCallbacks[editingIndex] = callback;
-            onCallbacksChange(newCallbacks);
+            await onCallbacksChange(newCallbacks);
         } else {
             // Adding new callback
-            onCallbacksChange([...callbacks, callback]);
+            await onCallbacksChange([...callbacks, callback]);
         }
         setFormOpen(false);
         setEditingIndex(null);
