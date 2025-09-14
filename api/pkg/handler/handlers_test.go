@@ -342,3 +342,47 @@ func TestUpdateInbox(t *testing.T) {
 		t.Errorf("Diff(updatedInbox, getedInbox) = %v, expected to be equals", diff)
 	}
 }
+
+func TestUpdateInboxWithLocalhostCallback(t *testing.T) {
+	config.LoadConfig(config.Test)
+	ih, closer := mustGetInboxHandler()
+	defer closer()
+	inbox := model.GenerateInbox()
+	inbox = shoudlExistsInbox(t, ih, inbox)
+	inbox.Callbacks = []model.Callback{
+		{
+			IsEnabled: true,
+			IsDynamic: false,
+			ToURL:     "http://localhost:8080/callback",
+			Method:    "POST",
+			Headers: map[string]string{
+				"Content-Type": "application/json",
+			},
+			Body: `{"event": "test"}`,
+		},
+	}
+
+	body := t_util.MustJson(t, inbox)
+	req, err := http.NewRequest(
+		"PUT",
+		"",
+		bytes.NewReader(body),
+	)
+	if err != nil {
+		t.Error(err)
+	}
+	w := httptest.NewRecorder()
+	ginCtx, _ := gin.CreateTestContext(w)
+	ginCtx.AddParam("id", inbox.ID.String())
+	ginCtx.Request = req
+	ih.UpdateInbox(ginCtx)
+	resp := w.Result()
+	err = resp.Body.Close()
+	if err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("Expected StatusBadRequest (400), got %v with body %s", resp.StatusCode, w.Body.String())
+	}
+}
