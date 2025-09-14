@@ -28,7 +28,7 @@ const CallbackManager: React.FC<CallbackManagerProps> = ({
     onCallbacksChange,
     readonly = false
 }) => {
-    const [editMode, setEditMode] = useState<boolean>(false);
+    const [editMode, setEditMode] = useState<boolean>(true);
     const [formOpen, setFormOpen] = useState<boolean>(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
@@ -139,15 +139,6 @@ const CallbackManager: React.FC<CallbackManagerProps> = ({
                             readonly={false}
                         />
                     </Paper>
-
-                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button 
-                            onClick={() => setEditMode(false)}
-                            variant="outlined"
-                        >
-                            Done
-                        </Button>
-                    </Box>
                 </Box>
             )}
 

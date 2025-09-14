@@ -42,12 +42,12 @@ const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete
     }
 
     const getMethodColor = (method: string) => {
-        const colors: Record<string, 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info'> = {
-            'GET': 'info',
-            'POST': 'success',
-            'PUT': 'warning',
-            'DELETE': 'error',
-            'PATCH': 'secondary',
+        const colors: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info'> = {
+            'GET': 'default',
+            'POST': 'default',
+            'PUT': 'default',
+            'DELETE': 'default',
+            'PATCH': 'default',
         };
         return colors[method.toUpperCase()] || 'primary';
     };
@@ -60,7 +60,7 @@ const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                             <Chip
                                 label={callback.IsEnabled ? 'Enabled' : 'Disabled'}
-                                color={callback.IsEnabled ? 'success' : 'default'}
+                                color={callback.IsEnabled ? 'info' : 'default'}
                                 size="small"
                             />
                             <Chip
@@ -95,7 +95,7 @@ const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete
                                     <Tooltip title="Delete callback">
                                         <IconButton
                                             size="small"
-                                            color="error"
+                                            color="default"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onDelete(index);
