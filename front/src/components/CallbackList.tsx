@@ -2,9 +2,6 @@ import React from 'react';
 import {
     Box,
     Typography,
-    List,
-    ListItem,
-    ListItemText,
     Chip,
     Accordion,
     AccordionSummary,
