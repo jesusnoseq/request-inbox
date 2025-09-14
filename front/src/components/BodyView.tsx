@@ -31,7 +31,7 @@ const BodyView: React.FC<BodyViewProps> = ({ title, data }) => {
             <Paper sx={{ p: 2, mt: 2 }}>
                 <Grid container spacing={2}>
                     <Grid size={11}>
-                        <Typography variant="h6">{title}</Typography>
+                        <Typography variant="subtitle1">{title}</Typography>
                     </Grid>
                     <Grid size={1}>
                         <CopyToClipboardButton textToCopy={data} />
