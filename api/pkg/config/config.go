@@ -44,6 +44,9 @@ const (
 	HTTPClientTimeoutSeconds        Key = "API_HTTP_CLIENT_TIMEOUT_SECONDS"
 	HTTPClientTimeoutSecondsDefault int = 20
 
+	CallbackTimeoutSeconds        Key = "CALLBACK_TIMEOUT_SECONDS"
+	CallbackTimeoutSecondsDefault int = 5
+
 	LogLevel      Key    = "LOG_LEVEL"
 	LogFormat     Key    = "LOG_FORMATER"
 	LogFormatJSON string = "json"
@@ -133,6 +136,7 @@ func setDefaults(app App) {
 	setDefault(MonitoringTrackedMethods, MonitoringTrackedMethodsDefault)
 
 	setDefault(HTTPClientTimeoutSeconds, HTTPClientTimeoutSecondsDefault)
+	setDefault(CallbackTimeoutSeconds, CallbackTimeoutSecondsDefault)
 	setDefault(BackendApplicationDomain, BackendApplicationDomainDefault)
 
 	// AUTH

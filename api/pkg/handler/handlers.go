@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/jesusnoseq/request-inbox/pkg/callback"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
@@ -311,6 +312,14 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 	}
 	filterRequestData(&request)
 
+	// TODO
+	// handle response return
+	// add extra functions to templates
+	// handle dynamic templates for callbacks
+	// save callbacks responses
+	// test callbacks
+	callbackResponses := callback.SendCallbacks(inbox, request)
+	request.CallbackResponses = callbackResponses
 	err = ih.dao.AddRequestToInbox(c, id, request)
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
