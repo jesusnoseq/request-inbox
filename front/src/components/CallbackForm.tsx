@@ -196,24 +196,26 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                         value={callback.Body}
                         onChange={(e) => setCallback({ ...callback, Body: e.target.value })}
                         placeholder="Request body content (optional)"
-                        InputProps={{
-                            inputComponent: TextareaAutosize,
-                            inputProps: {
-                                minRows: 4,
-                                style: { resize: 'vertical' },
-                            },
-                            endAdornment: callback.Body && (
-                                <InputAdornment position="end">
-                                    <Button 
-                                        onClick={formatAsJson} 
-                                        variant="outlined" 
-                                        size="small" 
-                                        color="secondary"
-                                    >
-                                        Format as JSON
-                                    </Button>
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                inputComponent: TextareaAutosize,
+                                inputProps: {
+                                    minRows: 4,
+                                    style: { resize: 'vertical' },
+                                },
+                                endAdornment: callback.Body && (
+                                    <InputAdornment position="end">
+                                        <Button 
+                                            onClick={formatAsJson} 
+                                            variant="outlined" 
+                                            size="small" 
+                                            color="secondary"
+                                        >
+                                            Format as JSON
+                                        </Button>
+                                    </InputAdornment>
+                                ),
+                            }
                         }}
                     />
 
