@@ -220,7 +220,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                     />
 
                     {/* Dynamic Response Toggle */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <FormControlLabel
                             control={
                                 <Switch
@@ -240,7 +240,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                                 <InfoIcon />
                             </IconButton>
                         </Tooltip>
-                    </Box>
+                    </Box> */}
                 </Box>
             </DialogContent>
             <DialogActions>
