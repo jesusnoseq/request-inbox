@@ -31,3 +31,11 @@ func AssertSameID(t *testing.T, actual, expected uuid.UUID) {
 		t.Errorf("Expected ID %v but got %v", expected, actual)
 	}
 }
+
+func MustWrite(t *testing.T, w http.ResponseWriter, data []byte) {
+	t.Helper()
+	_, err := w.Write(data)
+	if err != nil {
+		t.Fatalf("Failed to write response data: %v", err)
+	}
+}

@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
+	"github.com/jesusnoseq/request-inbox/pkg/t_util"
 )
 
 func init() {
@@ -51,7 +52,7 @@ func TestSendCallback_Success(t *testing.T) {
 		// Set response headers and body
 		w.Header().Set("X-Response-Header", "response-value")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"success": true}`))
+		t_util.MustWrite(t, w, []byte(`{"success": true}`))
 	}))
 	defer server.Close()
 
@@ -99,7 +100,7 @@ func TestSendCallback_HTTPError(t *testing.T) {
 	// Create test server that returns error
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "internal server error"}`))
+		t_util.MustWrite(t, w, []byte(`{"error": "internal server error"}`))
 	}))
 	defer server.Close()
 
@@ -180,7 +181,7 @@ func TestSendCallback_GETMethod(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"method": "GET"}`))
+		t_util.MustWrite(t, w, []byte(`{"method": "GET"}`))
 	}))
 	defer server.Close()
 
@@ -213,7 +214,7 @@ func TestSendCallback_EmptyBody(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"received": "empty"}`))
+		t_util.MustWrite(t, w, []byte(`{"received": "empty"}`))
 	}))
 	defer server.Close()
 
@@ -242,7 +243,7 @@ func TestSendCallback_WithCustomContentType(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`success`))
+		t_util.MustWrite(t, w, []byte(`success`))
 	}))
 	defer server.Close()
 
@@ -490,9 +491,10 @@ func TestSendCallbacks_ErrorHandling(t *testing.T) {
 	successCount := 0
 	errorCount := 0
 	for _, response := range responses {
-		if response.Code == http.StatusOK {
+		switch response.Code {
+		case http.StatusOK:
 			successCount++
-		} else if response.Code == http.StatusInternalServerError {
+		case http.StatusInternalServerError:
 			errorCount++
 		}
 	}
