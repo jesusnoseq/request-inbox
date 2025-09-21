@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/jesusnoseq/request-inbox/pkg/callback"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
 	"github.com/jesusnoseq/request-inbox/pkg/database"
 	"github.com/jesusnoseq/request-inbox/pkg/database/dberrors"
@@ -18,6 +19,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/instrumentation/event"
 	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
+	"github.com/jesusnoseq/request-inbox/pkg/model/validation"
 )
 
 type InboxHandler struct {
@@ -38,6 +40,12 @@ func (ih *InboxHandler) CreateInbox(c *gin.Context) {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox", err, http.StatusBadRequest))
 		return
 	}
+
+	if valid, err := validation.IsValidInbox(newInbox); !valid {
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusBadRequest))
+		return
+	}
+
 	if !login.IsUserLoggedIn(c) && newInbox.IsPrivate {
 		err := fmt.Errorf("you must be logged in to create a private inbox")
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusUnauthorized))
@@ -192,6 +200,11 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 		return
 	}
 
+	if valid, err := validation.IsValidInbox(updatedInbox); !valid {
+		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusBadRequest))
+		return
+	}
+
 	if updatedInbox.IsPrivate && updatedInbox.OwnerID == uuid.Nil {
 		c.AbortWithStatusJSON(model.ErrorResponseMsg("An anonymous inbox can not be private", http.StatusBadRequest))
 		return
@@ -299,6 +312,14 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 	}
 	filterRequestData(&request)
 
+	// TODO
+	// handle response return
+	// add extra functions to templates
+	// handle dynamic templates for callbacks
+	// save callbacks responses
+	// test callbacks
+	callbackResponses := callback.SendCallbacks(inbox, request)
+	request.CallbackResponses = callbackResponses
 	err = ih.dao.AddRequestToInbox(c, id, request)
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction, Stack, Autocomplete } from '@mui/material';
+import { TextField, Button, IconButton, List, ListItem, ListItemText, Stack, Autocomplete } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -85,13 +85,16 @@ const HeadersEditor: React.FC<HeadersEditorProps> = ({ initialHeaders, onHeaders
         <div>
             <List>
                 {headers.map((header, index) => (
-                    <ListItem key={index} divider>
-                        <ListItemText primary={header.key} secondary={header.value} />
-                        <ListItemSecondaryAction>
+                    <ListItem 
+                        key={index} 
+                        divider
+                        secondaryAction={
                             <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveHeader(index)}>
                                 <DeleteIcon />
                             </IconButton>
-                        </ListItemSecondaryAction>
+                        }
+                    >
+                        <ListItemText primary={header.key} secondary={header.value} />
                     </ListItem>
                 ))}
             </List>

@@ -11,13 +11,13 @@ import (
 
 func TestGenerateInbox(t *testing.T) {
 	t.Run("it should have random values", func(t *testing.T) {
-		inbox := model.GenerateInbox()
+		inbox := model.GenerateInboxWithOwner()
 		if hasEmptyField(t, inbox, nil) {
 			t.Errorf("Expected no empty fields in %+v", inbox)
 		}
 	})
 	t.Run("each inbox should be different", func(t *testing.T) {
-		if diff := cmp.Diff(model.GenerateInbox(), model.GenerateInbox()); diff == "" {
+		if diff := cmp.Diff(model.GenerateInboxWithOwner(), model.GenerateInboxWithOwner()); diff == "" {
 			t.Errorf("Diff() = %v, want %q", diff, "")
 		}
 	})
@@ -27,7 +27,7 @@ func TestGenerateRequest(t *testing.T) {
 	t.Run("it should have specific ID and random values", func(t *testing.T) {
 		req := model.GenerateRequest(20)
 		if req.ID != 20 {
-			t.Errorf("GenerateRequest(1).ID = %v, want %v", req.ID, 1)
+			t.Errorf("GenerateRequest(20).ID = %v, want %v", req.ID, 20)
 		}
 
 		if hasEmptyField(t, req, []string{"Path"}) {

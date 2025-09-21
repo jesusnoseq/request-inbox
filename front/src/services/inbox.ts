@@ -63,9 +63,14 @@ export const updateInbox = async (inbox: Inbox) => {
         credentials: 'include',
         body: JSON.stringify(reqInbox),
     });
+    
     if (!resp.ok) {
-        throw new Error('API response error ', await resp.json());
+        const errorData = await resp.json();
+        // Extract the error message, fallback to generic message
+        const errorMessage = errorData?.message || errorData?.error || 'Failed to update inbox';
+        throw new Error(errorMessage);
     }
+    
     const updatedInbox = (await resp.json()) as Inbox;
     return updatedInbox;
 }

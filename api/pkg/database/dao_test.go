@@ -48,6 +48,7 @@ func TestDBCreateInbox(t *testing.T) {
 	inboxWithID := inbox
 	inboxWithID.ID = created.ID
 	inboxWithID.Name = created.ID.String()
+	inboxWithID.Timestamp = created.Timestamp
 	if diff := cmp.Diff(inboxWithID, created); diff != "" {
 		t.Errorf("GetInboxDAO(ctx, inbox) = created, want inboxWithID. Diff: %s", diff)
 	}

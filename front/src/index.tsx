@@ -56,7 +56,7 @@ declare global {
 }
 
 
-reportWebVitals((metric) => {
+reportWebVitals((metric: any) => {
   if (window.posthog) {
     window.posthog.capture('web_vitals', {
       metric_name: metric.name,

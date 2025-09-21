@@ -16,13 +16,14 @@ const (
 
 type Inbox struct {
 	ID                    uuid.UUID
-	Name                  string    `dynamodbav:"alias"`
-	Timestamp             int64     `dynamodbav:"unixTimestamp"`
-	Response              Response  `dynamodbav:"resp"`
-	Requests              []Request `dynamodbav:"req"`
-	ObfuscateHeaderFields []string  `dynamodbav:"ofuscate"`
-	OwnerID               uuid.UUID `dynamodbav:"OwnerID"`
-	IsPrivate             bool      `dynamodbav:"IsPrivate"`
+	Name                  string     `dynamodbav:"alias"`
+	Timestamp             int64      `dynamodbav:"unixTimestamp"`
+	Response              Response   `dynamodbav:"resp"`
+	Requests              []Request  `dynamodbav:"req"`
+	ObfuscateHeaderFields []string   `dynamodbav:"ofuscate"`
+	Callbacks             []Callback `dynamodbav:"Callbacks"`
+	OwnerID               uuid.UUID  `dynamodbav:"OwnerID"`
+	IsPrivate             bool       `dynamodbav:"IsPrivate"`
 }
 
 type Response struct {
@@ -34,16 +35,17 @@ type Response struct {
 }
 
 type Request struct {
-	ID            int
-	Timestamp     int64 `dynamodbav:"unixTimestamp"`
-	URI           string
-	Host          string
-	RemoteAddr    string
-	Protocol      string
-	Headers       map[string][]string
-	Method        string `dynamodbav:"httpMethod"`
-	ContentLength int64
-	Body          string
+	ID                int
+	Timestamp         int64 `dynamodbav:"unixTimestamp"`
+	URI               string
+	Host              string
+	RemoteAddr        string
+	Protocol          string
+	Headers           map[string][]string
+	Method            string `dynamodbav:"httpMethod"`
+	ContentLength     int64
+	Body              string
+	CallbackResponses []CallbackResponse
 }
 
 func NewInbox() Inbox {
@@ -59,6 +61,7 @@ func NewInbox() Inbox {
 		},
 		Requests:              []Request{},
 		ObfuscateHeaderFields: []string{},
+		Callbacks:             []Callback{},
 		IsPrivate:             false,
 		OwnerID:               uuid.UUID{},
 	}

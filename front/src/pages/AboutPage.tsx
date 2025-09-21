@@ -4,7 +4,7 @@ import {
     Container,
     Typography,
     Paper,
-    Grid2,
+    Grid,
     useTheme,
     useMediaQuery,
     Link, // added Link import
@@ -56,8 +56,8 @@ export default function AboutPage() {
                 </Typography>
             </Paper>
 
-            <Grid2 container spacing={4} justifyContent="center" sx={{ mb: 6 }}>
-                <Grid2 size={4}>
+            <Grid container spacing={4} justifyContent="center" sx={{ mb: 6 }}>
+                <Grid size={4}>
                     <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <CodeIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                         <Typography variant="h6" component="h3" gutterBottom align="center">
@@ -67,8 +67,8 @@ export default function AboutPage() {
                             Built with the latest web technologies, ensuring speed, reliability, and a seamless user experience.
                         </Typography>
                     </Paper>
-                </Grid2>
-                <Grid2 size={4}>
+                </Grid>
+                <Grid size={4}>
                     <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <CloudIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                         <Typography variant="h6" component="h3" gutterBottom align="center">
@@ -78,8 +78,8 @@ export default function AboutPage() {
                             Your dedicated URL is always ready, providing a reliable endpoint for all your webhook testing needs.
                         </Typography>
                     </Paper>
-                </Grid2>
-                <Grid2 size={4}>
+                </Grid>
+                <Grid size={4}>
                     <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <SpeedIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
                         <Typography variant="h6" component="h3" gutterBottom align="center">
@@ -89,8 +89,8 @@ export default function AboutPage() {
                             Designed to make your life easier, saving you time and reducing frustration in your development process.
                         </Typography>
                     </Paper>
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
 
             <Paper elevation={3} sx={{ p: 4, mb: 6 }}>
                 <Typography variant="h4" component="h2" gutterBottom align="center">

@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import BodyView from './BodyView';
+import CallbackResponseView from './CallbackResponseView';
 
 dayjs.extend(localizedFormat);
 
@@ -14,10 +15,15 @@ type RequestDetailProps = {
 
 const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
     const headerEntries: [string, string][] = Object.entries(request.Headers);
-    const [open, setOpen] = useState<boolean>(false);
+    const [headersOpen, setHeadersOpen] = useState<boolean>(false);
+    const [callbacksOpen, setCallbacksOpen] = useState<boolean>(false);
 
-    const handleCollapse = () => {
-        setOpen(!open);
+    const handleHeadersCollapse = () => {
+        setHeadersOpen(!headersOpen);
+    };
+
+    const handleCallbacksCollapse = () => {
+        setCallbacksOpen(!callbacksOpen);
     };
 
     function splitPath(url: string) {
@@ -48,13 +54,13 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
 
 
                 <Typography>
-                    <Button onClick={handleCollapse}>
+                    <Button onClick={handleHeadersCollapse}>
                         <Typography>Show headers</Typography>
-                        {open ? <ExpandLess /> : <ExpandMore />}
+                        {headersOpen ? <ExpandLess /> : <ExpandMore />}
                     </Button>
                 </Typography>
 
-                <Collapse in={open} timeout="auto" unmountOnExit>
+                <Collapse in={headersOpen} timeout="auto" unmountOnExit>
                     <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                         {
                             headerEntries.map((k, index) => (
@@ -65,6 +71,31 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                         }
                     </List>
                 </Collapse>
+
+                {/* Callback Results Section */}
+                {request.CallbackResponses && request.CallbackResponses.length > 0 && (
+                    <>
+                        <Typography sx={{ marginTop: 2 }}>
+                            <Button onClick={handleCallbacksCollapse}>
+                                <Typography>Show callback results ({request.CallbackResponses.length})</Typography>
+                                {callbacksOpen ? <ExpandLess /> : <ExpandMore />}
+                            </Button>
+                        </Typography>
+
+                        <Collapse in={callbacksOpen} timeout="auto" unmountOnExit>
+                            <Box sx={{ marginTop: 1 }}>
+                                {request.CallbackResponses.map((callbackResponse, index) => (
+                                    <CallbackResponseView 
+                                        key={index}
+                                        callbackResponse={callbackResponse}
+                                        index={index}
+                                    />
+                                ))}
+                            </Box>
+                        </Collapse>
+                    </>
+                )}
+
                 <BodyView data={request.Body} />
             </CardContent>
         </Card >

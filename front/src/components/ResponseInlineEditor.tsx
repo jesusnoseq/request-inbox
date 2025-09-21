@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InboxResponse } from '../types/inbox';
 import {
-    Container, TextField, Box, FormControl, FormControlLabel, FormGroup, IconButton, Typography, Grid, Button,
-    ButtonGroup, InputAdornment, TextareaAutosize, Switch, Tooltip
+    TextField, Box, FormControl, FormControlLabel, FormGroup, IconButton, Typography, Button,
+    InputAdornment, TextareaAutosize, Switch, Tooltip
 } from '@mui/material';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import DoneIcon from '@mui/icons-material/Done';
-import ClearIcon from '@mui/icons-material/Clear';
 import InfoIcon from '@mui/icons-material/Info';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -107,36 +105,40 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
         <>
             {!editMode &&
                 <Box sx={{ mb: 2 }}>
-                    <Box display="flex" alignItems="center" gap={1}>
-                        Response
+                    <Box display="flex" alignItems="center" gap={1} mb={2}>
+                        <Typography variant="h6">
+                            Response
+                        </Typography>
                         {!readonly &&
                             <IconButton aria-label="edit response" size="small" onClick={enableEditMode}>
                                 <ModeEditIcon fontSize="medium" />
                             </IconButton>
                         }
                     </Box>
-                    <Container>
-                        <Box sx={{ display: 'flex', flexGrow: 1 }}>
-                            <Box sx={{ width: "12ch", mr: 5 }}>
-                                <Typography color="textSecondary">
-                                    Status code
-                                </Typography>
-                                {statusCode}
-                            </Box>
-
-                            {isDynamic &&
-                                <Box sx={{ mb: 2, minWidth: "30ch", flexGrow: 1 }}>
-                                    <Typography color="textSecondary">
-                                        Status code template
+                    <Paper variant="outlined" sx={{ p: 2 }}>
+                        <Box sx={{ mb: 3 }}>
+                            <Box sx={{ display: 'flex', flexGrow: 1 }}>
+                                <Box sx={{ width: "12ch", mr: 5 }}>
+                                    <Typography color="textSecondary" sx={{ mb: 1 }}>
+                                        Status code
                                     </Typography>
-                                    {statusCodeTemplate}
+                                    {statusCode}
                                 </Box>
-                            }
+
+                                {isDynamic &&
+                                    <Box sx={{ minWidth: "30ch", flexGrow: 1 }}>
+                                        <Typography color="textSecondary" sx={{ mb: 1 }}>
+                                            Status code template
+                                        </Typography>
+                                        {statusCodeTemplate}
+                                    </Box>
+                                }
+                            </Box>
                         </Box>
 
                         {headers.length !== 0 &&
-                            <>
-                                <Typography color="textSecondary">
+                            <Box sx={{ mb: 3 }}>
+                                <Typography color="textSecondary" sx={{ mb: 1 }}>
                                     Headers
                                 </Typography>
                                 <TableContainer component={Paper}>
@@ -153,95 +155,119 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                            </>
+                            </Box>
                         }
-                        <BodyView data={body} />
-
-                    </Container>
+                        <Box>
+                            <Typography color="textSecondary" sx={{ mb: 1 }}>
+                                Body
+                            </Typography>   
+                            <BodyView data={body} />
+                        </Box>
+                    </Paper>
                 </Box >
             }
             {
                 editMode &&
-                <Box component="form">
-                    Response
-                    <Container>
-                        <FormControl fullWidth sx={{ m: 1 }}>
-                            <Box sx={{ display: 'flex', flexGrow: 1 }}>
-                                <TextField
-                                    sx={{ mb: 2, mr: 5, width: "12ch" }}
-                                    required
-                                    id="status-code"
-                                    label="Status code"
-                                    variant="standard"
-                                    value={statusCode.toString()}
-                                    onChange={handleStatusCodeChange}
-                                    size='medium'
-                                    error={statusCodeError}
-                                    inputProps={{
-                                        maxLength: 3,
-                                        minLength: 3,
-                                        inputMode: 'numeric',
-                                        pattern: '[0-9]*',
-                                    }}
-                                    InputLabelProps={{
-                                        color: "primary",
-                                        sx: { fontSize: '1.25rem' },
-                                    }}
-                                />
-                                {
-                                    isDynamic &&
+                <Box sx={{ mb: 2 }}>
+                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+                        <Typography variant="h6">
+                            Manage Response
+                        </Typography>
+                    </Box>
 
+                    <Paper variant="outlined" sx={{ p: 2 }}>
+                        <FormControl fullWidth sx={{ m: 1 }}>
+                            <Box sx={{ mb: 3 }}>
+                                <Box sx={{ display: 'flex', flexGrow: 1 }}>
                                     <TextField
-                                        sx={{ mb: 2, minWidth: "30ch", flexGrow: 1 }}
+                                        sx={{ mr: 5, width: "12ch" }}
                                         required
-                                        id="status-code-template"
-                                        label="Status code template"
+                                        id="status-code"
+                                        label="Status code"
                                         variant="standard"
-                                        value={statusCodeTemplate.toString()}
-                                        onChange={handleStatusCodeTemplateChange}
+                                        value={statusCode.toString()}
+                                        onChange={handleStatusCodeChange}
                                         size='medium'
-                                        InputProps={{
-                                            inputComponent: TextareaAutosize,
-                                            inputProps: {
-                                                minRows: 1,
-                                                style: { resize: 'none' }, // Prevent manual resizing
+                                        error={statusCodeError}
+                                        slotProps={{
+                                            htmlInput: {
+                                                maxLength: 3,
+                                                minLength: 3,
+                                                inputMode: 'numeric',
+                                                pattern: '[0-9]*',
                                             },
-                                        }}
-                                        InputLabelProps={{
-                                            color: "primary",
-                                            sx: { fontSize: '1.25rem' },
+                                            inputLabel: {
+                                                color: "primary",
+                                                sx: { fontSize: '1.25rem' },
+                                            }
                                         }}
                                     />
-                                }
-                            </Box>
-                            Headers
-                            <HeadersEditor initialHeaders={headers} onHeadersChange={setHeaders} />
+                                    {
+                                        isDynamic &&
 
-                            <TextField
-                                id="outlined-multiline-flexible"
-                                label="Body"
-                                multiline
-                                fullWidth
-                                variant="standard"
-                                rows={3}
-                                value={body}
-                                onChange={handleBodyChange}
-                                sx={{ mt: 2 }}
-                                InputProps={{
-                                    inputComponent: TextareaAutosize,
-                                    inputProps: {
-                                        minRows: 3,
-                                        style: { resize: 'none' }, // Prevent manual resizing
-                                    },
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <Button onClick={formatAsJson} variant="outlined" size="small" color="secondary">
-                                                Format as JSON
-                                            </Button>
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
+                                        <TextField
+                                            sx={{ minWidth: "30ch", flexGrow: 1 }}
+                                            required
+                                            id="status-code-template"
+                                            label="Status code template"
+                                            variant="standard"
+                                            value={statusCodeTemplate.toString()}
+                                            onChange={handleStatusCodeTemplateChange}
+                                            size='medium'
+                                            slotProps={{
+                                                input: {
+                                                    inputComponent: TextareaAutosize,
+                                                    inputProps: {
+                                                        minRows: 1,
+                                                        style: { resize: 'none' }, // Prevent manual resizing
+                                                    },
+                                                },
+                                                inputLabel: {
+                                                    color: "primary",
+                                                    sx: { fontSize: '1.25rem' },
+                                                }
+                                            }}
+                                        />
+                                    }
+                                </Box>
+                            </Box>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="subtitle1">
+                                    Headers
+                                </Typography>
+                                <HeadersEditor initialHeaders={headers} onHeadersChange={setHeaders} />
+                            </Box>
+
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                    Body
+                                </Typography>
+                                <TextField
+                                    id="outlined-multiline-flexible"
+                                    multiline
+                                    fullWidth
+                                    variant="standard"
+                                    rows={3}
+                                    value={body}
+                                    onChange={handleBodyChange}
+                                    slotProps={{
+                                        input: {
+                                            inputComponent: TextareaAutosize,
+                                            inputProps: {
+                                                minRows: 3,
+                                                style: { resize: 'none' }, // Prevent manual resizing
+                                            },
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <Button onClick={formatAsJson} variant="outlined" size="small" color="secondary">
+                                                        Format as JSON
+                                                    </Button>
+                                                </InputAdornment>
+                                            ),
+                                        }
+                                    }}
+                                />
+                            </Box>
                             <FormGroup row sx={{ mt: 1 }}>
                                 <FormControlLabel
                                     control={<Switch checked={isDynamic} onChange={handleIsDynamicToggle} />}
@@ -259,19 +285,24 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                                 </Tooltip>
                             </FormGroup>
                         </FormControl>
+                    </Paper>
 
-
-                        <Grid container justifyContent="flex-end">
-                            <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                <IconButton aria-label="Cancel" size="small" onClick={handleCancel}>
-                                    <ClearIcon fontSize="medium" />
-                                </IconButton>
-                                <IconButton aria-label="Save" size="small" onClick={handleSave} disabled={errors}>
-                                    <DoneIcon fontSize="medium" />
-                                </IconButton>
-                            </ButtonGroup>
-                        </Grid>
-                    </Container>
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button 
+                            onClick={handleCancel}
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            onClick={handleSave} 
+                            variant="contained"
+                            disabled={errors}
+                        >
+                            Save
+                        </Button>
+                    </Box>
                 </Box >
             }
         </>

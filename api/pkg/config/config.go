@@ -44,6 +44,9 @@ const (
 	HTTPClientTimeoutSeconds        Key = "API_HTTP_CLIENT_TIMEOUT_SECONDS"
 	HTTPClientTimeoutSecondsDefault int = 20
 
+	CallbackTimeoutSeconds        Key = "CALLBACK_TIMEOUT_SECONDS"
+	CallbackTimeoutSecondsDefault int = 5
+
 	LogLevel      Key    = "LOG_LEVEL"
 	LogFormat     Key    = "LOG_FORMATER"
 	LogFormatJSON string = "json"
@@ -55,24 +58,26 @@ const (
 	SnapshotVersion        Key    = "SNAPSHOT_VERSION"
 	SnapshotVersionDefault string = "local"
 
-	LoginGithubClientId           Key    = "LOGIN_GITHUB_CLIENT_ID"
-	LoginGithubClientSecret       Key    = "LOGIN_GITHUB_CLIENT_SECRET"
-	LoginGithubCallback           Key    = "LOGIN_GITHUB_CALLBACK"
-	LoginGithubCallbackDefault    string = "https://api.request-inbox.com/api/v1/auth/github/callback"
-	LoginGoogleClientId           Key    = "LOGIN_GOOGLE_CLIENT_ID"
-	LoginGoogleClientSecret       Key    = "LOGIN_GOOGLE_CLIENT_SECRET"
-	LoginGoogleCallback           Key    = "LOGIN_GOOGLE_CALLBACK"
-	LoginGoogleCallbackDefault    string = "https://api.request-inbox.com/api/v1/auth/google/callback"
-	FrontendApplicationURL        Key    = "FRONTEND_APPLICATION_URL"
-	FrontendApplicationURLDefault string = "https://request-inbox.com/"
-	AuthCookieDomain              Key    = "AUTH_COOKIE_DOMAIN"
-	AuthCookieDomainDefault       string = "request-inbox.com"
-	CORSAllowOrigins              Key    = "CORS_ALLOW_ORIGINS"
-	CORSAllowOriginsDefault       string = "https://request-inbox.com https://api.request-inbox.com"
-	JWTSecret                     Key    = "JWT_SECRET"
-	JWTSecretDefault              string = "d14f50e6a26bbbd8922a41449c7f00bb87b4629acfc153403f5ed1342cf6fcd0"
-	UserJTISalt                   Key    = "USER_JTI_SALT"
-	UserJTISaltDefault            string = "AcL30zFxQf"
+	LoginGithubClientId             Key    = "LOGIN_GITHUB_CLIENT_ID"
+	LoginGithubClientSecret         Key    = "LOGIN_GITHUB_CLIENT_SECRET"
+	LoginGithubCallback             Key    = "LOGIN_GITHUB_CALLBACK"
+	LoginGithubCallbackDefault      string = "https://api.request-inbox.com/api/v1/auth/github/callback"
+	LoginGoogleClientId             Key    = "LOGIN_GOOGLE_CLIENT_ID"
+	LoginGoogleClientSecret         Key    = "LOGIN_GOOGLE_CLIENT_SECRET"
+	LoginGoogleCallback             Key    = "LOGIN_GOOGLE_CALLBACK"
+	LoginGoogleCallbackDefault      string = "https://api.request-inbox.com/api/v1/auth/google/callback"
+	FrontendApplicationURL          Key    = "FRONTEND_APPLICATION_URL"
+	FrontendApplicationURLDefault   string = "https://request-inbox.com/"
+	BackendApplicationDomain        Key    = "BACKEND_APPLICATION_DOMAIN"
+	BackendApplicationDomainDefault string = "api.request-inbox.com"
+	AuthCookieDomain                Key    = "AUTH_COOKIE_DOMAIN"
+	AuthCookieDomainDefault         string = "request-inbox.com"
+	CORSAllowOrigins                Key    = "CORS_ALLOW_ORIGINS"
+	CORSAllowOriginsDefault         string = "https://request-inbox.com https://api.request-inbox.com"
+	JWTSecret                       Key    = "JWT_SECRET"
+	JWTSecretDefault                string = "d14f50e6a26bbbd8922a41449c7f00bb87b4629acfc153403f5ed1342cf6fcd0"
+	UserJTISalt                     Key    = "USER_JTI_SALT"
+	UserJTISaltDefault              string = "AcL30zFxQf"
 
 	PostHogURL                      Key    = "POSTHOG_URL"
 	PostHogURLDefault               string = "https://eu.i.posthog.com"
@@ -88,6 +93,8 @@ const (
 	EnablePrintConfigDefault  bool = false
 	EnabledMonitoring         Key  = "ENABLED_MONITORING"
 	EnabledMonitoringDefault  bool = false
+	MaxCallbacksKey           Key  = "MAX_CALLBACKS"
+	MaxCallbacksDefault       int  = 3
 )
 
 func LoadConfig(app App) {
@@ -128,6 +135,10 @@ func setDefaults(app App) {
 	setDefault(PostHogAPIKey, PostHogAPIKeyDefault)
 	setDefault(MonitoringTrackedMethods, MonitoringTrackedMethodsDefault)
 
+	setDefault(HTTPClientTimeoutSeconds, HTTPClientTimeoutSecondsDefault)
+	setDefault(CallbackTimeoutSeconds, CallbackTimeoutSecondsDefault)
+	setDefault(BackendApplicationDomain, BackendApplicationDomainDefault)
+
 	// AUTH
 	setDefault(FrontendApplicationURL, FrontendApplicationURLDefault)
 	setDefault(AuthCookieDomain, AuthCookieDomainDefault)
@@ -145,7 +156,7 @@ func setDefaults(app App) {
 	setDefault(EnableListingPublicInbox, EnableListingInboxDefault)
 	setDefault(EnablePrintConfig, EnableListingInboxDefault)
 	setDefault(EnabledMonitoring, EnabledMonitoringDefault)
-
+	setDefault(MaxCallbacksKey, MaxCallbacksDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {

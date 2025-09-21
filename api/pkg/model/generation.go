@@ -32,19 +32,42 @@ func mustRandomString(l int) string {
 
 func GenerateInbox() Inbox {
 	return Inbox{
+		ID:        uuid.New(),
 		Name:      mustRandomString(10),
 		Timestamp: time.Now().UnixMilli(),
 		Response: Response{
-			Code: 200,
-			Body: "response body" + mustRandomString(5),
+			Code:         200,
+			CodeTemplate: "200",
+			Body:         "response body" + mustRandomString(5),
 			Headers: map[string]string{
 				"Content-Type":      "application/json; charset=utf-8",
 				mustRandomString(5): mustRandomString(5),
 			},
+			IsDynamic: false,
 		},
 		Requests:              []Request{GenerateRequest(1), GenerateRequest(2)},
 		ObfuscateHeaderFields: []string{"Authorization"},
+		Callbacks: []Callback{
+			{
+				IsEnabled: true,
+				IsDynamic: false,
+				ToURL:     "http://example.com/webhook",
+				Method:    "POST",
+				Headers: map[string]string{
+					"Content-Type": "application/json",
+				},
+				Body: `{"event": "request_received"}`,
+			},
+		},
+		OwnerID:   uuid.Nil,
+		IsPrivate: false,
 	}
+}
+
+func GenerateInboxWithOwner() Inbox {
+	inbox := GenerateInbox()
+	inbox.OwnerID = uuid.New()
+	return inbox
 }
 
 func GenerateRequest(id int) Request {
@@ -63,6 +86,19 @@ func GenerateRequest(id int) Request {
 		ContentLength: int64(len(body)),
 		RemoteAddr:    "[::1]:61764",
 		Method:        "POST",
+		CallbackResponses: []CallbackResponse{
+			{
+				URL:          "http://example.com/callback",
+				Method:       "POST",
+				Error:        "",
+				Code:         200,
+				CodeTemplate: "200",
+				Body:         "callback response " + mustRandomString(5),
+				Headers: map[string]string{
+					"Content-Type": "application/json",
+				},
+			},
+		},
 	}
 }
 
@@ -77,12 +113,14 @@ func CopyInbox(inbox Inbox) Inbox {
 	}
 
 	copy.ObfuscateHeaderFields = collection.CopySlice(inbox.ObfuscateHeaderFields)
+	copy.Callbacks = collection.CopySlice(inbox.Callbacks)
 	return copy
 }
 
 func CopyRequest(request Request) Request {
 	copy := request
 	copy.Headers = collection.CopySliceMap(request.Headers)
+	copy.CallbackResponses = collection.CopySlice(copy.CallbackResponses)
 	return copy
 }
 
