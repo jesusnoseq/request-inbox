@@ -38,6 +38,46 @@ const CallbackResponseView: React.FC<CallbackResponseViewProps> = ({
                     Callback {index + 1}
                 </Typography>
                 
+                {callbackResponse.URL && (
+                    <Typography variant="body2" sx={{ marginBottom: 1 }}>
+                        <strong>URL:</strong>{' '}
+                        <Typography 
+                            component="a" 
+                            href={callbackResponse.URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{ 
+                                color: 'primary.main',
+                                textDecoration: 'none',
+                                '&:hover': {
+                                    textDecoration: 'underline'
+                                }
+                            }}
+                        >
+                            {callbackResponse.URL}
+                        </Typography>
+                    </Typography>
+                )}
+                
+                {callbackResponse.Method && (
+                    <Typography variant="body2" sx={{ marginBottom: 1 }}>
+                        <strong>Method:</strong> {callbackResponse.Method}
+                    </Typography>
+                )}
+                
+                {callbackResponse.Error && (
+                    <Typography variant="body2" sx={{ 
+                        marginBottom: 1, 
+                        color: 'error.main',
+                        padding: 1,
+                        borderRadius: 1,
+                        border: '1px solid',
+                        borderColor: 'error.main'
+                    }}>
+                        <strong>Error:</strong> {callbackResponse.Error}
+                    </Typography>
+                )}
+                
                 {callbackResponse.Code !== 0 && (
                     <Typography variant="body2" sx={{ marginBottom: 1 }}>
                         <strong>Status Code:</strong> {callbackResponse.Code}

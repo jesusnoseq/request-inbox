@@ -130,7 +130,8 @@ const BodyView: React.FC<BodyViewProps> = ({ title, data, defaultExpanded = true
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    p: 1.5,
+                    p: 0,
+                    paddingX: 1.5,
                     borderBottom: `1px solid ${muiTheme.palette.divider}`,
                     backgroundColor: theme.isDarkMode 
                         ? muiTheme.palette.grey[800] 

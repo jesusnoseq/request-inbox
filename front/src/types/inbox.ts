@@ -25,11 +25,13 @@ export type InboxCallback = {
 }
 
 export type CallbackResponse = {
+    URL: string;
+	Method: string;
+	Error: string;
     Code: number;
     CodeTemplate: string;
     Body: string;
     Headers: Record<string, string>;
-    IsDynamic: boolean;
 }
 
 export type InboxRequest = {
