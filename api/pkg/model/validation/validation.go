@@ -56,7 +56,7 @@ func IsValidCallback(cb model.Callback) (bool, error) {
 
 func IsHTTPStatusCode(code int) (bool, error) {
 	if code < 100 || code > 999 {
-		return false, &ValidationError{message: "Status code should be an intenger between 100 and 999"}
+		return false, &ValidationError{message: "Status code should be an integer between 100 and 999"}
 	}
 	return true, nil
 }
