@@ -88,13 +88,15 @@ func GenerateRequest(id int) Request {
 		Method:        "POST",
 		CallbackResponses: []CallbackResponse{
 			{
+				URL:          "http://example.com/callback",
+				Method:       "POST",
+				Error:        "",
 				Code:         200,
 				CodeTemplate: "200",
 				Body:         "callback response " + mustRandomString(5),
 				Headers: map[string]string{
 					"Content-Type": "application/json",
 				},
-				IsDynamic: false,
 			},
 		},
 	}

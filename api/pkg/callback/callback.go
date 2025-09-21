@@ -29,7 +29,10 @@ func SendCallbacks(inbox model.Inbox, request model.Request) []model.CallbackRes
 			slog.Info("callback response received",
 				"inbox_id", inbox.ID,
 				"callback_index", k,
+				"url", cResp.URL,
+				"method", cResp.Method,
 				"status_code", cResp.Code,
+				"error", cResp.Error,
 				"response_body", cResp.Body)
 			callbackResponse[k] = cResp
 		}(k, c)
@@ -42,6 +45,9 @@ func SendCallbacks(inbox model.Inbox, request model.Request) []model.CallbackRes
 // SendCallback sends a single callback request and returns the response
 func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Request) model.CallbackResponse {
 	response := model.CallbackResponse{
+		URL:     c.ToURL,
+		Method:  c.Method,
+		Error:   "",
 		Code:    0,
 		Body:    "",
 		Headers: make(map[string]string),
@@ -91,7 +97,7 @@ func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Requ
 	// Create HTTP request
 	req, err := http.NewRequest(callbackCopy.Method, callbackCopy.ToURL, bodyReader)
 	if err != nil {
-		response.Body = fmt.Sprintf("Error creating callback request: %v", err)
+		response.Error = fmt.Sprintf("Error creating callback request: %v", err)
 		return response
 	}
 
@@ -108,13 +114,13 @@ func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Requ
 	// Make the HTTP request
 	resp, err := client.Do(req)
 	if err != nil {
-		response.Body = fmt.Sprintf("Error sending callback request: %v", err)
+		response.Error = fmt.Sprintf("Error sending callback request: %v", err)
 		return response
 	}
 	defer func() {
 		err := resp.Body.Close()
 		if err != nil {
-			response.Body = fmt.Sprintf("Error closing response body: %v", err)
+			response.Error = fmt.Sprintf("Error closing response body: %v", err)
 			slog.Error("Error closing callback response body", "error", err, "inbox_id", inbox.ID, "callback_index", k)
 		}
 	}()
@@ -122,7 +128,7 @@ func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Requ
 	// Read response body
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		response.Body = fmt.Sprintf("Error reading callback response: %v", err)
+		response.Error = fmt.Sprintf("Error reading callback response: %v", err)
 		return response
 	}
 
@@ -136,6 +142,9 @@ func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Requ
 
 	// Create successful response
 	response = model.CallbackResponse{
+		URL:     callbackCopy.ToURL,
+		Method:  callbackCopy.Method,
+		Error:   "",
 		Code:    resp.StatusCode,
 		Body:    string(respBody),
 		Headers: headers,

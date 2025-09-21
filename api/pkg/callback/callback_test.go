@@ -74,6 +74,18 @@ func TestSendCallback_Success(t *testing.T) {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, response.Code)
 	}
 
+	if response.URL != server.URL {
+		t.Errorf("Expected URL %s, got %s", server.URL, response.URL)
+	}
+
+	if response.Method != "POST" {
+		t.Errorf("Expected Method POST, got %s", response.Method)
+	}
+
+	if response.Error != "" {
+		t.Errorf("Expected no error, got %s", response.Error)
+	}
+
 	if response.Body != `{"success": true}` {
 		t.Errorf("Expected body %s, got %s", `{"success": true}`, response.Body)
 	}
@@ -125,16 +137,16 @@ func TestSendCallback_InvalidURL(t *testing.T) {
 
 	response := SendCallback(inbox, 0, callback, request)
 
-	if response.Code != http.StatusInternalServerError {
-		t.Errorf("Expected status code %d, got %d", http.StatusInternalServerError, response.Code)
+	if response.Code != 0 {
+		t.Errorf("Expected status code 0, got %d", response.Code)
 	}
 
-	if response.Body == "" {
-		t.Error("Expected error message in response body, got empty string")
+	if response.Error == "" {
+		t.Error("Expected error message in response Error field, got empty string")
 	}
 
-	if !strings.Contains(response.Body, "Error sending callback request") {
-		t.Errorf("Expected error message about sending request, got %s", response.Body)
+	if !strings.Contains(response.Error, "Error") {
+		t.Errorf("Expected error message about creating or sending request, got %s", response.Error)
 	}
 }
 
@@ -151,12 +163,12 @@ func TestSendCallback_NetworkError(t *testing.T) {
 
 	response := SendCallback(inbox, 0, callback, request)
 
-	if response.Code != http.StatusInternalServerError {
-		t.Errorf("Expected status code %d, got %d", http.StatusInternalServerError, response.Code)
+	if response.Code != 0 {
+		t.Errorf("Expected status code 0, got %d", response.Code)
 	}
 
-	if !strings.Contains(response.Body, "Error sending callback request") {
-		t.Errorf("Expected error message about sending request, got %s", response.Body)
+	if !strings.Contains(response.Error, "Error sending callback request") {
+		t.Errorf("Expected error message about sending request, got %s", response.Error)
 	}
 }
 
