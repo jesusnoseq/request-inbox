@@ -16,10 +16,10 @@ import {
     InputLabel,
     TextareaAutosize,
     InputAdornment,
-    Tooltip,
-    IconButton
+    // Tooltip,
+    // IconButton
 } from '@mui/material';
-import InfoIcon from '@mui/icons-material/Info';
+// import InfoIcon from '@mui/icons-material/Info';
 import { InboxCallback } from '../types/inbox';
 import HeadersEditor, { Header, convertRecordToHeaders, convertHeadersToRecord } from './HeadersEditor';
 
