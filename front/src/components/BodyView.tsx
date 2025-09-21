@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { 
     Typography, 
     Paper, 
-    Grid, 
     Box, 
     Chip, 
     Collapse, 
@@ -38,14 +37,12 @@ const BodyView: React.FC<BodyViewProps> = ({ title, data, defaultExpanded = true
     if (!data) return null;
 
     let body;
-    let isJson = false;
     let dataType = 'text';
     let parsedData = null;
 
     // Try to parse as JSON
     try {
         parsedData = JSON.parse(data);
-        isJson = true;
         dataType = 'json';
         body = (
             <JsonView 
