@@ -38,9 +38,11 @@ const CallbackResponseView: React.FC<CallbackResponseViewProps> = ({
                     Callback {index + 1}
                 </Typography>
                 
-                <Typography variant="body2" sx={{ marginBottom: 1 }}>
-                    <strong>Status Code:</strong> {callbackResponse.Code}
-                </Typography>
+                {callbackResponse.Code !== 0 && (
+                    <Typography variant="body2" sx={{ marginBottom: 1 }}>
+                        <strong>Status Code:</strong> {callbackResponse.Code}
+                    </Typography>
+                )}
                 
                 {hasHeaders && (
                     <>

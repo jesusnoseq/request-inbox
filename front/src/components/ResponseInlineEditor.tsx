@@ -116,27 +116,29 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                         }
                     </Box>
                     <Paper variant="outlined" sx={{ p: 2 }}>
-                        <Box sx={{ display: 'flex', flexGrow: 1 }}>
-                            <Box sx={{ width: "12ch", mr: 5 }}>
-                                <Typography color="textSecondary">
-                                    Status code
-                                </Typography>
-                                {statusCode}
-                            </Box>
-
-                            {isDynamic &&
-                                <Box sx={{ mb: 2, minWidth: "30ch", flexGrow: 1 }}>
-                                    <Typography color="textSecondary">
-                                        Status code template
+                        <Box sx={{ mb: 3 }}>
+                            <Box sx={{ display: 'flex', flexGrow: 1 }}>
+                                <Box sx={{ width: "12ch", mr: 5 }}>
+                                    <Typography color="textSecondary" sx={{ mb: 1 }}>
+                                        Status code
                                     </Typography>
-                                    {statusCodeTemplate}
+                                    {statusCode}
                                 </Box>
-                            }
+
+                                {isDynamic &&
+                                    <Box sx={{ minWidth: "30ch", flexGrow: 1 }}>
+                                        <Typography color="textSecondary" sx={{ mb: 1 }}>
+                                            Status code template
+                                        </Typography>
+                                        {statusCodeTemplate}
+                                    </Box>
+                                }
+                            </Box>
                         </Box>
 
                         {headers.length !== 0 &&
-                            <>
-                                <Typography color="textSecondary">
+                            <Box sx={{ mb: 3 }}>
+                                <Typography color="textSecondary" sx={{ mb: 1 }}>
                                     Headers
                                 </Typography>
                                 <TableContainer component={Paper}>
@@ -153,10 +155,14 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                            </>
+                            </Box>
                         }
-                        <BodyView data={body} />
-
+                        <Box>
+                            <Typography color="textSecondary" sx={{ mb: 1 }}>
+                                Body
+                            </Typography>   
+                            <BodyView data={body} />
+                        </Box>
                     </Paper>
                 </Box >
             }
@@ -171,82 +177,97 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
 
                     <Paper variant="outlined" sx={{ p: 2 }}>
                         <FormControl fullWidth sx={{ m: 1 }}>
-                            <Box sx={{ display: 'flex', flexGrow: 1 }}>
-                                <TextField
-                                    sx={{ mb: 2, mr: 5, width: "12ch" }}
-                                    required
-                                    id="status-code"
-                                    label="Status code"
-                                    variant="standard"
-                                    value={statusCode.toString()}
-                                    onChange={handleStatusCodeChange}
-                                    size='medium'
-                                    error={statusCodeError}
-                                    inputProps={{
-                                        maxLength: 3,
-                                        minLength: 3,
-                                        inputMode: 'numeric',
-                                        pattern: '[0-9]*',
-                                    }}
-                                    InputLabelProps={{
-                                        color: "primary",
-                                        sx: { fontSize: '1.25rem' },
-                                    }}
-                                />
-                                {
-                                    isDynamic &&
-
+                            <Box sx={{ mb: 3 }}>
+                                <Box sx={{ display: 'flex', flexGrow: 1 }}>
                                     <TextField
-                                        sx={{ mb: 2, minWidth: "30ch", flexGrow: 1 }}
+                                        sx={{ mr: 5, width: "12ch" }}
                                         required
-                                        id="status-code-template"
-                                        label="Status code template"
+                                        id="status-code"
+                                        label="Status code"
                                         variant="standard"
-                                        value={statusCodeTemplate.toString()}
-                                        onChange={handleStatusCodeTemplateChange}
+                                        value={statusCode.toString()}
+                                        onChange={handleStatusCodeChange}
                                         size='medium'
-                                        InputProps={{
-                                            inputComponent: TextareaAutosize,
-                                            inputProps: {
-                                                minRows: 1,
-                                                style: { resize: 'none' }, // Prevent manual resizing
+                                        error={statusCodeError}
+                                        slotProps={{
+                                            htmlInput: {
+                                                maxLength: 3,
+                                                minLength: 3,
+                                                inputMode: 'numeric',
+                                                pattern: '[0-9]*',
                                             },
-                                        }}
-                                        InputLabelProps={{
-                                            color: "primary",
-                                            sx: { fontSize: '1.25rem' },
+                                            inputLabel: {
+                                                color: "primary",
+                                                sx: { fontSize: '1.25rem' },
+                                            }
                                         }}
                                     />
-                                }
-                            </Box>
-                            Headers
-                            <HeadersEditor initialHeaders={headers} onHeadersChange={setHeaders} />
+                                    {
+                                        isDynamic &&
 
-                            <TextField
-                                id="outlined-multiline-flexible"
-                                label="Body"
-                                multiline
-                                fullWidth
-                                variant="standard"
-                                rows={3}
-                                value={body}
-                                onChange={handleBodyChange}
-                                sx={{ mt: 2 }}
-                                InputProps={{
-                                    inputComponent: TextareaAutosize,
-                                    inputProps: {
-                                        minRows: 3,
-                                        style: { resize: 'none' }, // Prevent manual resizing
-                                    },
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <Button onClick={formatAsJson} variant="outlined" size="small" color="secondary">
-                                                Format as JSON
-                                            </Button>
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
+                                        <TextField
+                                            sx={{ minWidth: "30ch", flexGrow: 1 }}
+                                            required
+                                            id="status-code-template"
+                                            label="Status code template"
+                                            variant="standard"
+                                            value={statusCodeTemplate.toString()}
+                                            onChange={handleStatusCodeTemplateChange}
+                                            size='medium'
+                                            slotProps={{
+                                                input: {
+                                                    inputComponent: TextareaAutosize,
+                                                    inputProps: {
+                                                        minRows: 1,
+                                                        style: { resize: 'none' }, // Prevent manual resizing
+                                                    },
+                                                },
+                                                inputLabel: {
+                                                    color: "primary",
+                                                    sx: { fontSize: '1.25rem' },
+                                                }
+                                            }}
+                                        />
+                                    }
+                                </Box>
+                            </Box>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="subtitle1">
+                                    Headers
+                                </Typography>
+                                <HeadersEditor initialHeaders={headers} onHeadersChange={setHeaders} />
+                            </Box>
+
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                    Body
+                                </Typography>
+                                <TextField
+                                    id="outlined-multiline-flexible"
+                                    multiline
+                                    fullWidth
+                                    variant="standard"
+                                    rows={3}
+                                    value={body}
+                                    onChange={handleBodyChange}
+                                    slotProps={{
+                                        input: {
+                                            inputComponent: TextareaAutosize,
+                                            inputProps: {
+                                                minRows: 3,
+                                                style: { resize: 'none' }, // Prevent manual resizing
+                                            },
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <Button onClick={formatAsJson} variant="outlined" size="small" color="secondary">
+                                                        Format as JSON
+                                                    </Button>
+                                                </InputAdornment>
+                                            ),
+                                        }
+                                    }}
+                                />
+                            </Box>
                             <FormGroup row sx={{ mt: 1 }}>
                                 <FormControlLabel
                                     control={<Switch checked={isDynamic} onChange={handleIsDynamicToggle} />}
