@@ -271,13 +271,13 @@ func TestSendCallbacks_AllEnabled(t *testing.T) {
 	// Create test servers for callbacks
 	server1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"callback": 1}`))
+		t_util.MustWrite(t, w, []byte(`{"callback": 1}`))
 	}))
 	defer server1.Close()
 
 	server2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(`{"callback": 2}`))
+		t_util.MustWrite(t, w, []byte(`{"callback": 2}`))
 	}))
 	defer server2.Close()
 
@@ -330,7 +330,7 @@ func TestSendCallbacks_MixedEnabledDisabled(t *testing.T) {
 	// Create test server for enabled callback
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"enabled": true}`))
+		t_util.MustWrite(t, w, []byte(`{"enabled": true}`))
 	}))
 	defer server.Close()
 
@@ -451,10 +451,10 @@ func TestSendCallbacks_ErrorHandling(t *testing.T) {
 		if callCount%2 == 0 {
 			// Every second call fails
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"error": "server error"}`))
+			t_util.MustWrite(t, w, []byte(`{"error": "server error"}`))
 		} else {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"success": true}`))
+			t_util.MustWrite(t, w, []byte(`{"success": true}`))
 		}
 	}))
 	defer server.Close()
@@ -510,7 +510,7 @@ func TestSendCallbacks_Concurrency(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(delay) // Simulate slow callback
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"delayed": true}`))
+		t_util.MustWrite(t, w, []byte(`{"delayed": true}`))
 	}))
 	defer server.Close()
 

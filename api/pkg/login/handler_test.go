@@ -97,21 +97,18 @@ func OauthServerHandlers(t *testing.T) http.Handler {
 	// Handle /token endpoint
 	mux.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, err := w.Write([]byte(`{"access_token": "mocktoken", "id_token": "mockidtoken", "token_type": "bearer"}`))
-		t_util.AssertNoError(t, err)
+		t_util.MustWrite(t, w, []byte(`{"access_token": "mocktoken", "id_token": "mockidtoken", "token_type": "bearer"}`))
 	})
 
 	// Handle /introspect endpoint
 	mux.HandleFunc("/introspect", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, err := w.Write([]byte(`{"active": true}`))
-		t_util.AssertNoError(t, err)
+		t_util.MustWrite(t, w, []byte(`{"active": true}`))
 	})
 
 	mux.HandleFunc("/userinfo", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, err := w.Write([]byte(`{"email": "test@mail.dev"}`))
-		t_util.AssertNoError(t, err)
+		t_util.MustWrite(t, w, []byte(`{"email": "test@mail.dev"}`))
 	})
 	return mux
 }
