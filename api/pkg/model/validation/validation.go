@@ -19,23 +19,23 @@ func (e *ValidationError) Error() string {
 	return e.message
 }
 
-func IsValidInbox(i model.Inbox) (bool, error) {
-	if i.ID == uuid.Nil {
+func IsValidInbox(inbox model.Inbox) (bool, error) {
+	if inbox.ID == uuid.Nil {
 		return false, &ValidationError{message: "Inbox ID cannot be empty"}
 	}
-	if i.Name == "" {
+	if inbox.Name == "" {
 		return false, &ValidationError{message: "Inbox Name cannot be empty"}
 	}
-	if i.Timestamp == 0 {
+	if inbox.Timestamp == 0 {
 		return false, &ValidationError{message: "Inbox Timestamp cannot be empty"}
 	}
-	if _, err := IsHTTPStatusCode(i.Response.Code); err != nil {
+	if _, err := IsHTTPStatusCode(inbox.Response.Code); err != nil {
 		return false, err
 	}
-	if len(i.Callbacks) > config.GetInt(config.MaxCallbacksKey) {
+	if len(inbox.Callbacks) > config.GetInt(config.MaxCallbacksKey) {
 		return false, &ValidationError{message: fmt.Sprintf("Inbox cannot have more than %d callbacks", config.GetInt(config.MaxCallbacksKey))}
 	}
-	for _, cb := range i.Callbacks {
+	for _, cb := range inbox.Callbacks {
 		if valid, err := IsValidCallback(cb); !valid {
 			return false, err
 		}
