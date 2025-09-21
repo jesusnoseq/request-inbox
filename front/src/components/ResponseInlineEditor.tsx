@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InboxResponse } from '../types/inbox';
 import {
-    Container, TextField, Box, FormControl, FormControlLabel, FormGroup, IconButton, Typography, Button,
+    TextField, Box, FormControl, FormControlLabel, FormGroup, IconButton, Typography, Button,
     InputAdornment, TextareaAutosize, Switch, Tooltip
 } from '@mui/material';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
