@@ -34,8 +34,6 @@ type Response struct {
 	IsDynamic    bool
 }
 
-type CallbackResponse Response
-
 type Request struct {
 	ID                int
 	Timestamp         int64 `dynamodbav:"unixTimestamp"`
@@ -48,16 +46,6 @@ type Request struct {
 	ContentLength     int64
 	Body              string
 	CallbackResponses []CallbackResponse
-}
-
-type Callback struct {
-	IsEnabled bool `dynamodbav:"enabled"`
-	IsDynamic bool `dynamodbav:"isDynamic"`
-	// PrefixURL string            `dynamodbav:"prefixURL"`
-	ToURL   string            `dynamodbav:"toURL"`
-	Method  string            `dynamodbav:"method"`
-	Headers map[string]string `dynamodbav:"headers"`
-	Body    string            `dynamodbav:"body"`
 }
 
 func NewInbox() Inbox {
@@ -76,17 +64,5 @@ func NewInbox() Inbox {
 		Callbacks:             []Callback{},
 		IsPrivate:             false,
 		OwnerID:               uuid.UUID{},
-	}
-}
-
-func NewCallback() Callback {
-	return Callback{
-		IsEnabled: false,
-		IsDynamic: false,
-		Method:    "",
-		ToURL:     "",
-		// PrefixURL: "",
-		Headers: map[string]string{},
-		Body:    "",
 	}
 }
