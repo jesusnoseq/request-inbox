@@ -41,9 +41,8 @@ func SendCallbacks(inbox model.Inbox, request model.Request) []model.CallbackRes
 
 // SendCallback sends a single callback request and returns the response
 func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Request) model.CallbackResponse {
-	// Initialize response with error defaults
 	response := model.CallbackResponse{
-		Code:    http.StatusInternalServerError,
+		Code:    0,
 		Body:    "",
 		Headers: make(map[string]string),
 	}
