@@ -312,13 +312,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 	}
 	filterRequestData(&request)
 
-	// TODO
-	// handle response return
-	// add extra functions to templates
-	// handle dynamic templates for callbacks
-	// save callbacks responses
-	// test callbacks
-	callbackResponses := callback.SendCallbacks(inbox, request)
+	callbackResponses := callback.SendCallbacks(c, inbox, request)
 	request.CallbackResponses = callbackResponses
 	err = ih.dao.AddRequestToInbox(c, id, request)
 	if err != nil {

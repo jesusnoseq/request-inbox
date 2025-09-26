@@ -2,6 +2,7 @@ package callback
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"log/slog"
@@ -10,32 +11,37 @@ import (
 	"time"
 
 	"github.com/jesusnoseq/request-inbox/pkg/config"
+	"github.com/jesusnoseq/request-inbox/pkg/dynamic_response"
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
 // SendCallbacks sends all enabled callbacks for an inbox concurrently and returns their responses
-func SendCallbacks(inbox model.Inbox, request model.Request) []model.CallbackResponse {
+func SendCallbacks(c context.Context, inbox model.Inbox, request model.Request) []model.CallbackResponse {
 	callbackResponse := make([]model.CallbackResponse, len(inbox.Callbacks))
 	var wg sync.WaitGroup
-
-	for k, c := range inbox.Callbacks {
-		if !c.IsEnabled {
+	callbacks, err := dynamic_response.ParseCallbacks(c, inbox, request)
+	if err != nil {
+		slog.Error("Error parsing callbacks", "error", err, "inbox_id", inbox.ID)
+		return callbackResponse
+	}
+	for k, cb := range callbacks {
+		if !cb.IsEnabled {
 			continue
 		}
 		wg.Add(1)
-		go func(k int, c model.Callback) {
+		go func(k int, cb model.Callback) {
 			defer wg.Done()
-			cResp := SendCallback(inbox, k, c, request)
+			cbResp := SendCallback(inbox, k, cb, request)
 			slog.Info("callback response received",
 				"inbox_id", inbox.ID,
 				"callback_index", k,
-				"url", cResp.URL,
-				"method", cResp.Method,
-				"status_code", cResp.Code,
-				"error", cResp.Error,
-				"response_body", cResp.Body)
-			callbackResponse[k] = cResp
-		}(k, c)
+				"url", cbResp.URL,
+				"method", cbResp.Method,
+				"status_code", cbResp.Code,
+				"error", cbResp.Error,
+				"response_body", cbResp.Body)
+			callbackResponse[k] = cbResp
+		}(k, cb)
 	}
 	wg.Wait()
 
@@ -55,32 +61,6 @@ func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Requ
 
 	// Create a copy of the callback for dynamic parsing if needed
 	callbackCopy := c
-
-	// Parse dynamic content if callback is dynamic
-	// if c.IsDynamic {
-	// 	// Create a temporary inbox with the callback data to use ParseInbox functionality
-	// 	tempInbox := model.Inbox{
-	// 		Response: model.Response{
-	// 			Body:    c.Body,
-	// 			Headers: c.Headers,
-	// 		},
-	// 	}
-
-	// 	// Parse the callback using the existing dynamic parsing
-	// 	parsedInbox, err := dynamic_response.ParseInbox(context.Background(), tempInbox, request)
-	// 	if err != nil {
-	// 		response.Body = fmt.Sprintf("Error parsing dynamic callback content: %v", err)
-	// 		return response
-	// 	}
-
-	// 	// Apply parsed values back to callback
-	// 	callbackCopy.Body = parsedInbox.Response.Body
-	// 	callbackCopy.Headers = parsedInbox.Response.Headers
-
-	// 	// For URL parsing, we need to manually handle it since ParseInbox doesn't parse URLs
-	// 	// For now, we'll use the URL as-is for dynamic callbacks
-	// 	// TODO: Implement proper URL template parsing if needed
-	// }
 
 	// Create HTTP client with timeout from config
 	timeout := time.Duration(config.GetInt(config.CallbackTimeoutSeconds)) * time.Second

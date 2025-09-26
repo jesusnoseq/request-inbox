@@ -64,19 +64,18 @@ func ParseInbox(c context.Context, inbox model.Inbox, req model.Request) (model.
 	}
 	inCopy.Response.Headers = parsedHeaders
 
-	callbacks, err := ParseCallbacks(c, inCopy, req)
-	if err != nil {
-		return inCopy, fmt.Errorf("callback template error: %w", err)
-	}
-	inCopy.Callbacks = callbacks
-
 	return inCopy, nil
 }
 
 func ParseCallbacks(c context.Context, inbox model.Inbox, req model.Request) ([]model.Callback, error) {
-	callbacks := make([]model.Callback, 0, len(inbox.Callbacks))
+	callbacks := make([]model.Callback, len(inbox.Callbacks))
 
 	for i, cb := range inbox.Callbacks {
+		if !cb.IsDynamic {
+			callbacks[i] = cb // Non-dynamic callbacks are kept as-is
+			continue
+		}
+
 		values := map[string]any{
 			"Request": req,
 			"Inbox":   &inbox,
@@ -98,14 +97,14 @@ func ParseCallbacks(c context.Context, inbox model.Inbox, req model.Request) ([]
 		if err != nil {
 			return nil, fmt.Errorf("callback %d %w", i, err)
 		}
-		callbacks = append(callbacks, model.Callback{
+		callbacks[i] = model.Callback{
 			IsEnabled: cb.IsEnabled,
 			IsDynamic: cb.IsDynamic,
 			ToURL:     parsedURL,
 			Method:    parsedMethod,
 			Headers:   parsedHeaders,
 			Body:      parsedBody,
-		})
+		}
 	}
 	return callbacks, nil
 }

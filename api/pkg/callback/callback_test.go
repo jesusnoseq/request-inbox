@@ -1,6 +1,7 @@
 package callback
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -287,6 +288,7 @@ func TestSendCallbacks_AllEnabled(t *testing.T) {
 		Callbacks: []model.Callback{
 			{
 				IsEnabled: true,
+				IsDynamic: false, // Ensure non-dynamic to avoid parsing issues
 				ToURL:     server1.URL,
 				Method:    "POST",
 				Headers:   map[string]string{"Content-Type": "application/json"},
@@ -294,6 +296,7 @@ func TestSendCallbacks_AllEnabled(t *testing.T) {
 			},
 			{
 				IsEnabled: true,
+				IsDynamic: false, // Ensure non-dynamic to avoid parsing issues
 				ToURL:     server2.URL,
 				Method:    "POST",
 				Headers:   map[string]string{"Content-Type": "application/json"},
@@ -303,7 +306,7 @@ func TestSendCallbacks_AllEnabled(t *testing.T) {
 	}
 	request := createTestRequest()
 
-	responses := SendCallbacks(inbox, request)
+	responses := SendCallbacks(context.Background(), inbox, request)
 
 	if len(responses) != 2 {
 		t.Errorf("Expected 2 responses, got %d", len(responses))
@@ -340,6 +343,7 @@ func TestSendCallbacks_MixedEnabledDisabled(t *testing.T) {
 		Callbacks: []model.Callback{
 			{
 				IsEnabled: true,
+				IsDynamic: false,
 				ToURL:     server.URL,
 				Method:    "POST",
 				Headers:   map[string]string{},
@@ -347,6 +351,7 @@ func TestSendCallbacks_MixedEnabledDisabled(t *testing.T) {
 			},
 			{
 				IsEnabled: false, // This should be skipped
+				IsDynamic: false,
 				ToURL:     "http://should-not-be-called.com",
 				Method:    "POST",
 				Headers:   map[string]string{},
@@ -354,6 +359,7 @@ func TestSendCallbacks_MixedEnabledDisabled(t *testing.T) {
 			},
 			{
 				IsEnabled: true,
+				IsDynamic: false,
 				ToURL:     server.URL,
 				Method:    "GET",
 				Headers:   map[string]string{},
@@ -363,7 +369,7 @@ func TestSendCallbacks_MixedEnabledDisabled(t *testing.T) {
 	}
 	request := createTestRequest()
 
-	responses := SendCallbacks(inbox, request)
+	responses := SendCallbacks(context.Background(), inbox, request)
 
 	if len(responses) != 3 {
 		t.Errorf("Expected 3 responses (including disabled), got %d", len(responses))
@@ -396,7 +402,7 @@ func TestSendCallbacks_EmptyCallbacks(t *testing.T) {
 	}
 	request := createTestRequest()
 
-	responses := SendCallbacks(inbox, request)
+	responses := SendCallbacks(context.Background(), inbox, request)
 
 	if len(responses) != 0 {
 		t.Errorf("Expected 0 responses for empty callbacks, got %d", len(responses))
@@ -410,6 +416,7 @@ func TestSendCallbacks_AllDisabled(t *testing.T) {
 		Callbacks: []model.Callback{
 			{
 				IsEnabled: false,
+				IsDynamic: false,
 				ToURL:     "http://should-not-be-called.com",
 				Method:    "POST",
 				Headers:   map[string]string{},
@@ -417,6 +424,7 @@ func TestSendCallbacks_AllDisabled(t *testing.T) {
 			},
 			{
 				IsEnabled: false,
+				IsDynamic: false,
 				ToURL:     "http://should-not-be-called2.com",
 				Method:    "POST",
 				Headers:   map[string]string{},
@@ -426,7 +434,7 @@ func TestSendCallbacks_AllDisabled(t *testing.T) {
 	}
 	request := createTestRequest()
 
-	responses := SendCallbacks(inbox, request)
+	responses := SendCallbacks(context.Background(), inbox, request)
 
 	if len(responses) != 2 {
 		t.Errorf("Expected 2 responses (for disabled callbacks), got %d", len(responses))
@@ -465,6 +473,7 @@ func TestSendCallbacks_ErrorHandling(t *testing.T) {
 		Callbacks: []model.Callback{
 			{
 				IsEnabled: true,
+				IsDynamic: false,
 				ToURL:     server.URL,
 				Method:    "POST",
 				Headers:   map[string]string{},
@@ -472,6 +481,7 @@ func TestSendCallbacks_ErrorHandling(t *testing.T) {
 			},
 			{
 				IsEnabled: true,
+				IsDynamic: false,
 				ToURL:     server.URL,
 				Method:    "POST",
 				Headers:   map[string]string{},
@@ -481,7 +491,7 @@ func TestSendCallbacks_ErrorHandling(t *testing.T) {
 	}
 	request := createTestRequest()
 
-	responses := SendCallbacks(inbox, request)
+	responses := SendCallbacks(context.Background(), inbox, request)
 
 	if len(responses) != 2 {
 		t.Errorf("Expected 2 responses, got %d", len(responses))
@@ -520,6 +530,7 @@ func TestSendCallbacks_Concurrency(t *testing.T) {
 		Callbacks: []model.Callback{
 			{
 				IsEnabled: true,
+				IsDynamic: false,
 				ToURL:     server.URL,
 				Method:    "POST",
 				Headers:   map[string]string{},
@@ -527,6 +538,7 @@ func TestSendCallbacks_Concurrency(t *testing.T) {
 			},
 			{
 				IsEnabled: true,
+				IsDynamic: false,
 				ToURL:     server.URL,
 				Method:    "POST",
 				Headers:   map[string]string{},
@@ -534,6 +546,7 @@ func TestSendCallbacks_Concurrency(t *testing.T) {
 			},
 			{
 				IsEnabled: true,
+				IsDynamic: false,
 				ToURL:     server.URL,
 				Method:    "POST",
 				Headers:   map[string]string{},
@@ -544,7 +557,7 @@ func TestSendCallbacks_Concurrency(t *testing.T) {
 	request := createTestRequest()
 
 	start := time.Now()
-	responses := SendCallbacks(inbox, request)
+	responses := SendCallbacks(context.Background(), inbox, request)
 	duration := time.Since(start)
 
 	if len(responses) != 3 {
@@ -563,5 +576,182 @@ func TestSendCallbacks_Concurrency(t *testing.T) {
 		if response.Code != http.StatusOK {
 			t.Errorf("Expected callback %d status %d, got %d", i, http.StatusOK, response.Code)
 		}
+	}
+}
+
+func TestSendCallbacks_DynamicCallbacks(t *testing.T) {
+	// Create test server that will verify dynamic content
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// The server will receive different content based on dynamic templates
+		if r.Header.Get("X-Inbox-Name") == "" {
+			t.Error("Expected X-Inbox-Name header to be set dynamically")
+		}
+		if r.Header.Get("X-Request-Method") == "" {
+			t.Error("Expected X-Request-Method header to be set dynamically")
+		}
+		if r.Header.Get("X-Request-URI") == "" {
+			t.Error("Expected X-Request-URI header to be set dynamically")
+		}
+
+		// Verify that the body contains dynamic content
+		if !strings.Contains(r.Header.Get("X-Inbox-Name"), "dynamic-test-inbox") {
+			t.Errorf("Expected inbox name in header, got %s", r.Header.Get("X-Inbox-Name"))
+		}
+		if !strings.Contains(r.Header.Get("X-Request-Method"), "POST") {
+			t.Errorf("Expected request method in header, got %s", r.Header.Get("X-Request-Method"))
+		}
+		if !strings.Contains(r.Header.Get("X-Request-URI"), "/test") {
+			t.Errorf("Expected request URI in header, got %s", r.Header.Get("X-Request-URI"))
+		}
+
+		w.WriteHeader(http.StatusOK)
+		t_util.MustWrite(t, w, []byte(`{"dynamic": "response"}`))
+	}))
+	defer server.Close()
+
+	inbox := model.Inbox{
+		ID:   uuid.New(),
+		Name: "dynamic-test-inbox",
+		Callbacks: []model.Callback{
+			{
+				IsEnabled: true,
+				IsDynamic: true, // Enable dynamic parsing
+				ToURL:     server.URL,
+				Method:    "{{.Request.Method}}", // Dynamic method from request
+				Headers: map[string]string{
+					"Content-Type":     "application/json",
+					"X-Inbox-Name":     "{{.Inbox.Name}}",             // Dynamic inbox name
+					"X-Request-Method": "{{.Request.Method}}",         // Dynamic request method
+					"X-Request-URI":    "{{.Request.URI}}",            // Dynamic request URI
+					"X-Request-Host":   "{{.Request.Host}}",           // Dynamic request host
+					"X-Callback-Index": "{{.Index}}",                  // Dynamic callback index
+					"X-Upper-Method":   "{{toUpper .Request.Method}}", // Using template function
+				},
+				Body: `{"original_method": "{{.Request.Method}}", "inbox_name": "{{.Inbox.Name}}", "uri": "{{.Request.URI}}"}`,
+			},
+			{
+				IsEnabled: true,
+				IsDynamic: true,
+				ToURL:     server.URL + "/callback-{{.Index}}", // Dynamic URL with index
+				Method:    "POST",
+				Headers: map[string]string{
+					"Content-Type":     "application/json",
+					"X-Inbox-Name":     "{{toLower .Inbox.Name}}", // Using toLower function
+					"X-Request-Method": "{{.Request.Method}}",
+					"X-Request-URI":    "{{.Request.URI}}",
+				},
+				Body: `{"callback_index": {{.Index}}, "request_body": {{.Request.Body}}}`,
+			},
+		},
+	}
+	request := createTestRequest()
+
+	responses := SendCallbacks(context.Background(), inbox, request)
+
+	if len(responses) != 2 {
+		t.Errorf("Expected 2 responses, got %d", len(responses))
+	}
+
+	// Check first dynamic callback response
+	if responses[0].Code != http.StatusOK {
+		t.Errorf("Expected first callback status %d, got %d", http.StatusOK, responses[0].Code)
+	}
+	if responses[0].Method != "POST" { // Should be parsed from Request.Method
+		t.Errorf("Expected first callback method POST, got %s", responses[0].Method)
+	}
+	if responses[0].URL != server.URL {
+		t.Errorf("Expected first callback URL %s, got %s", server.URL, responses[0].URL)
+	}
+
+	// Check second dynamic callback response
+	if responses[1].Code != http.StatusOK {
+		t.Errorf("Expected second callback status %d, got %d", http.StatusOK, responses[1].Code)
+	}
+	expectedURL := server.URL + "/callback-1"
+	if responses[1].URL != expectedURL {
+		t.Errorf("Expected second callback URL %s, got %s", expectedURL, responses[1].URL)
+	}
+}
+
+func TestSendCallbacks_DynamicCallbacksWithJSONPath(t *testing.T) {
+	// Create test server that will verify gjsonPath functionality
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Verify that gjsonPath extracted the correct value
+		if r.Header.Get("X-Extracted-Value") != "request" {
+			t.Errorf("Expected X-Extracted-Value to be 'request', got %s", r.Header.Get("X-Extracted-Value"))
+		}
+
+		w.WriteHeader(http.StatusOK)
+		t_util.MustWrite(t, w, []byte(`{"gjson": "success"}`))
+	}))
+	defer server.Close()
+
+	inbox := model.Inbox{
+		ID:   uuid.New(),
+		Name: "gjson-test-inbox",
+		Callbacks: []model.Callback{
+			{
+				IsEnabled: true,
+				IsDynamic: true,
+				ToURL:     server.URL,
+				Method:    "POST",
+				Headers: map[string]string{
+					"Content-Type":      "application/json",
+					"X-Extracted-Value": `{{gjsonPath .Request.Body "incoming"}}`,                       // Extract "incoming" field from JSON body
+					"X-Default-Value":   `{{gjsonPathOrDefault .Request.Body "nonexistent" "default"}}`, // Test default value
+				},
+				Body: `{"extracted": "{{gjsonPath .Request.Body "incoming"}}"}`,
+			},
+		},
+	}
+	request := createTestRequest() // This has Body: `{"incoming": "request"}`
+
+	responses := SendCallbacks(context.Background(), inbox, request)
+
+	if len(responses) != 1 {
+		t.Errorf("Expected 1 response, got %d", len(responses))
+	}
+
+	if responses[0].Code != http.StatusOK {
+		t.Errorf("Expected callback status %d, got %d", http.StatusOK, responses[0].Code)
+	}
+	if responses[0].Body != `{"gjson": "success"}` {
+		t.Errorf("Expected callback body %s, got %s", `{"gjson": "success"}`, responses[0].Body)
+	}
+}
+
+func TestSendCallbacks_DynamicCallbacksError(t *testing.T) {
+	inbox := model.Inbox{
+		ID:   uuid.New(),
+		Name: "error-test-inbox",
+		Callbacks: []model.Callback{
+			{
+				IsEnabled: true,
+				IsDynamic: true,
+				ToURL:     "{{.Invalid.Field}}", // This should cause a template error
+				Method:    "POST",
+				Headers:   map[string]string{},
+				Body:      "",
+			},
+		},
+	}
+	request := createTestRequest()
+
+	responses := SendCallbacks(context.Background(), inbox, request)
+
+	// When there's a parsing error, SendCallbacks should return empty responses
+	if len(responses) != 1 {
+		t.Errorf("Expected 1 response (empty due to error), got %d", len(responses))
+	}
+
+	// The response should be empty/zero value due to parsing error
+	if responses[0].Code != 0 {
+		t.Errorf("Expected empty response due to parsing error, got code %d", responses[0].Code)
+	}
+	if responses[0].URL != "<no value>" { // Template parsing produces "<no value>" for invalid fields
+		t.Errorf("Expected '<no value>' URL due to parsing error, got %s", responses[0].URL)
+	}
+	if responses[0].Error == "" {
+		t.Error("Expected error message in response")
 	}
 }
