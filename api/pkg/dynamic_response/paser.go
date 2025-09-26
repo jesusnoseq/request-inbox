@@ -58,15 +58,68 @@ func ParseInbox(c context.Context, inbox model.Inbox, req model.Request) (model.
 	}
 	inCopy.Response.Body = body
 
-	for k, v := range inCopy.Response.Headers {
-		parsedVal, err := parse(v, values)
-		if err != nil {
-			return inCopy, fmt.Errorf("header %s template error: %w", k, err)
-		}
-		inCopy.Response.Headers[k] = parsedVal
+	parsedHeaders, err := parseHeaders(inCopy.Response.Headers, values)
+	if err != nil {
+		return inCopy, fmt.Errorf("response %w", err)
 	}
+	inCopy.Response.Headers = parsedHeaders
+
+	callbacks, err := ParseCallbacks(c, inCopy, req)
+	if err != nil {
+		return inCopy, fmt.Errorf("callback template error: %w", err)
+	}
+	inCopy.Callbacks = callbacks
 
 	return inCopy, nil
+}
+
+func ParseCallbacks(c context.Context, inbox model.Inbox, req model.Request) ([]model.Callback, error) {
+	callbacks := make([]model.Callback, 0, len(inbox.Callbacks))
+
+	for i, cb := range inbox.Callbacks {
+		values := map[string]any{
+			"Request": req,
+			"Inbox":   &inbox,
+			"Index":   i,
+		}
+		parsedURL, err := parse(cb.ToURL, values)
+		if err != nil {
+			return nil, fmt.Errorf("callback %d URL template error: %w", i, err)
+		}
+		parsedMethod, err := parse(cb.Method, values)
+		if err != nil {
+			return nil, fmt.Errorf("callback %d Method template error: %w", i, err)
+		}
+		parsedBody, err := parse(cb.Body, values)
+		if err != nil {
+			return nil, fmt.Errorf("callback %d Body template error: %w", i, err)
+		}
+		parsedHeaders, err := parseHeaders(cb.Headers, values)
+		if err != nil {
+			return nil, fmt.Errorf("callback %d %w", i, err)
+		}
+		callbacks = append(callbacks, model.Callback{
+			IsEnabled: cb.IsEnabled,
+			IsDynamic: cb.IsDynamic,
+			ToURL:     parsedURL,
+			Method:    parsedMethod,
+			Headers:   parsedHeaders,
+			Body:      parsedBody,
+		})
+	}
+	return callbacks, nil
+}
+
+func parseHeaders(headers map[string]string, values map[string]any) (map[string]string, error) {
+	parsedHeaders := make(map[string]string)
+	for k, v := range headers {
+		parsedVal, err := parse(v, values)
+		if err != nil {
+			return nil, fmt.Errorf("header %s template error: %w", k, err)
+		}
+		parsedHeaders[k] = parsedVal
+	}
+	return parsedHeaders, nil
 }
 
 func parse(content string, values map[string]any) (string, error) {
