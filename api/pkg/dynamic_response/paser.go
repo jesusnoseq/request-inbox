@@ -33,7 +33,7 @@ var templateFuncMap = template.FuncMap{
 	"stringToInt":             stringToInt,
 }
 
-func ParseInbox(c context.Context, inbox model.Inbox, req model.Request) (model.Inbox, error) {
+func ParseInboxResponse(c context.Context, inbox model.Inbox, req model.Request) (model.Inbox, error) {
 	inCopy := model.CopyInbox(inbox)
 	values := map[string]any{
 		"Request": req,

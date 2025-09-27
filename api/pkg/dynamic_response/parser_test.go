@@ -205,7 +205,7 @@ func TestParseInbox(t *testing.T) {
 	ctx := context.Background()
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			got, err := dynamic_response.ParseInbox(ctx, tc.inbox, tc.req)
+			got, err := dynamic_response.ParseInboxResponse(ctx, tc.inbox, tc.req)
 
 			if err != nil && !tc.expectErr {
 				t.Error(err)

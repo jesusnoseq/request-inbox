@@ -312,8 +312,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 	}
 	filterRequestData(&request)
 
-	callbackResponses := callback.SendCallbacks(c, inbox, request)
-	request.CallbackResponses = callbackResponses
+	request.CallbackResponses = callback.SendCallbacks(c, inbox, request)
 	err = ih.dao.AddRequestToInbox(c, id, request)
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
@@ -324,7 +323,7 @@ func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
 	}
 
 	if inbox.Response.IsDynamic {
-		inbox, err = dynamic_response.ParseInbox(c, inbox, request)
+		inbox, err = dynamic_response.ParseInboxResponse(c, inbox, request)
 		if err != nil {
 			c.AbortWithStatusJSON(model.ErrorResponseFromError(err, http.StatusInternalServerError))
 			return
