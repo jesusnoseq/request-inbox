@@ -215,5 +215,6 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - WebSocket support for real-time updates
 - Custom domain support for inboxes
 - Advanced filtering and search
-- Request passthrough
+- Request callback/passthrough
 - Performance monitoring and metrics
+- Docker images
