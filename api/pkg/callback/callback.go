@@ -19,25 +19,35 @@ import (
 func SendCallbacks(c context.Context, inbox model.Inbox, request model.Request) []model.CallbackResponse {
 	callbackResponse := make([]model.CallbackResponse, len(inbox.Callbacks))
 	var wg sync.WaitGroup
-	callbacks, err := dynamic_response.ParseCallbacks(c, inbox, request)
-	if err != nil {
-		slog.Error("Error parsing callbacks", "error", err, "inbox_id", inbox.ID)
-		return callbackResponse
-	}
-	for k, cb := range callbacks {
-		if !cb.IsEnabled {
-			continue
-		}
+
+	for k := range inbox.Callbacks {
 		wg.Add(1)
-		go func(k int, cb model.Callback) {
+		go func(k int) {
 			defer wg.Done()
-			isValid, err := validation.IsValidCallbackURL(cb.ToURL)
-			if !isValid {
-				slog.Error("Invalid callback URL", "error", err, "inbox_id", inbox.ID, "callback_index", k)
+
+			// Parse individual callback inside goroutine
+			cb, err := dynamic_response.ParseCallback(c, k, inbox, request)
+			if err != nil {
+				slog.Error("Error parsing callback", "error", err, "inbox_id", inbox.ID, "callback_index", k)
 				callbackResponse[k] = model.CallbackResponse{
-					Error: fmt.Sprintf("Invalid callback URL: %v", err),
+					Error: fmt.Sprintf("Error parsing callback: %v", err),
 				}
 				return
+			}
+
+			if !cb.IsEnabled {
+				return
+			}
+
+			if config.GetBool(config.EnableCallbackURLValidation) {
+				isValid, err := validation.IsValidCallbackURL(cb.ToURL)
+				if !isValid {
+					slog.Error("Invalid callback URL", "error", err, "inbox_id", inbox.ID, "callback_index", k)
+					callbackResponse[k] = model.CallbackResponse{
+						Error: fmt.Sprintf("Invalid callback URL: %v", err),
+					}
+					return
+				}
 			}
 			cbResp := SendCallback(inbox, k, cb, request)
 			slog.Info("callback response received",
@@ -49,7 +59,7 @@ func SendCallbacks(c context.Context, inbox model.Inbox, request model.Request) 
 				"error", cbResp.Error,
 				"response_body", cbResp.Body)
 			callbackResponse[k] = cbResp
-		}(k, cb)
+		}(k)
 	}
 	wg.Wait()
 

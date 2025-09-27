@@ -17,6 +17,8 @@ import (
 func init() {
 	// Initialize test config
 	config.LoadConfig(config.Test)
+	// Disable URL validation for tests to allow localhost callbacks
+	config.Set(config.EnableCallbackURLValidation, false)
 }
 
 // Helper function to create test request

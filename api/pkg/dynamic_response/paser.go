@@ -67,46 +67,47 @@ func ParseInboxResponse(c context.Context, inbox model.Inbox, req model.Request)
 	return inCopy, nil
 }
 
-func ParseCallbacks(c context.Context, inbox model.Inbox, req model.Request) ([]model.Callback, error) {
-	callbacks := make([]model.Callback, len(inbox.Callbacks))
-
-	for i, cb := range inbox.Callbacks {
-		if !cb.IsDynamic {
-			callbacks[i] = cb // Non-dynamic callbacks are kept as-is
-			continue
-		}
-
-		values := map[string]any{
-			"Request": req,
-			"Inbox":   &inbox,
-			"Index":   i,
-		}
-		parsedURL, err := parse(cb.ToURL, values)
-		if err != nil {
-			return nil, fmt.Errorf("callback %d URL template error: %w", i, err)
-		}
-		parsedMethod, err := parse(cb.Method, values)
-		if err != nil {
-			return nil, fmt.Errorf("callback %d Method template error: %w", i, err)
-		}
-		parsedBody, err := parse(cb.Body, values)
-		if err != nil {
-			return nil, fmt.Errorf("callback %d Body template error: %w", i, err)
-		}
-		parsedHeaders, err := parseHeaders(cb.Headers, values)
-		if err != nil {
-			return nil, fmt.Errorf("callback %d %w", i, err)
-		}
-		callbacks[i] = model.Callback{
-			IsEnabled: cb.IsEnabled,
-			IsDynamic: cb.IsDynamic,
-			ToURL:     parsedURL,
-			Method:    parsedMethod,
-			Headers:   parsedHeaders,
-			Body:      parsedBody,
-		}
+func ParseCallback(c context.Context, index int, inbox model.Inbox, req model.Request) (model.Callback, error) {
+	if index >= len(inbox.Callbacks) {
+		return model.Callback{}, fmt.Errorf("callback index %d out of bounds", index)
 	}
-	return callbacks, nil
+
+	cb := inbox.Callbacks[index]
+
+	if !cb.IsDynamic {
+		return cb, nil // Non-dynamic callbacks are kept as-is
+	}
+
+	values := map[string]any{
+		"Request": req,
+		"Inbox":   &inbox,
+		"Index":   index,
+	}
+	parsedURL, err := parse(cb.ToURL, values)
+	if err != nil {
+		return model.Callback{}, fmt.Errorf("callback %d URL template error: %w", index, err)
+	}
+	parsedMethod, err := parse(cb.Method, values)
+	if err != nil {
+		return model.Callback{}, fmt.Errorf("callback %d Method template error: %w", index, err)
+	}
+	parsedBody, err := parse(cb.Body, values)
+	if err != nil {
+		return model.Callback{}, fmt.Errorf("callback %d Body template error: %w", index, err)
+	}
+	parsedHeaders, err := parseHeaders(cb.Headers, values)
+	if err != nil {
+		return model.Callback{}, fmt.Errorf("callback %d %w", index, err)
+	}
+
+	return model.Callback{
+		IsEnabled: cb.IsEnabled,
+		IsDynamic: cb.IsDynamic,
+		ToURL:     parsedURL,
+		Method:    parsedMethod,
+		Headers:   parsedHeaders,
+		Body:      parsedBody,
+	}, nil
 }
 
 func parseHeaders(headers map[string]string, values map[string]any) (map[string]string, error) {
