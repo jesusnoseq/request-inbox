@@ -80,9 +80,11 @@ func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Requ
 	timeout := time.Duration(config.GetInt(config.CallbackTimeoutSeconds)) * time.Second
 	client := &http.Client{
 		Timeout: timeout,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	}
+	if !config.GetBool(config.EnableCallbackFollowRedirects) {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
-		},
+		}
 	}
 
 	var bodyReader io.Reader
