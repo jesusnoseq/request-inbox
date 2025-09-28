@@ -39,16 +39,15 @@ func SendCallbacks(c context.Context, inbox model.Inbox, request model.Request) 
 				return
 			}
 
-			if config.GetBool(config.EnableCallbackURLValidation) {
-				isValid, err := validation.IsValidCallbackURL(cb.ToURL)
-				if !isValid {
-					slog.Error("Invalid callback URL", "error", err, "inbox_id", inbox.ID, "callback_index", k)
-					callbackResponse[k] = model.CallbackResponse{
-						Error: fmt.Sprintf("Invalid callback URL: %v", err),
-					}
-					return
+			isValid, err := validation.IsValidCallbackURL(cb.ToURL)
+			if !isValid {
+				slog.Error("Invalid callback URL", "error", err, "inbox_id", inbox.ID, "callback_index", k)
+				callbackResponse[k] = model.CallbackResponse{
+					Error: fmt.Sprintf("Invalid callback URL: %v", err),
 				}
+				return
 			}
+
 			cbResp := SendCallback(inbox, k, cb, request)
 			slog.Info("callback response received",
 				"inbox_id", inbox.ID,
