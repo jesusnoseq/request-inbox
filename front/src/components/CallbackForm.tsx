@@ -36,7 +36,8 @@ const defaultCallback: InboxCallback = {
     ToURL: '',
     Method: 'POST',
     Headers: {},
-    Body: ''
+    Body: '',
+    IsForwardingHeaders: false
 };
 
 const CallbackForm: React.FC<CallbackFormProps> = ({
@@ -189,6 +190,29 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                             initialHeaders={headers} 
                             onHeadersChange={setHeaders} 
                         />
+                    </Box>
+
+                    {/* Forward Headers Toggle */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={callback.IsForwardingHeaders}
+                                    onChange={(e) => setCallback({ ...callback, IsForwardingHeaders: e.target.checked })}
+                                />
+                            }
+                            label="Forward incoming headers"
+                        />
+                        <Tooltip
+                            title="When enabled, all headers from the incoming request will be forwarded to the callback. Custom headers defined above will override forwarded headers if they have the same name."
+                            arrow
+                            enterDelay={200}
+                            leaveDelay={300}
+                        >
+                            <IconButton size="small">
+                                <InfoIcon />
+                            </IconButton>
+                        </Tooltip>
                     </Box>
 
                     {/* Body Field */}
