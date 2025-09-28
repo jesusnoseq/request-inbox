@@ -69,6 +69,10 @@ func IsAPIKey(code string) (bool, error) {
 }
 
 func IsValidCallbackURL(urlStr string) (bool, error) {
+	if !config.GetBool(config.EnableCallbackURLValidation) {
+		return true, nil
+	}
+
 	if urlStr == "" {
 		return false, &ValidationError{message: "Callback URL cannot be empty"}
 	}

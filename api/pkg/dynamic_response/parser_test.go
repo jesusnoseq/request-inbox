@@ -10,7 +10,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-func TestParse(t *testing.T) {
+func TestParseInbox(t *testing.T) {
 	orgInbox := model.GenerateInbox()
 	orgInbox.Requests = []model.Request{}
 	orgReq := model.GenerateRequest(1)
@@ -205,7 +205,7 @@ func TestParse(t *testing.T) {
 	ctx := context.Background()
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			got, err := dynamic_response.ParseInbox(ctx, tc.inbox, tc.req)
+			got, err := dynamic_response.ParseInboxResponse(ctx, tc.inbox, tc.req)
 
 			if err != nil && !tc.expectErr {
 				t.Error(err)
@@ -213,6 +213,157 @@ func TestParse(t *testing.T) {
 			}
 			if diff := cmp.Diff(got, tc.expect); diff != "" {
 				t.Errorf("Diff(queryInbox, inbox) = %v, expected to be equals", diff)
+			}
+		})
+	}
+}
+
+func TestParseCallback(t *testing.T) {
+	orgInbox := model.GenerateInbox()
+	orgReq := model.GenerateRequest(1)
+
+	testCases := []struct {
+		desc      string
+		inbox     model.Inbox
+		index     int
+		req       model.Request
+		expect    model.Callback
+		expectErr bool
+	}{
+		{
+			desc: "Index out of bounds",
+			inbox: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Callbacks = []model.Callback{
+					{
+						IsEnabled: true,
+						IsDynamic: false,
+						ToURL:     "https://example.com/webhook",
+						Method:    "POST",
+						Headers:   map[string]string{},
+						Body:      "",
+					},
+				}
+				return in
+			}(),
+			index:     5, // Out of bounds
+			req:       model.CopyRequest(orgReq),
+			expect:    model.Callback{},
+			expectErr: true,
+		},
+		{
+			desc: "Non-dynamic callback",
+			inbox: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Callbacks = []model.Callback{
+					{
+						IsEnabled: true,
+						IsDynamic: false,
+						ToURL:     "https://example.com/webhook",
+						Method:    "POST",
+						Headers: map[string]string{
+							"Content-Type": "application/json",
+						},
+						Body: `{"message": "test"}`,
+					},
+				}
+				return in
+			}(),
+			index: 0,
+			req:   model.CopyRequest(orgReq),
+			expect: model.Callback{
+				IsEnabled: true,
+				IsDynamic: false,
+				ToURL:     "https://example.com/webhook",
+				Method:    "POST",
+				Headers: map[string]string{
+					"Content-Type": "application/json",
+				},
+				Body: `{"message": "test"}`,
+			},
+			expectErr: false,
+		},
+		{
+			desc: "Dynamic callback with index template",
+			inbox: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Callbacks = []model.Callback{
+					{
+						IsEnabled: true,
+						IsDynamic: true,
+						ToURL:     "https://example.com/webhook-{{.Index}}",
+						Method:    "POST",
+						Headers: map[string]string{
+							"X-Callback-Index": "{{.Index}}",
+							"X-Inbox-Name":     "{{.Inbox.Name}}",
+						},
+						Body: `{"callback_index": {{.Index}}, "inbox": "{{.Inbox.Name}}"}`,
+					},
+					{
+						IsEnabled: false,
+						IsDynamic: true,
+						ToURL:     "https://example.com/webhook-{{.Index}}",
+						Method:    "PUT",
+						Headers:   map[string]string{},
+						Body:      "",
+					},
+				}
+				return in
+			}(),
+			index: 1, // Parse second callback
+			req:   model.CopyRequest(orgReq),
+			expect: model.Callback{
+				IsEnabled: false,
+				IsDynamic: true,
+				ToURL:     "https://example.com/webhook-1",
+				Method:    "PUT",
+				Headers:   map[string]string{},
+				Body:      "",
+			},
+			expectErr: false,
+		},
+		{
+			desc: "Template error in URL",
+			inbox: func() model.Inbox {
+				in := model.CopyInbox(orgInbox)
+				in.Callbacks = []model.Callback{
+					{
+						IsEnabled: true,
+						IsDynamic: true,
+						ToURL:     "https://{{invalid syntax/webhook",
+						Method:    "POST",
+						Headers:   map[string]string{},
+						Body:      "",
+					},
+				}
+				return in
+			}(),
+			index:     0,
+			req:       model.CopyRequest(orgReq),
+			expect:    model.Callback{},
+			expectErr: true,
+		},
+	}
+
+	ctx := context.Background()
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			got, err := dynamic_response.ParseCallback(ctx, tc.index, tc.inbox, tc.req)
+
+			if err != nil && !tc.expectErr {
+				t.Errorf("Unexpected error: %v", err)
+				return
+			}
+			if err == nil && tc.expectErr {
+				t.Error("Expected error but got none")
+				return
+			}
+			if tc.expectErr {
+				return // Skip comparison if we expected an error
+			}
+
+			if diff := cmp.Diff(got, tc.expect); diff != "" {
+				t.Errorf("Diff(got, expected) = %v", diff)
 			}
 		})
 	}

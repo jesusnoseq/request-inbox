@@ -6,20 +6,17 @@ import {
     DialogActions,
     TextField,
     Button,
-    FormControl,
     FormControlLabel,
     Switch,
     Box,
     Typography,
-    MenuItem,
-    Select,
-    InputLabel,
     TextareaAutosize,
     InputAdornment,
-    // Tooltip,
-    // IconButton
+    Tooltip,
+    IconButton,
+    Autocomplete
 } from '@mui/material';
-// import InfoIcon from '@mui/icons-material/Info';
+import InfoIcon from '@mui/icons-material/Info';
 import { InboxCallback } from '../types/inbox';
 import HeadersEditor, { Header, convertRecordToHeaders, convertHeadersToRecord } from './HeadersEditor';
 
@@ -160,20 +157,28 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                     />
 
                     {/* HTTP Method */}
-                    <FormControl fullWidth required error={!!errors.Method}>
-                        <InputLabel>HTTP Method</InputLabel>
-                        <Select
-                            value={callback.Method}
-                            label="HTTP Method"
-                            onChange={(e) => setCallback({ ...callback, Method: e.target.value })}
-                        >
-                            {httpMethods.map((method) => (
-                                <MenuItem key={method} value={method}>
-                                    {method}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    <Autocomplete
+                        freeSolo
+                        options={httpMethods}
+                        value={callback.Method}
+                        onChange={(event, newValue) => {
+                            setCallback({ ...callback, Method: (newValue || '').toUpperCase() });
+                        }}
+                        onInputChange={(event, newInputValue) => {
+                            setCallback({ ...callback, Method: newInputValue.toUpperCase() });
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="HTTP Method"
+                                error={!!errors.Method}
+                                helperText={errors.Method || "Select from list or enter a custom HTTP method/template"}
+                                fullWidth
+                                required
+                                placeholder="POST, GET, PUT, DELETE, etc."
+                            />
+                        )}
+                    />
 
                     {/* Headers Section */}
                     <Box>
@@ -220,7 +225,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                     />
 
                     {/* Dynamic Response Toggle */}
-                    {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <FormControlLabel
                             control={
                                 <Switch
@@ -240,7 +245,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                                 <InfoIcon />
                             </IconButton>
                         </Tooltip>
-                    </Box> */}
+                    </Box>
                 </Box>
             </DialogContent>
             <DialogActions>
