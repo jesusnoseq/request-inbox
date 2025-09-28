@@ -136,7 +136,7 @@ func TestRegisterInboxRequest(t *testing.T) {
 
 			// Verify response
 			resp := w.Result()
-			defer resp.Body.Close()
+			defer mustCloseBody(t, resp)
 
 			if tt.wantResponse && resp.StatusCode != tt.wantStatus {
 				t.Errorf("Expected status %d, got %d, body: %s", tt.wantStatus, resp.StatusCode, w.Body.String())
@@ -213,7 +213,7 @@ func TestRegisterInboxRequestInvalidID(t *testing.T) {
 	ih.RegisterInboxRequest(ginCtx)
 
 	resp := w.Result()
-	defer resp.Body.Close()
+	defer mustCloseBody(t, resp)
 
 	if resp.StatusCode != http.StatusBadRequest {
 		t.Errorf("Expected StatusBadRequest, got %d, body: %s", resp.StatusCode, w.Body.String())
@@ -240,7 +240,7 @@ func TestRegisterInboxRequestNotFound(t *testing.T) {
 	ih.RegisterInboxRequest(ginCtx)
 
 	resp := w.Result()
-	defer resp.Body.Close()
+	defer mustCloseBody(t, resp)
 
 	// The handler returns 500 for database errors, which includes "not found" cases
 	// This is the current behavior of the system
@@ -302,6 +302,12 @@ func TestRegisterInboxRequestFiltersAuthCookies(t *testing.T) {
 
 // Helper functions
 
+func mustCloseBody(t *testing.T, resp *http.Response) {
+	if err := resp.Body.Close(); err != nil {
+		t.Fatalf("Failed to close response body: %v", err)
+	}
+}
+
 func mustGetInboxHandler() (*InboxHandler, func()) {
 	ctx := context.Background()
 	dao, err := database.GetInboxDAO(ctx, database.Badger)
@@ -340,7 +346,7 @@ func shouldExistInbox(t *testing.T, ih *InboxHandler, i model.Inbox) model.Inbox
 	ginCtx.Request = req
 	ih.CreateInbox(ginCtx)
 	resp := w.Result()
-	defer resp.Body.Close()
+	defer mustCloseBody(t, resp)
 	if resp.StatusCode != http.StatusCreated {
 		t.Fatalf("inbox should be created, got status %d, body: %s", resp.StatusCode, w.Body.String())
 	}
@@ -358,7 +364,7 @@ func getInbox(t *testing.T, ih *InboxHandler, id uuid.UUID) model.Inbox {
 	ginCtx.Request = req
 	ih.GetInbox(ginCtx)
 	resp := w.Result()
-	defer resp.Body.Close()
+	defer mustCloseBody(t, resp)
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("Expected to get inbox, got status %d, body: %s", resp.StatusCode, w.Body.String())
 	}
