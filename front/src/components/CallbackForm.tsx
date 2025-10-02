@@ -14,10 +14,16 @@ import {
     InputAdornment,
     Tooltip,
     IconButton,
-    Autocomplete
+    Autocomplete,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
+import TemplateIcon from '@mui/icons-material/Assignment';
 import { InboxCallback } from '../types/inbox';
+import { callbackTemplates } from '../types/callbackTemplates';
 import HeadersEditor, { Header, convertRecordToHeaders, convertHeadersToRecord } from './HeadersEditor';
 
 interface CallbackFormProps {
@@ -51,6 +57,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
     const [headers, setHeaders] = useState<Header[]>([]);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [selectedTemplate, setSelectedTemplate] = useState<string>('');
 
     useEffect(() => {
         if (initialCallback) {
@@ -62,6 +69,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
         }
         setErrors({});
         setIsSubmitting(false);
+        setSelectedTemplate('');
     }, [initialCallback, open]);
 
     const validateForm = (): boolean => {
@@ -104,11 +112,29 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
         }
     };
 
+    const applyTemplate = (templateName: string) => {
+        const template = callbackTemplates.find(t => t.name === templateName);
+        if (!template) return;
+
+        const newCallback: InboxCallback = {
+            ...defaultCallback,
+            ...template.callback,
+            // Preserve the current URL and IsEnabled state
+            ToURL: callback.ToURL || template.callback.ToURL || '',
+            IsEnabled: callback.IsEnabled
+        };
+
+        setCallback(newCallback);
+        setHeaders(convertRecordToHeaders(newCallback.Headers || {}));
+        setSelectedTemplate(templateName);
+    };
+
     const handleCancel = () => {
         setCallback(initialCallback || defaultCallback);
         setHeaders(convertRecordToHeaders((initialCallback?.Headers) || {}));
         setErrors({});
         setIsSubmitting(false);
+        setSelectedTemplate('');
         onClose();
     };
 
@@ -127,8 +153,10 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
             onClose={handleCancel} 
             maxWidth="md" 
             fullWidth
-            PaperProps={{
-                sx: { minHeight: '60vh' }
+            slotProps={{
+                paper: {
+                    sx: { minHeight: '60vh' }
+                }
             }}
         >
             <DialogTitle>{title}</DialogTitle>
@@ -144,6 +172,63 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                         }
                         label="Enable callback"
                     />
+
+                    {/* Template Selector */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <FormControl sx={{ minWidth: 200, flexGrow: 1 }} size="small">
+                            <InputLabel id="template-select-label">Template</InputLabel>
+                            <Select
+                                labelId="template-select-label"
+                                id="template-select"
+                                value={selectedTemplate}
+                                label="Template"
+                                onChange={(e) => {
+                                    const templateName = e.target.value;
+                                    setSelectedTemplate(templateName);
+                                    if (templateName) {
+                                        applyTemplate(templateName);
+                                    }
+                                }}
+                                renderValue={(value) => value || <em>No template</em>}
+                                startAdornment={
+                                    <InputAdornment position="start">
+                                        <TemplateIcon />
+                                    </InputAdornment>
+                                }
+                            >
+                                <MenuItem value="">
+                                    <em>No template</em>
+                                </MenuItem>
+                                {callbackTemplates.map((template) => (
+                                    <MenuItem key={template.name} value={template.name}>
+                                        <Box>
+                                            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                                                {template.name}
+                                            </Typography>
+                                            <Typography variant="caption" color="textSecondary">
+                                                {template.description}
+                                            </Typography>
+                                        </Box>
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        {selectedTemplate && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Button
+                                    size="small"
+                                    variant="outlined"
+                                    onClick={() => {
+                                        setSelectedTemplate('');
+                                        setCallback({ ...defaultCallback, ToURL: callback.ToURL });
+                                        setHeaders([]);
+                                    }}
+                                >
+                                    Clear Template
+                                </Button>
+                            </Box>
+                        )}
+                    </Box>
 
                     {/* URL Field */}
                     <TextField
@@ -171,7 +256,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="HTTP Method"
+                                label={`HTTP Method${callback.Method.includes('{{') ? ' (Dynamic)' : ''}`}
                                 error={!!errors.Method}
                                 helperText={errors.Method || "Select from list or enter a custom HTTP method/template"}
                                 fullWidth
@@ -217,7 +302,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
 
                     {/* Body Field */}
                     <TextField
-                        label="Request Body"
+                        label={`Request Body${callback.Body.includes('{{') ? ' (Dynamic)' : ''}`}
                         multiline
                         fullWidth
                         variant="outlined"
