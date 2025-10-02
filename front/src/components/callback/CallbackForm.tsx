@@ -22,9 +22,9 @@ import {
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import TemplateIcon from '@mui/icons-material/Assignment';
-import { InboxCallback } from '../types/inbox';
-import { callbackTemplates } from '../types/callbackTemplates';
-import HeadersEditor, { Header, convertRecordToHeaders, convertHeadersToRecord } from './HeadersEditor';
+import { InboxCallback } from '../../types/inbox';
+import { callbackTemplates } from './callbackTemplates';
+import HeadersEditor, { Header, convertRecordToHeaders, convertHeadersToRecord } from '../HeadersEditor';
 
 interface CallbackFormProps {
     open: boolean;

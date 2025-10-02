@@ -18,7 +18,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { InboxCallback } from '../types/inbox';
+import { InboxCallback } from '../../types/inbox';
 
 interface CallbackListProps {
     callbacks: InboxCallback[];
