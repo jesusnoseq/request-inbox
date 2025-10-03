@@ -87,17 +87,17 @@ const (
 	MonitoringTrackedMethodsDefault string = "POST PUT PATCH DELETE"
 
 	// Features
-	EnableListingPublicInbox           Key  = "ENABLE_LISTING_PUBLIC_INBOX"
-	EnableListingInboxDefault          bool = false
-	EnablePrintConfig                  Key  = "PRINT_CONFIG"
-	EnablePrintConfigDefault           bool = false
-	EnabledMonitoring                  Key  = "ENABLED_MONITORING"
-	EnabledMonitoringDefault           bool = false
-	MaxCallbacksKey                    Key  = "MAX_CALLBACKS"
-	MaxCallbacksDefault                int  = 3
-	EnableCallbackURLValidation        Key  = "ENABLE_CALLBACK_URL_VALIDATION"
-	EnableCallbackURLValidationDefault bool = true
-	EnableCallbackFollowRedirects      Key  = "ENABLE_CALLBACK_FOLLOW_REDIRECTS"
+	EnableListingPublicInbox             Key  = "ENABLE_LISTING_PUBLIC_INBOX"
+	EnableListingInboxDefault            bool = false
+	EnablePrintConfig                    Key  = "PRINT_CONFIG"
+	EnablePrintConfigDefault             bool = false
+	EnabledMonitoring                    Key  = "ENABLED_MONITORING"
+	EnabledMonitoringDefault             bool = false
+	MaxCallbacksKey                      Key  = "MAX_CALLBACKS"
+	MaxCallbacksDefault                  int  = 3
+	EnableCallbackURLValidation          Key  = "ENABLE_CALLBACK_URL_VALIDATION"
+	EnableCallbackURLValidationDefault   bool = true
+	EnableCallbackFollowRedirects        Key  = "ENABLE_CALLBACK_FOLLOW_REDIRECTS"
 	EnableCallbackFollowRedirectsDefault bool = false
 )
 
