@@ -248,10 +248,10 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                         options={httpMethods}
                         value={callback.Method}
                         onChange={(event, newValue) => {
-                            setCallback({ ...callback, Method: (newValue || '').toUpperCase() });
+                            setCallback({ ...callback, Method: (newValue || '') });
                         }}
                         onInputChange={(event, newInputValue) => {
-                            setCallback({ ...callback, Method: newInputValue.toUpperCase() });
+                            setCallback({ ...callback, Method: newInputValue });
                         }}
                         renderInput={(params) => (
                             <TextField
