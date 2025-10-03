@@ -24,6 +24,7 @@ const InboxDetailPage: React.FC = () => {
     const [inbox, setInbox] = useState<Inbox | null>(null);
     const [isLoading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [autoUpdateError, setAutoUpdateError] = useState<string | null>(null);
     const [autoUpdate, setAutoUpdate] = useState(true);
     const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
 
@@ -52,15 +53,22 @@ const InboxDetailPage: React.FC = () => {
     useEffect(() => {
         const fetchInboxRequests = async () => {
             if (inboxId && !isLoading && !error) {
-                const data = await getInbox(inboxId);
-                setInbox(data);
+                try {
+                    const data = await getInbox(inboxId);
+                    setInbox(data);
+                    setAutoUpdateError(null);
+                } catch (e) {
+                    console.error('Error fetching inbox updates:', e);
+                    setAutoUpdateError('Auto-update failed. Updates have been paused.');
+                    setAutoUpdate(false);
+                }
             }
         };
         const intervalId = autoUpdate ? setInterval(() => {
             fetchInboxRequests();
         }, 2000) : undefined;
         return () => clearInterval(intervalId);
-    }, [inboxId, inbox, isLoading, error, autoUpdate])
+    }, [inboxId, isLoading, error, autoUpdate])
 
     if (isLoading) {
         return (
@@ -124,6 +132,11 @@ const InboxDetailPage: React.FC = () => {
 
     return (
         <Container>
+            {autoUpdateError && (
+                <Alert severity="warning" onClose={() => setAutoUpdateError(null)} sx={{ mb: 2 }}>
+                    {autoUpdateError}
+                </Alert>
+            )}
             <Dialog
                 open={confirmDialogOpen}
                 onClose={handleCloseDeleteRequestsDialog}
