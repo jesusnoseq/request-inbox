@@ -50,7 +50,7 @@ const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete
     };
 
     const getMethodLabel = (method: string) => {
-        if (method.toUpperCase() === '{{.REQUEST.METHOD}}') {
+        if (method === '{{.Request.Method}}') {
             return 'Pass Forward';
         }
         if (method.length > 6) {
