@@ -613,6 +613,87 @@ const UsersManualPage: React.FC = () => {
                                 </Box>
                             </ListItem>
 
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">extractURI</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            Extracts the portion of the URI after /in/. Useful for pass-through inbox scenarios.
+                                            For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value, 
+                                            this returns /extrapath?query=value
+                                        </Typography>
+                                        <Typography sx={{ mt: 0.1 }}>
+                                            Example
+                                        </Typography>
+                                        <Paper >
+                                            <code>
+                                                {'{{ extractURI .Request.URI }}'}
+                                            </code>
+                                        </Paper >
+
+                                    </Box>
+                                </Box>
+                            </ListItem>
+
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">extractPath</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            Extracts only the path portion after /in/ (excluding query parameters).
+                                            For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
+                                            this returns /extrapath
+                                        </Typography>
+                                        <Typography sx={{ mt: 0.1 }}>
+                                            Example
+                                        </Typography>
+                                        <Paper >
+                                            <code>
+                                                {'{{ extractPath .Request.URI }}'}
+                                            </code>
+                                        </Paper >
+
+                                    </Box>
+                                </Box>
+                            </ListItem>
+
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">extractQueryParams</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            Extracts the query parameters portion from a URI (including the ? prefix).
+                                            For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
+                                            this returns ?query=value
+                                        </Typography>
+                                        <Typography sx={{ mt: 0.1 }}>
+                                            Example
+                                        </Typography>
+                                        <Paper >
+                                            <code>
+                                                {'{{ extractQueryParams .Request.URI }}'}
+                                            </code>
+                                        </Paper >
+
+                                    </Box>
+                                </Box>
+                            </ListItem>
+
 
                         </List>
 
