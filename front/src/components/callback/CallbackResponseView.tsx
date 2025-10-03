@@ -11,8 +11,8 @@ import {
     Collapse 
 } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { CallbackResponse } from '../types/inbox';
-import BodyView from './BodyView';
+import { CallbackResponse } from '../../types/inbox';
+import BodyView from '../BodyView';
 
 type CallbackResponseViewProps = {
     callbackResponse: CallbackResponse;

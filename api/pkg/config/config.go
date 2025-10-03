@@ -87,16 +87,18 @@ const (
 	MonitoringTrackedMethodsDefault string = "POST PUT PATCH DELETE"
 
 	// Features
-	EnableListingPublicInbox           Key  = "ENABLE_LISTING_PUBLIC_INBOX"
-	EnableListingInboxDefault          bool = false
-	EnablePrintConfig                  Key  = "PRINT_CONFIG"
-	EnablePrintConfigDefault           bool = false
-	EnabledMonitoring                  Key  = "ENABLED_MONITORING"
-	EnabledMonitoringDefault           bool = false
-	MaxCallbacksKey                    Key  = "MAX_CALLBACKS"
-	MaxCallbacksDefault                int  = 3
-	EnableCallbackURLValidation        Key  = "ENABLE_CALLBACK_URL_VALIDATION"
-	EnableCallbackURLValidationDefault bool = true
+	EnableListingPublicInbox             Key  = "ENABLE_LISTING_PUBLIC_INBOX"
+	EnableListingInboxDefault            bool = false
+	EnablePrintConfig                    Key  = "PRINT_CONFIG"
+	EnablePrintConfigDefault             bool = false
+	EnabledMonitoring                    Key  = "ENABLED_MONITORING"
+	EnabledMonitoringDefault             bool = false
+	MaxCallbacksKey                      Key  = "MAX_CALLBACKS"
+	MaxCallbacksDefault                  int  = 3
+	EnableCallbackURLValidation          Key  = "ENABLE_CALLBACK_URL_VALIDATION"
+	EnableCallbackURLValidationDefault   bool = true
+	EnableCallbackFollowRedirects        Key  = "ENABLE_CALLBACK_FOLLOW_REDIRECTS"
+	EnableCallbackFollowRedirectsDefault bool = false
 )
 
 func LoadConfig(app App) {
@@ -160,6 +162,7 @@ func setDefaults(app App) {
 	setDefault(EnabledMonitoring, EnabledMonitoringDefault)
 	setDefault(MaxCallbacksKey, MaxCallbacksDefault)
 	setDefault(EnableCallbackURLValidation, EnableCallbackURLValidationDefault)
+	setDefault(EnableCallbackFollowRedirects, EnableCallbackFollowRedirectsDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {

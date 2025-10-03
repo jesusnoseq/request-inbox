@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import BodyView from './BodyView';
-import CallbackResponseView from './CallbackResponseView';
+import CallbackResponseView from './callback/CallbackResponseView';
 
 dayjs.extend(localizedFormat);
 

@@ -22,6 +22,7 @@ export type InboxCallback = {
     Method: string;
     Headers: Record<string, string>;
     Body: string;
+    IsForwardingHeaders: boolean;
 }
 
 export type CallbackResponse = {

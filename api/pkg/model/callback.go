@@ -4,10 +4,11 @@ type Callback struct {
 	IsEnabled bool `dynamodbav:"enabled"`
 	IsDynamic bool `dynamodbav:"isDynamic"`
 	// PrefixURL string            `dynamodbav:"prefixURL"`
-	ToURL   string            `dynamodbav:"toURL"`
-	Method  string            `dynamodbav:"method"`
-	Headers map[string]string `dynamodbav:"headers"`
-	Body    string            `dynamodbav:"body"`
+	ToURL               string            `dynamodbav:"toURL"`
+	Method              string            `dynamodbav:"method"`
+	Headers             map[string]string `dynamodbav:"headers"`
+	Body                string            `dynamodbav:"body"`
+	IsForwardingHeaders bool              `dynamodbav:"isForwardingHeaders"`
 }
 
 type CallbackResponse struct {
@@ -28,7 +29,8 @@ func NewCallback() Callback {
 		Method:    "",
 		ToURL:     "",
 		// PrefixURL: "",
-		Headers: map[string]string{},
-		Body:    "",
+		Headers:             map[string]string{},
+		Body:                "",
+		IsForwardingHeaders: false,
 	}
 }

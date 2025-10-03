@@ -31,6 +31,9 @@ var templateFuncMap = template.FuncMap{
 	"intAdd":                  intAdd,
 	"intSubtract":             intSubtract,
 	"stringToInt":             stringToInt,
+	"extractURI":              extractURI,
+	"extractPath":             extractPath,
+	"extractQueryParams":      extractQueryParams,
 }
 
 func ParseInboxResponse(c context.Context, inbox model.Inbox, req model.Request) (model.Inbox, error) {
@@ -83,6 +86,7 @@ func ParseCallback(c context.Context, index int, inbox model.Inbox, req model.Re
 		"Inbox":   &inbox,
 		"Index":   index,
 	}
+
 	parsedURL, err := parse(cb.ToURL, values)
 	if err != nil {
 		return model.Callback{}, fmt.Errorf("callback %d URL template error: %w", index, err)

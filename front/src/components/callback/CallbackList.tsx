@@ -18,7 +18,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { InboxCallback } from '../types/inbox';
+import { InboxCallback } from '../../types/inbox';
 
 interface CallbackListProps {
     callbacks: InboxCallback[];
@@ -49,6 +49,16 @@ const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete
         return colors[method.toUpperCase()] || 'primary';
     };
 
+    const getMethodLabel = (method: string) => {
+        if (method === '{{.Request.Method}}') {
+            return 'Pass Forward';
+        }
+        if (method.length > 6) {
+            return 'Custom';
+        }
+        return method;
+    };
+
     return (
         <Box>
             {callbacks.map((callback, index) => (
@@ -61,7 +71,7 @@ const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete
                                 size="small"
                             />
                             <Chip
-                                label={callback.Method || 'GET'}
+                                label={getMethodLabel(callback.Method || 'GET')}
                                 color={getMethodColor(callback.Method || 'GET')}
                                 size="small"
                             />

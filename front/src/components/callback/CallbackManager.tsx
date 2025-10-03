@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import { InboxCallback } from '../types/inbox';
+import { InboxCallback } from '../../types/inbox';
 import CallbackList from './CallbackList';
 import CallbackForm from './CallbackForm';
 

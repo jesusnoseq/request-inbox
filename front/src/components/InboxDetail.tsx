@@ -8,7 +8,7 @@ import { buildInboxURL, updateInbox } from '../services/inbox';
 import ResponseInlineEditor from '../components/ResponseInlineEditor';
 import TextInlineEditor from '../components/TextInlineEditor';
 import InboxVisibilityToggle from '../components/InboxVisibilityToggle';
-import CallbackManager from '../components/CallbackManager';
+import CallbackManager from '../components/callback/CallbackManager';
 import { useUser } from '../context/UserContext';
 
 dayjs.extend(localizedFormat);

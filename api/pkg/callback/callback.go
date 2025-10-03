@@ -81,6 +81,11 @@ func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Requ
 	client := &http.Client{
 		Timeout: timeout,
 	}
+	if !config.GetBool(config.EnableCallbackFollowRedirects) {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+	}
 
 	var bodyReader io.Reader
 	if callbackCopy.Body != "" {
@@ -93,13 +98,17 @@ func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Requ
 		return response
 	}
 
+	if callbackCopy.IsForwardingHeaders {
+		for key, values := range request.Headers {
+			if len(values) > 0 {
+				req.Header.Set(key, values[0])
+			}
+		}
+	}
+
 	for key, value := range callbackCopy.Headers {
 		req.Header.Set(key, value)
 	}
-
-	// if callbackCopy.Body != "" && req.Header.Get("Content-Type") == "" {
-	// 	req.Header.Set("Content-Type", "application/json")
-	// }
 
 	resp, err := client.Do(req)
 	if err != nil {

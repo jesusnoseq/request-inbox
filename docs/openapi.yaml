@@ -185,9 +185,9 @@ components:
           type: integer
           format: int64
         IsPrivate:
-          type: bool
+          type: boolean
         OwnerID:
-          type: bool
+          type: boolean
         Response:
           $ref: "#/components/schemas/Response"
         Requests:
@@ -198,6 +198,10 @@ components:
           type: array
           items:
             type: string
+        Callbacks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Callback"
     Response:
       type: object
       properties:
@@ -213,7 +217,7 @@ components:
           additionalProperties:
             type: string
         IsDynamic:
-          type: bool
+          type: boolean
     Request:
       type: object
       properties:
@@ -241,6 +245,48 @@ components:
           format: int64
         Protocol:
           type: string
+        CallbackResponses:
+          type: array
+          items:
+            $ref: "#/components/schemas/CallbackResponse"
+    Callback:
+      type: object
+      properties:
+        IsEnabled:
+          type: boolean
+        IsDynamic:
+          type: boolean
+        ToURL:
+          type: string
+        Method:
+          type: string
+        Headers:
+          type: object
+          additionalProperties:
+            type: string
+        Body:
+          type: string
+        IsForwardingHeaders:
+          type: boolean
+    CallbackResponse:
+      type: object
+      properties:
+        URL:
+          type: string
+        Method:
+          type: string
+        Error:
+          type: string
+        Code:
+          type: integer
+        CodeTemplate:
+          type: string
+        Body:
+          type: string
+        Headers:
+          type: object
+          additionalProperties:
+            type: string
     Error:
       type: object
       required:
