@@ -1,4 +1,4 @@
-import { InboxCallback } from './inbox';
+import { InboxCallback } from '../../types/inbox';
 
 export type CallbackTemplate = {
     name: string;
