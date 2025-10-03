@@ -84,6 +84,21 @@ const UsersManualPage: React.FC = () => {
                                     </Box>
                                 </Box>
                             </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Callback</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            Represents an automated HTTP request that is triggered when the Inbox receives a request. Callbacks allow you to forward, relay, or notify external services about incoming requests, enabling integration workflows and webhooks. Each callback can be configured with its own URL, method, headers, and body, and can optionally use dynamic templates.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
                         </List>
                     </AccordionDetails>
                 </Accordion>
