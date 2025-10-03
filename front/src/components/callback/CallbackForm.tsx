@@ -119,8 +119,7 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
         const newCallback: InboxCallback = {
             ...defaultCallback,
             ...template.callback,
-            // Preserve the current URL and IsEnabled state
-            ToURL: callback.ToURL || template.callback.ToURL || '',
+            ToURL: callback.ToURL + template.callback.ToURL,
             IsEnabled: callback.IsEnabled
         };
 
