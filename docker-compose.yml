@@ -9,10 +9,10 @@ services:
     environment:
       - API_MODE=server
       - API_HTTP_PORT=8080
+      - CORS_ALLOW_ORIGINS=http://localhost
       - DB_ENGINE=badger
       - DB_BADGER_PATH=/app/data
       - GIN_MODE=release
-      - CORS_ALLOW_ORIGINS=*
       - ENABLE_PRINT_CONFIG=false
       - ENABLE_CALLBACK_URL_VALIDATION=false
       - ENABLE_LISTING_PUBLIC_INBOX=true

@@ -3,6 +3,8 @@
 # Stage 1: Build Frontend
 FROM node:18 AS frontend-builder
 
+ARG API_HTTP_PORT=8080
+
 WORKDIR /app/front
 
 # Copy frontend package files and install dependencies
@@ -12,6 +14,10 @@ RUN npm install
 # Copy frontend source and build
 COPY docs/* ../docs/
 COPY front/ ./
+
+# Create .env.production with the API URL
+# Use /api for production to go through nginx proxy (avoids CORS issues)
+RUN echo "REACT_APP_REQUEST_INBOX_API_URL=/api" > .env.production
 
 RUN npm run build
 
