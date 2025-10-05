@@ -36,24 +36,45 @@ A web application to collect and inspect HTTP requests for testing and debugging
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Using Docker
 
-- Docker and Docker Compose
-- Go 1.24+ (for local development)
-- Node.js 20+ (for local development)
-
-### Using Docker Compose (Recommended)
-
-Run the complete application stack with an embedded database:
+Run the complete application in a single container with nginx and the Go API:
 
 ```bash
-docker-compose -f docker-compose-local.yml up --build
+# Using Docker Compose
+docker-compose up -d
+
+# Or pull from Docker Hub
+docker pull jesusnoseq/request-inbox:latest
+docker run -d -p 80:80 -p 8080:8080 -v inbox-data:/app/data jesusnoseq/request-inbox:latest
+
+# Or pull from GitHub Container Registry
+docker pull ghcr.io/jesusnoseq/request-inbox:latest
+docker run -d -p 80:80 -p 8080:8080 -v inbox-data:/app/data ghcr.io/jesusnoseq/request-inbox:latest
+```
+
+The application will be available at `http://localhost`
+
+📖 **[Full Docker deployment guide](DOCKER.md)**
+
+### Using Docker Compose (Development)
+
+Run separate containers for frontend and backend development:
+
+```bash
+docker-compose -f docker-compose-dev.yml up --build
 ```
 
 This will start:
 
 - **API server** on `http://localhost:8080`
 - **Frontend** on `http://localhost:3000`
+
+### Prerequisites
+
+- Docker and Docker Compose (for containerized deployment)
+- Go 1.24+ (for local development)
+- Node.js 20+ (for local development)
 
 ### Local Development
 
@@ -203,6 +224,11 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## 🗺️ Roadmap
 
+### Recent Additions
+
+- ✅ **Docker images** - Production-ready Docker image with nginx and API
+- ✅ **GitHub Container Registry** - Automated image publishing
+
 ### Planned Features
 
 - **Alerts**: Notification system for new requests
@@ -217,4 +243,3 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - Advanced filtering and search
 - Request callback/passthrough
 - Performance monitoring and metrics
-- Docker images
