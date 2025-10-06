@@ -39,10 +39,6 @@ RUN apk update && \
 
 WORKDIR /github.com/jesusnoseq/request-inbox/
 
-# Copy Makefile and install tools
-COPY Makefile Makefile
-RUN make download-tools
-
 # Copy Go module files and download dependencies
 COPY api/go.mod api/go.sum ./api/
 RUN cd api && go mod download
