@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Stage 1: Build Frontend
-FROM node:18 AS frontend-builder
+FROM node:22 AS frontend-builder
 
 ARG API_HTTP_PORT=8080
 
