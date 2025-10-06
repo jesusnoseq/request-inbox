@@ -1,8 +1,43 @@
-*
-!api/*
-!static/*
-!Makefile
-!go.mod
-!go.sum
-!front
-front/node_modules
+# Git and version control
+.git
+.gitignore
+.gitmodules
+.github
+
+# Documentation
+*.md
+!README.md
+LICENSE
+
+# Build artifacts and temporary files
+api/tmp/
+api/*.exe
+api/main.exe
+api/cmd.exe
+front/build/
+front/node_modules/
+blog/public/
+
+# Deployment and infrastructure
+deploy/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+
+# Development files
+.env*
+.vscode/
+.idea/
+
+# Docker files (not needed in image)
+docker-compose*.yml
+Dockerfile-api
+Dockerfile-front
+
+# Blog
+blog/
+
+# Testing
+**/test/
+**/*_test.go
+**/coverage/
