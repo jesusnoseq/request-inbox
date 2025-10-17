@@ -18,6 +18,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
+import SignUpButton from '../components/SignUpButton';
+import { useUser } from '../context/UserContext';
 
 const InboxDetailPage: React.FC = () => {
     const { inboxId } = useParams<'inboxId'>();
@@ -27,6 +29,7 @@ const InboxDetailPage: React.FC = () => {
     const [autoUpdateError, setAutoUpdateError] = useState<string | null>(null);
     const [autoUpdate, setAutoUpdate] = useState(true);
     const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
+    const { isLoggedIn } = useUser();
 
     useEffect(() => {
         const fetchInboxDetail = async () => {
@@ -132,6 +135,22 @@ const InboxDetailPage: React.FC = () => {
 
     return (
         <Container>
+            {!isLoggedIn() && (
+                <Alert 
+                    severity="info" 
+                    sx={{ mb: 2, mt: 2 }}
+                    action={
+                        <SignUpButton variant="outlined" size="small" />
+                    }
+                >
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                        Create Your Free Account
+                    </Typography>
+                    <Typography variant="body2">
+                        List all your inboxes · Generate API keys · Enjoy higher limits · Keep inboxes permanently
+                    </Typography>
+                </Alert>
+            )}
             {autoUpdateError && (
                 <Alert severity="warning" onClose={() => setAutoUpdateError(null)} sx={{ mb: 2 }}>
                     {autoUpdateError}

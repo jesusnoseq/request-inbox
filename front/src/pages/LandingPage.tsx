@@ -61,16 +61,16 @@ export default function LandingPage() {
                         Request Inbox simplifies the process of testing and debugging callbacks and webhooks. Capture, inspect, and manage incoming HTTP requests effortlessly.
                     </Typography>
                     <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                        <SignUpButton variant="contained" color="primary" size="large" />
-                        <Button variant="outlined" color="primary" sx={{ mx: 1 }} onClick={() => navigate('/docs')} size="large">
-                            Learn More
-                        </Button>
+                        <CreateInboxButton variant="contained" color="primary" size="large" source="landing-page-anonymous" />
                     </Box>
                     <Typography variant="h5" align="center" color="textSecondary" paragraph sx={{ mt: 5 }}>
-                        Or jump straight into action and create a new Request Inbox anonymously.
+                        Or create an account to save your inboxes and access advanced features.
                     </Typography>
                     <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                        <CreateInboxButton variant="contained" color="inherit" size="large" source="landing-page-anonymous" />
+                        <SignUpButton variant="outlined" color="primary" sx={{ mx: 1 }} size="large" />
+                        <Button variant="outlined" color="primary" onClick={() => navigate('/docs')} size="large">
+                            Learn More
+                        </Button>
                     </Box>
                 </Container>
 
