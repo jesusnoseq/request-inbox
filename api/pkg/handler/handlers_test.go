@@ -22,7 +22,7 @@ import (
 
 func mustGetInboxHandler() (handler.InboxHandler, func()) {
 	ctx := context.Background()
-	dao, err := database.GetInboxDAO(ctx, database.Badger)
+	dao, err := database.NewRepository(ctx, database.Badger)
 	if err != nil {
 		panic(err)
 	}

@@ -108,7 +108,7 @@ func getRouter() (*gin.Engine, func()) {
 	}))
 
 	ctx := context.Background()
-	dao, err := database.GetInboxDAO(ctx, database.GetDatabaseEngine(config.GetString(config.DBEngine)))
+	dao, err := database.NewRepository(ctx, database.GetDatabaseEngine(config.GetString(config.DBEngine)))
 	closer := func() {
 		err := dao.Close(ctx)
 		if err != nil {
@@ -116,7 +116,7 @@ func getRouter() (*gin.Engine, func()) {
 		}
 	}
 	if err != nil {
-		log.Fatal("failed to obtain InboxDAO:", err)
+		log.Fatal("failed to obtain Repository:", err)
 	}
 
 	eventTracker, err := instrumentation.NewEventTracker()

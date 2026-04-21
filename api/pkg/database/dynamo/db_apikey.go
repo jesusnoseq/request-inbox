@@ -13,7 +13,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-func (d *InboxDAO) GetAPIKey(ctx context.Context, ID uuid.UUID) (model.APIKey, error) {
+func (d *DB) GetAPIKey(ctx context.Context, ID uuid.UUID) (model.APIKey, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 
@@ -44,7 +44,7 @@ func (d *InboxDAO) GetAPIKey(ctx context.Context, ID uuid.UUID) (model.APIKey, e
 	return apiKeyItem.APIKey, nil
 }
 
-func (d *InboxDAO) ListAPIKeyByUser(ctx context.Context, userID uuid.UUID) ([]model.APIKey, error) {
+func (d *DB) ListAPIKeyByUser(ctx context.Context, userID uuid.UUID) ([]model.APIKey, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 
@@ -82,7 +82,7 @@ func (d *InboxDAO) ListAPIKeyByUser(ctx context.Context, userID uuid.UUID) ([]mo
 	return apiKeys, nil
 }
 
-func (d *InboxDAO) DeleteAPIKey(ctx context.Context, ID uuid.UUID) error {
+func (d *DB) DeleteAPIKey(ctx context.Context, ID uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 
@@ -105,7 +105,7 @@ func (d *InboxDAO) DeleteAPIKey(ctx context.Context, ID uuid.UUID) error {
 	return nil
 }
 
-func (d *InboxDAO) CreateAPIKey(
+func (d *DB) CreateAPIKey(
 	ctx context.Context,
 	ak model.APIKey,
 ) error {

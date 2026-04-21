@@ -12,7 +12,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-func DeleteAPIKey(t *testing.T, dao dynamo.InboxDAO, aPIKeyID uuid.UUID) {
+func DeleteAPIKey(t *testing.T, dao dynamo.DB, aPIKeyID uuid.UUID) {
 	t.Log("Deleting API key ", aPIKeyID.String())
 	t.Helper()
 	err := dao.DeleteAPIKey(context.Background(), aPIKeyID)

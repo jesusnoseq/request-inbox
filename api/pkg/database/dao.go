@@ -7,7 +7,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-type InboxDAO interface {
+type Repository interface {
 	CreateInbox(context.Context, model.Inbox) (model.Inbox, error)
 	UpdateInbox(context.Context, model.Inbox) (model.Inbox, error)
 	GetInbox(context.Context, uuid.UUID) (model.Inbox, error)

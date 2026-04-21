@@ -23,11 +23,11 @@ import (
 )
 
 type inboxHandler struct {
-	dao database.InboxDAO
+	dao database.Repository
 	et  event.EventTracker
 }
 
-func NewInboxHandler(dao database.InboxDAO, et event.EventTracker) InboxHandler {
+func NewInboxHandler(dao database.Repository, et event.EventTracker) InboxHandler {
 	return &inboxHandler{
 		dao: dao,
 		et:  et,

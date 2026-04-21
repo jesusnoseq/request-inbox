@@ -10,7 +10,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-func DeleteUser(t *testing.T, dao dynamo.InboxDAO, userID uuid.UUID) {
+func DeleteUser(t *testing.T, dao dynamo.DB, userID uuid.UUID) {
 	t.Log("Deleting user ", userID.String())
 	t.Helper()
 	err := dao.DeleteUser(context.Background(), userID)

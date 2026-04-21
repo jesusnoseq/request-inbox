@@ -12,10 +12,10 @@ import (
 )
 
 type apiKeyHandler struct {
-	dao database.InboxDAO
+	dao database.Repository
 }
 
-func NewAPIKeyHandler(dao database.InboxDAO) APIKeyHandler {
+func NewAPIKeyHandler(dao database.Repository) APIKeyHandler {
 	return &apiKeyHandler{
 		dao: dao,
 	}

@@ -19,25 +19,25 @@ import (
 // const inboxIDAnnotationKey = "InboxID"
 const MaxBatchItems = 25
 
-type InboxDAO struct {
+type DB struct {
 	tableName string
 	dbclient  *dynamodb.Client
 	timeout   time.Duration
 }
 
-func NewInboxDAO(
+func New(
 	tableName string,
 	dbclient *dynamodb.Client,
 	defaultTimeout time.Duration,
-) *InboxDAO {
-	return &InboxDAO{
+) *DB {
+	return &DB{
 		tableName: tableName,
 		timeout:   defaultTimeout,
 		dbclient:  dbclient,
 	}
 }
 
-func (d *InboxDAO) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox, error) {
+func (d *DB) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	pk, sk := GenInboxKey(ID)
@@ -67,7 +67,7 @@ func (d *InboxDAO) GetInbox(ctx context.Context, ID uuid.UUID) (model.Inbox, err
 	return inboxItem.Inbox, nil
 }
 
-func (d *InboxDAO) ListInboxByUser(ctx context.Context, userID uuid.UUID) ([]model.Inbox, error) {
+func (d *DB) ListInboxByUser(ctx context.Context, userID uuid.UUID) ([]model.Inbox, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	userKey, _ := GenUserKey(userID)
@@ -107,7 +107,7 @@ func (d *InboxDAO) ListInboxByUser(ctx context.Context, userID uuid.UUID) ([]mod
 	return inboxes, nil
 }
 
-func (d *InboxDAO) GetInboxWithRequests(ctx context.Context, id uuid.UUID) (model.Inbox, error) {
+func (d *DB) GetInboxWithRequests(ctx context.Context, id uuid.UUID) (model.Inbox, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	pk, _ := GenInboxKey(id)
@@ -153,7 +153,7 @@ func (d *InboxDAO) GetInboxWithRequests(ctx context.Context, id uuid.UUID) (mode
 	return toInboxModel(in), nil
 }
 
-func (d *InboxDAO) CreateInbox(
+func (d *DB) CreateInbox(
 	ctx context.Context,
 	in model.Inbox,
 ) (model.Inbox, error) {
@@ -187,7 +187,7 @@ func (d *InboxDAO) CreateInbox(
 	return in, err
 }
 
-func (d *InboxDAO) AddRequestToInbox(ctx context.Context, id uuid.UUID, req model.Request) error {
+func (d *DB) AddRequestToInbox(ctx context.Context, id uuid.UUID, req model.Request) error {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	reqItem := toRequestItem(id, req)
@@ -208,11 +208,11 @@ func (d *InboxDAO) AddRequestToInbox(ctx context.Context, id uuid.UUID, req mode
 	return err
 }
 
-func (d *InboxDAO) Close(context.Context) error {
+func (d *DB) Close(context.Context) error {
 	return nil
 }
 
-func (d *InboxDAO) UpdateInbox(
+func (d *DB) UpdateInbox(
 	ctx context.Context,
 	in model.Inbox,
 ) (model.Inbox, error) {
@@ -246,7 +246,7 @@ func (d *InboxDAO) UpdateInbox(
 	return in, nil
 }
 
-func (d *InboxDAO) ListInbox(
+func (d *DB) ListInbox(
 	ctx context.Context,
 	//	options ...option.ListInboxOption,
 ) ([]model.Inbox, error) {
@@ -283,7 +283,7 @@ func (d *InboxDAO) ListInbox(
 	return inboxes, err
 }
 
-func (d *InboxDAO) deleteInboxWithFilter(ctx context.Context, id uuid.UUID, toDeletefilter func(pk, sk string) bool) error {
+func (d *DB) deleteInboxWithFilter(ctx context.Context, id uuid.UUID, toDeletefilter func(pk, sk string) bool) error {
 	pk, _ := GenInboxKey(id)
 
 	queryPaginator := dynamodb.NewQueryPaginator(d.dbclient, &dynamodb.QueryInput{
@@ -343,13 +343,13 @@ func (d *InboxDAO) deleteInboxWithFilter(ctx context.Context, id uuid.UUID, toDe
 	return nil
 }
 
-func (d *InboxDAO) DeleteInbox(ctx context.Context, id uuid.UUID) error {
+func (d *DB) DeleteInbox(ctx context.Context, id uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	return d.deleteInboxWithFilter(ctx, id, func(pk, sk string) bool { return true })
 }
 
-func (d *InboxDAO) DeleteInboxRequests(ctx context.Context, id uuid.UUID) error {
+func (d *DB) DeleteInboxRequests(ctx context.Context, id uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	return d.deleteInboxWithFilter(ctx, id, func(pk, sk string) bool { return isRequestSK(sk) })

@@ -25,7 +25,7 @@ import (
 
 func mustGetLoginHandlerWithPM(pm provider.ProviderManager) (LoginHandler, func()) {
 	ctx := context.Background()
-	dao, err := database.GetInboxDAO(ctx, database.Badger)
+	dao, err := database.NewRepository(ctx, database.Badger)
 	if err != nil {
 		panic(err)
 	}

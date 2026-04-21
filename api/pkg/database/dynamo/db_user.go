@@ -13,7 +13,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-func (d *InboxDAO) UpsertUser(ctx context.Context, user model.User) (bool, error) {
+func (d *DB) UpsertUser(ctx context.Context, user model.User) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 	userItem := toUserItem(user)
@@ -37,7 +37,7 @@ func (d *InboxDAO) UpsertUser(ctx context.Context, user model.User) (bool, error
 	return isNewUser, nil
 }
 
-func (d *InboxDAO) GetUser(ctx context.Context, ID uuid.UUID) (model.User, error) {
+func (d *DB) GetUser(ctx context.Context, ID uuid.UUID) (model.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 
@@ -68,7 +68,7 @@ func (d *InboxDAO) GetUser(ctx context.Context, ID uuid.UUID) (model.User, error
 	return userItem.User, nil
 }
 
-func (d *InboxDAO) DeleteUser(ctx context.Context, ID uuid.UUID) error {
+func (d *DB) DeleteUser(ctx context.Context, ID uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(ctx, d.timeout)
 	defer cancel()
 

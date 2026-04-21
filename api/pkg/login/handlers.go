@@ -17,12 +17,12 @@ import (
 )
 
 type loginHandler struct {
-	dao database.InboxDAO
+	dao database.Repository
 	pm  provider.ProviderManager
 	et  event.EventTracker
 }
 
-func NewLoginHandler(dao database.InboxDAO, pm provider.ProviderManager, et event.EventTracker) LoginHandler {
+func NewLoginHandler(dao database.Repository, pm provider.ProviderManager, et event.EventTracker) LoginHandler {
 	return &loginHandler{
 		dao: dao,
 		pm:  pm,

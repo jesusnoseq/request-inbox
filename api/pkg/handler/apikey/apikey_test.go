@@ -20,9 +20,9 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/t_util"
 )
 
-func mustGetAPIKeyHandler() (APIKeyHandler, database.InboxDAO, func()) {
+func mustGetAPIKeyHandler() (APIKeyHandler, database.Repository, func()) {
 	ctx := context.Background()
-	dao, err := database.GetInboxDAO(ctx, database.Badger)
+	dao, err := database.NewRepository(ctx, database.Badger)
 	if err != nil {
 		panic(err)
 	}
@@ -60,7 +60,7 @@ type APIKeyParams struct {
 	ExpiryDate time.Time
 }
 
-func mustCreateAndSetLoggedUser(t *testing.T, ctx *gin.Context, dao database.InboxDAO, email string) model.User {
+func mustCreateAndSetLoggedUser(t *testing.T, ctx *gin.Context, dao database.Repository, email string) model.User {
 	t.Helper()
 	user := model.NewUser(email)
 	_, err := dao.UpsertUser(ctx, user)
@@ -73,7 +73,7 @@ func mustCreateAndSetLoggedUser(t *testing.T, ctx *gin.Context, dao database.Inb
 	return user
 }
 
-func mustCreateAPIKey(t *testing.T, dao database.InboxDAO, user model.User, p APIKeyParams) model.APIKey {
+func mustCreateAPIKey(t *testing.T, dao database.Repository, user model.User, p APIKeyParams) model.APIKey {
 	t.Helper()
 	ctx := context.Background()
 	apikey, err := model.NewAPIKey(user.ID)
