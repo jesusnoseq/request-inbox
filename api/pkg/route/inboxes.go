@@ -9,7 +9,7 @@ import (
 
 const APIBasePath = "/api/v1"
 
-func SetUtilityRoutes(r gin.IRouter, ih handler.IInboxHandler) {
+func SetUtilityRoutes(r gin.IRouter, ih handler.InboxHandler) {
 	v1 := r.Group(APIBasePath)
 	{
 		v1.GET("/health", ih.Health)
@@ -17,7 +17,7 @@ func SetUtilityRoutes(r gin.IRouter, ih handler.IInboxHandler) {
 	}
 }
 
-func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
+func SetInboxRoutes(r gin.IRouter, ih handler.InboxHandler) {
 	v1 := r.Group(APIBasePath)
 	{
 		inboxes := v1.Group("/inboxes")
@@ -34,7 +34,7 @@ func SetInboxRoutes(r gin.IRouter, ih handler.IInboxHandler) {
 	}
 }
 
-func SetLoginRoutes(r gin.IRouter, lh login.ILoginHandler) {
+func SetLoginRoutes(r gin.IRouter, lh login.LoginHandler) {
 	v1 := r.Group(APIBasePath)
 	{
 		auth := v1.Group("/auth")
@@ -48,7 +48,7 @@ func SetLoginRoutes(r gin.IRouter, lh login.ILoginHandler) {
 	}
 }
 
-func SetAPIKeyRoutes(r gin.IRouter, ah apikey.IAPIKeyHandler) {
+func SetAPIKeyRoutes(r gin.IRouter, ah apikey.APIKeyHandler) {
 	v1 := r.Group(APIBasePath)
 	{
 		apikey := v1.Group("/api-keys")

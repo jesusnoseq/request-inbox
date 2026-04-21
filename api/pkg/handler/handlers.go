@@ -22,19 +22,19 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model/validation"
 )
 
-type InboxHandler struct {
+type inboxHandler struct {
 	dao database.InboxDAO
 	et  event.EventTracker
 }
 
-func NewInboxHandler(dao database.InboxDAO, et event.EventTracker) *InboxHandler {
-	return &InboxHandler{
+func NewInboxHandler(dao database.InboxDAO, et event.EventTracker) InboxHandler {
+	return &inboxHandler{
 		dao: dao,
 		et:  et,
 	}
 }
 
-func (ih *InboxHandler) CreateInbox(c *gin.Context) {
+func (ih *inboxHandler) CreateInbox(c *gin.Context) {
 	newInbox := model.NewInbox()
 	if err := c.ShouldBindJSON(&newInbox); err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox", err, http.StatusBadRequest))
@@ -86,7 +86,7 @@ func (ih *InboxHandler) CreateInbox(c *gin.Context) {
 	c.JSON(http.StatusCreated, inbox)
 }
 
-func (ih *InboxHandler) DeleteInbox(c *gin.Context) {
+func (ih *inboxHandler) DeleteInbox(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
@@ -122,7 +122,7 @@ func (ih *InboxHandler) DeleteInbox(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
-func (ih *InboxHandler) DeleteInboxRequests(c *gin.Context) {
+func (ih *inboxHandler) DeleteInboxRequests(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
@@ -158,7 +158,7 @@ func (ih *InboxHandler) DeleteInboxRequests(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
-func (ih *InboxHandler) GetInbox(c *gin.Context) {
+func (ih *inboxHandler) GetInbox(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
@@ -188,7 +188,7 @@ func (ih *InboxHandler) GetInbox(c *gin.Context) {
 	c.JSON(http.StatusOK, inbox)
 }
 
-func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
+func (ih *inboxHandler) UpdateInbox(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))
@@ -242,7 +242,7 @@ func (ih *InboxHandler) UpdateInbox(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedInbox)
 }
 
-func (ih *InboxHandler) ListInbox(c *gin.Context) {
+func (ih *inboxHandler) ListInbox(c *gin.Context) {
 	if login.IsUserLoggedIn(c) {
 		user, err := login.GetUser(c)
 		if err != nil {
@@ -271,7 +271,7 @@ func (ih *InboxHandler) ListInbox(c *gin.Context) {
 	c.JSON(http.StatusOK, model.NewItemList(inboxes))
 }
 
-func (ih *InboxHandler) RegisterInboxRequest(c *gin.Context) {
+func (ih *inboxHandler) RegisterInboxRequest(c *gin.Context) {
 	id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid inbox ID", err, http.StatusBadRequest))

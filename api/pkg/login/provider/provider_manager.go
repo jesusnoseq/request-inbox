@@ -5,9 +5,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-//go:generate mockgen -destination=provider_mock/provider_mock.go -package=provider_mock github.com/jesusnoseq/request-inbox/pkg/login/provider IProviderManager
+//go:generate mockgen -destination=provider_mock/provider_mock.go -package=provider_mock github.com/jesusnoseq/request-inbox/pkg/login/provider ProviderManager
 
-type IProviderManager interface {
+type ProviderManager interface {
 	GetOAuthConfig(provider string) (OAuthConfig, bool)
 	ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User, error)
 }

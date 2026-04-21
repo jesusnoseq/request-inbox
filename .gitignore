@@ -44,3 +44,5 @@ e2e/*report
 .idea
 
 api/.env.development
+
+blog/*

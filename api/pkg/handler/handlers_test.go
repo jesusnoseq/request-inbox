@@ -20,7 +20,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/t_util"
 )
 
-func mustGetInboxHandler() (*handler.InboxHandler, func()) {
+func mustGetInboxHandler() (handler.InboxHandler, func()) {
 	ctx := context.Background()
 	dao, err := database.GetInboxDAO(ctx, database.Badger)
 	if err != nil {
@@ -61,7 +61,7 @@ func isUUID(id string) bool {
 	return err == nil
 }
 
-func shoudlExistsInbox(t *testing.T, ih *handler.InboxHandler, i model.Inbox) model.Inbox {
+func shoudlExistsInbox(t *testing.T, ih handler.InboxHandler, i model.Inbox) model.Inbox {
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
 	body := t_util.MustJson(t, i)

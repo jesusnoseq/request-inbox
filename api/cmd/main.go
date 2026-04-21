@@ -21,6 +21,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/handler/apikey"
 	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/login"
+	"github.com/jesusnoseq/request-inbox/pkg/login/provider"
 	"github.com/jesusnoseq/request-inbox/pkg/route"
 )
 
@@ -127,7 +128,7 @@ func getRouter() (*gin.Engine, func()) {
 	r.Use(login.APIKeyMiddleware(dao))
 	r.Use(instrumentation.MonitoringMiddleware(eventTracker))
 
-	lh := login.NewLoginHandler(dao, eventTracker)
+	lh := login.NewLoginHandler(dao, provider.NewProviderManager(), eventTracker)
 	route.SetLoginRoutes(r, lh)
 
 	ih := handler.NewInboxHandler(dao, eventTracker)

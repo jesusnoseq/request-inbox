@@ -308,7 +308,7 @@ func mustCloseBody(t *testing.T, resp *http.Response) {
 	}
 }
 
-func mustGetInboxHandler() (*InboxHandler, func()) {
+func mustGetInboxHandler() (InboxHandler, func()) {
 	ctx := context.Background()
 	dao, err := database.GetInboxDAO(ctx, database.Badger)
 	if err != nil {
@@ -335,7 +335,7 @@ func mustParseInbox(payload []byte) model.Inbox {
 	return i
 }
 
-func shouldExistInbox(t *testing.T, ih *InboxHandler, i model.Inbox) model.Inbox {
+func shouldExistInbox(t *testing.T, ih InboxHandler, i model.Inbox) model.Inbox {
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
 	body := t_util.MustJson(t, i)
@@ -353,7 +353,7 @@ func shouldExistInbox(t *testing.T, ih *InboxHandler, i model.Inbox) model.Inbox
 	return mustParseInbox(w.Body.Bytes())
 }
 
-func getInbox(t *testing.T, ih *InboxHandler, id uuid.UUID) model.Inbox {
+func getInbox(t *testing.T, ih InboxHandler, id uuid.UUID) model.Inbox {
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
 	ginCtx.AddParam("id", id.String())
