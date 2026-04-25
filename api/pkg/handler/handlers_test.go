@@ -61,10 +61,10 @@ func isUUID(id string) bool {
 	return err == nil
 }
 
-func shoudlExistsInbox(t *testing.T, ih handler.InboxHandler, i model.Inbox) model.Inbox {
+func shouldExistInbox(t *testing.T, ih handler.InboxHandler, i model.Inbox) model.Inbox {
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
-	body := t_util.MustJson(t, i)
+	body := t_util.MustJson(t, i)º
 	req, err := http.NewRequest(
 		"POST",
 		"",
@@ -180,8 +180,8 @@ func TestListInbox(t *testing.T) {
 	config.Set(config.EnableListingPublicInbox, true)
 	ih, closer := mustGetInboxHandler()
 	defer closer()
-	inboxA := shoudlExistsInbox(t, ih, model.GenerateInbox())
-	inboxB := shoudlExistsInbox(t, ih, model.GenerateInbox())
+	inboxA := shouldExistInbox(t, ih, model.GenerateInbox())
+	inboxB := shouldExistInbox(t, ih, model.GenerateInbox())
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
 	req, err := http.NewRequest(
@@ -220,7 +220,7 @@ func TestDeleteInbox(t *testing.T) {
 	config.LoadConfig(config.Test)
 	ih, closer := mustGetInboxHandler()
 	defer closer()
-	inbox := shoudlExistsInbox(t, ih, model.GenerateInbox())
+	inbox := shouldExistInbox(t, ih, model.GenerateInbox())
 
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
@@ -249,7 +249,7 @@ func TestDeleteInboxRequests(t *testing.T) {
 	config.LoadConfig(config.Test)
 	ih, closer := mustGetInboxHandler()
 	defer closer()
-	inbox := shoudlExistsInbox(t, ih, model.GenerateInbox())
+	inbox := shouldExistInbox(t, ih, model.GenerateInbox())
 
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
@@ -279,7 +279,7 @@ func TestGetInbox(t *testing.T) {
 	ih, closer := mustGetInboxHandler()
 	defer closer()
 	inbox := model.GenerateInbox()
-	inbox = shoudlExistsInbox(t, ih, inbox)
+	inbox = shouldExistInbox(t, ih, inbox)
 
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
@@ -320,7 +320,7 @@ func TestUpdateInbox(t *testing.T) {
 	ih, closer := mustGetInboxHandler()
 	defer closer()
 	inbox := model.GenerateInbox()
-	inbox = shoudlExistsInbox(t, ih, inbox)
+	inbox = shouldExistInbox(t, ih, inbox)
 
 	modInbox := model.GenerateInbox()
 	modInbox.ID = inbox.ID
@@ -392,7 +392,7 @@ func TestUpdateInboxWithLocalhostCallback(t *testing.T) {
 	ih, closer := mustGetInboxHandler()
 	defer closer()
 	inbox := model.GenerateInbox()
-	inbox = shoudlExistsInbox(t, ih, inbox)
+	inbox = shouldExistInbox(t, ih, inbox)
 	inbox.Callbacks = []model.Callback{
 		{
 			IsEnabled: true,
