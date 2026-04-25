@@ -41,10 +41,6 @@ func mustGetLoginHandlerWithPM(pm provider.ProviderManager) (LoginHandler, func(
 	}
 }
 
-func mustGetLoginHandler() (LoginHandler, func()) {
-	return mustGetLoginHandlerWithPM(provider.NewProviderManager())
-}
-
 func findCookie(cookies []*http.Cookie, name string) *http.Cookie {
 	for _, cookie := range cookies {
 		if cookie.Name == name {
