@@ -64,7 +64,7 @@ func isUUID(id string) bool {
 func shouldExistInbox(t *testing.T, ih handler.InboxHandler, i model.Inbox) model.Inbox {
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
-	body := t_util.MustJson(t, i)º
+	body := t_util.MustJson(t, i)
 	req, err := http.NewRequest(
 		"POST",
 		"",
