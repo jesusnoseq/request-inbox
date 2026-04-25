@@ -35,7 +35,6 @@ func NewRepository(ctx context.Context, e Engine) (Repository, error) {
 		dao, err := embedded.NewInboxDB(config.GetString(config.DBBadgerPath), false)
 		return dao, err
 	case Dynamo:
-		ctx := context.Background()
 		s, err := dynamo.GetSession(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("error getting AWS session: %w", err)
