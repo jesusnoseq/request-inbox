@@ -87,9 +87,9 @@ func TestJWTMiddlewareNoToken(t *testing.T) {
 	t_util.AssertStringContains(t, err.Error(), "the user is not logged in")
 }
 
-func mustGetInboxDao() (database.InboxDAO, func()) {
+func mustGetInboxDao() (database.Repository, func()) {
 	ctx := context.Background()
-	dao, err := database.GetInboxDAO(ctx, database.Badger)
+	dao, err := database.NewRepository(ctx, database.Badger)
 	if err != nil {
 		panic(err)
 	}

@@ -17,7 +17,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/t_util"
 )
 
-func setupTest() (dynamo.InboxDAO, context.Context) {
+func setupTest() (dynamo.DB, context.Context) {
 	config.LoadConfig(config.Test)
 	// TODO
 	// Because the table has indexes and configuration that I don't want to duplicate
@@ -30,7 +30,7 @@ func setupTest() (dynamo.InboxDAO, context.Context) {
 		panic(err)
 	}
 	dbClient := dynamo.NewDynamoClient(s)
-	dao := dynamo.NewInboxDAO(testTableName, dbClient, 5*time.Second)
+	dao := dynamo.New(testTableName, dbClient, 5*time.Second)
 
 	return *dao, ctx
 }
@@ -344,7 +344,7 @@ func TestUpdateInbox(t *testing.T) {
 	})
 }
 
-func deleteInbox(t *testing.T, dao dynamo.InboxDAO, inboxID uuid.UUID) {
+func deleteInbox(t *testing.T, dao dynamo.DB, inboxID uuid.UUID) {
 	t.Log("Deleting inbox ", inboxID.String())
 	t.Helper()
 	err := dao.DeleteInbox(context.Background(), inboxID)

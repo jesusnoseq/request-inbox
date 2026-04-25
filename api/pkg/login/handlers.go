@@ -16,21 +16,21 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-type LoginHandler struct {
-	dao database.InboxDAO
-	pm  provider.IProviderManager
+type loginHandler struct {
+	dao database.Repository
+	pm  provider.ProviderManager
 	et  event.EventTracker
 }
 
-func NewLoginHandler(dao database.InboxDAO, et event.EventTracker) *LoginHandler {
-	return &LoginHandler{
+func NewLoginHandler(dao database.Repository, pm provider.ProviderManager, et event.EventTracker) LoginHandler {
+	return &loginHandler{
 		dao: dao,
-		pm:  provider.NewProviderManager(),
+		pm:  pm,
 		et:  et,
 	}
 }
 
-func (lh *LoginHandler) HandleLogin(c *gin.Context) {
+func (lh *loginHandler) HandleLogin(c *gin.Context) {
 	p := c.Param("provider")
 	oauthConfig, exists := lh.pm.GetOAuthConfig(p)
 	if !exists {
@@ -53,7 +53,7 @@ func (lh *LoginHandler) HandleLogin(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
-func (lh *LoginHandler) HandleCallback(c *gin.Context) {
+func (lh *loginHandler) HandleCallback(c *gin.Context) {
 	p := c.Param("provider")
 	oauthConfig, exists := lh.pm.GetOAuthConfig(p)
 	if !exists {
@@ -170,7 +170,7 @@ func GetUser(c *gin.Context) (model.User, error) {
 	return user, nil
 }
 
-func (lh *LoginHandler) HandleLoginUser(c *gin.Context) {
+func (lh *loginHandler) HandleLoginUser(c *gin.Context) {
 	token, _ := c.Cookie(AuthTokenCookieName)
 	if token == "" {
 		c.AbortWithStatusJSON(http.StatusNoContent, nil)
@@ -186,7 +186,7 @@ func (lh *LoginHandler) HandleLoginUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (lh *LoginHandler) HandleLogout(c *gin.Context) {
+func (lh *loginHandler) HandleLogout(c *gin.Context) {
 	cookie := http.Cookie{
 		Name:     AuthTokenCookieName,
 		Value:    "",
@@ -201,7 +201,7 @@ func (lh *LoginHandler) HandleLogout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "You have successfully logged out"})
 }
 
-func (lh *LoginHandler) HandleDeleteLoginUser(c *gin.Context) {
+func (lh *loginHandler) HandleDeleteLoginUser(c *gin.Context) {
 	token, _ := c.Cookie(AuthTokenCookieName)
 	if token == "" {
 		c.AbortWithStatusJSON(http.StatusNoContent, nil)

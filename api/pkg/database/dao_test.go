@@ -14,7 +14,7 @@ import (
 
 type closer func(context.Context)
 
-func MustGetDB() (database.InboxDAO, closer) {
+func MustGetDB() (database.Repository, closer) {
 	config.LoadConfig(config.Test)
 	db, err := embedded.NewInboxDB("", true)
 	if err != nil {
@@ -28,7 +28,7 @@ func MustGetDB() (database.InboxDAO, closer) {
 	}
 }
 
-func MustCreateInbox(ctx context.Context, db database.InboxDAO, inbox model.Inbox) model.Inbox {
+func MustCreateInbox(ctx context.Context, db database.Repository, inbox model.Inbox) model.Inbox {
 	created, err := db.CreateInbox(ctx, inbox)
 	if err != nil {
 		panic(err)
@@ -50,7 +50,7 @@ func TestDBCreateInbox(t *testing.T) {
 	inboxWithID.Name = created.ID.String()
 	inboxWithID.Timestamp = created.Timestamp
 	if diff := cmp.Diff(inboxWithID, created); diff != "" {
-		t.Errorf("GetInboxDAO(ctx, inbox) = created, want inboxWithID. Diff: %s", diff)
+		t.Errorf("NewRepository(ctx, inbox) = created, want inboxWithID. Diff: %s", diff)
 	}
 }
 

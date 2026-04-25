@@ -13,7 +13,7 @@ const (
 	Warn State = "warn" // healthy, with some concerns
 )
 
-func (ih *InboxHandler) Health(c *gin.Context) {
+func (ih *inboxHandler) Health(c *gin.Context) {
 	c.Header("Content-Type", "application/health+json; charset=utf-8")
 	c.JSON(200, gin.H{
 		"status":    Pass,

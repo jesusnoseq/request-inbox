@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (ih *InboxHandler) AcceptCookies(c *gin.Context) {
+func (ih *inboxHandler) AcceptCookies(c *gin.Context) {
 	slog.Info("Cookies accepted", "ip", c.ClientIP())
 	c.JSON(http.StatusNoContent, gin.H{})
 }

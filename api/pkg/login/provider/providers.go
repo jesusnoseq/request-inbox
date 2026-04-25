@@ -22,15 +22,15 @@ type OauthProvider string
 const GitHub OauthProvider = "github"
 const Google OauthProvider = "google"
 
-type ProviderManager struct {
+type providerManager struct {
 	oAuthConfigs map[OauthProvider]OAuthConfig
 }
 
-func NewProviderManager() IProviderManager {
-	return &ProviderManager{}
+func NewProviderManager() ProviderManager {
+	return &providerManager{}
 }
 
-func (p *ProviderManager) GetOAuthConfig(provider string) (OAuthConfig, bool) {
+func (p *providerManager) GetOAuthConfig(provider string) (OAuthConfig, bool) {
 	if p.oAuthConfigs != nil {
 		c, exists := p.oAuthConfigs[OauthProvider(provider)]
 		return c, exists
@@ -62,7 +62,7 @@ func (p *ProviderManager) GetOAuthConfig(provider string) (OAuthConfig, bool) {
 	return c, exists
 }
 
-func (p *ProviderManager) ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User, error) {
+func (p *providerManager) ExtractUser(prov string, token *oauth2.Token, jsonInfo []byte) (model.User, error) {
 	provider := OauthProvider(prov)
 	switch provider {
 	case Google:
@@ -74,7 +74,7 @@ func (p *ProviderManager) ExtractUser(prov string, token *oauth2.Token, jsonInfo
 	}
 }
 
-func (p *ProviderManager) extractGoogleUser(token *oauth2.Token, jsonInfo []byte) (model.User, error) {
+func (p *providerManager) extractGoogleUser(token *oauth2.Token, jsonInfo []byte) (model.User, error) {
 	var gInfo googleUserInfo
 	err := json.Unmarshal(jsonInfo, &gInfo)
 	if err != nil {
@@ -94,7 +94,7 @@ func (p *ProviderManager) extractGoogleUser(token *oauth2.Token, jsonInfo []byte
 	return user, nil
 }
 
-func (p *ProviderManager) extractGitHubUser(token *oauth2.Token, jsonInfo []byte) (model.User, error) {
+func (p *providerManager) extractGitHubUser(token *oauth2.Token, jsonInfo []byte) (model.User, error) {
 	var gInfo githubUserInfo
 	err := json.Unmarshal(jsonInfo, &gInfo)
 	if err != nil {

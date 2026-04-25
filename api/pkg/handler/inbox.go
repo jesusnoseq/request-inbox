@@ -2,9 +2,9 @@ package handler
 
 import "github.com/gin-gonic/gin"
 
-//go:generate mockgen -destination=handler_mock/inbox_mock.go -package=handler_mock github.com/jesusnoseq/request-inbox/pkg/handler IInboxHandler
+//go:generate mockgen -destination=handler_mock/inbox_mock.go -package=handler_mock github.com/jesusnoseq/request-inbox/pkg/handler InboxHandler
 
-type IInboxHandler interface {
+type InboxHandler interface {
 	CreateInbox(c *gin.Context)
 	DeleteInbox(c *gin.Context)
 	GetInbox(c *gin.Context)

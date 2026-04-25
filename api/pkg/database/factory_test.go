@@ -15,10 +15,10 @@ func TestGetDatabaseEngine(t *testing.T) {
 	}
 }
 
-func TestGetInboxDAOSuccess(t *testing.T) {
+func TestNewRepositorySuccess(t *testing.T) {
 	config.LoadConfig(config.Test)
 	ctx := context.Background()
-	db, err := database.GetInboxDAO(ctx, database.Badger)
+	db, err := database.NewRepository(ctx, database.Badger)
 	defer func() {
 		if err := db.Close(ctx); err != nil {
 			t.Errorf("error closing db: %v", err)
@@ -28,19 +28,19 @@ func TestGetInboxDAOSuccess(t *testing.T) {
 		t.Errorf("expected no error got %v", err)
 	}
 	if db == nil {
-		t.Errorf("GetInboxDAO(ctx, %v) = %v, want not nil", config.DBEngineBadger, db)
+		t.Errorf("NewRepository(ctx, %v) = %v, want not nil", config.DBEngineBadger, db)
 	}
 }
 
-func TestGetInboxDAOEngineDoesNotExits(t *testing.T) {
+func TestNewRepositoryEngineDoesNotExist(t *testing.T) {
 	config.LoadConfig(config.Test)
 	ctx := context.Background()
 	fakeEngine := "fakeEngine"
-	db, err := database.GetInboxDAO(ctx, database.Engine(fakeEngine))
+	db, err := database.NewRepository(ctx, database.Engine(fakeEngine))
 	if err == nil {
 		t.Errorf("expected error got %v", err)
 	}
 	if db != nil {
-		t.Errorf("GetInboxDAO(ctx, %v) = %v, want nil", fakeEngine, db)
+		t.Errorf("NewRepository(ctx, %v) = %v, want nil", fakeEngine, db)
 	}
 }

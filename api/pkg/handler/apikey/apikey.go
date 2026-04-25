@@ -11,17 +11,17 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model"
 )
 
-type APIKeyHandler struct {
-	dao database.InboxDAO
+type apiKeyHandler struct {
+	dao database.Repository
 }
 
-func NewAPIKeyHandler(dao database.InboxDAO) *APIKeyHandler {
-	return &APIKeyHandler{
+func NewAPIKeyHandler(dao database.Repository) APIKeyHandler {
+	return &apiKeyHandler{
 		dao: dao,
 	}
 }
 
-func (h *APIKeyHandler) CreateAPIKey(c *gin.Context) {
+func (h *apiKeyHandler) CreateAPIKey(c *gin.Context) {
 	if !login.IsUserLoggedIn(c) {
 		c.AbortWithStatusJSON(model.NewUnauthorizedError())
 		return
@@ -54,7 +54,7 @@ func (h *APIKeyHandler) CreateAPIKey(c *gin.Context) {
 	c.JSON(http.StatusCreated, apiKey)
 }
 
-func (h *APIKeyHandler) GetAPIKey(c *gin.Context) {
+func (h *apiKeyHandler) GetAPIKey(c *gin.Context) {
 	if !login.IsUserLoggedIn(c) {
 		c.AbortWithStatusJSON(model.NewUnauthorizedError())
 		return
@@ -83,7 +83,7 @@ func (h *APIKeyHandler) GetAPIKey(c *gin.Context) {
 	c.JSON(http.StatusOK, apiKey.WithMaskedKey())
 }
 
-func (h *APIKeyHandler) ListAPIKeysByUser(c *gin.Context) {
+func (h *apiKeyHandler) ListAPIKeysByUser(c *gin.Context) {
 	if !login.IsUserLoggedIn(c) {
 		c.AbortWithStatusJSON(model.NewUnauthorizedError())
 		return
@@ -111,7 +111,7 @@ func (h *APIKeyHandler) ListAPIKeysByUser(c *gin.Context) {
 	c.JSON(http.StatusOK, model.NewItemList(maskedAPIKeys))
 }
 
-func (h *APIKeyHandler) DeleteAPIKey(c *gin.Context) {
+func (h *apiKeyHandler) DeleteAPIKey(c *gin.Context) {
 	if !login.IsUserLoggedIn(c) {
 		c.AbortWithStatusJSON(model.NewUnauthorizedError())
 		return

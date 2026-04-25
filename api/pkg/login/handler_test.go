@@ -23,9 +23,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func mustGetLoginHandler() (*LoginHandler, func()) {
+func mustGetLoginHandlerWithPM(pm provider.ProviderManager) (LoginHandler, func()) {
 	ctx := context.Background()
-	dao, err := database.GetInboxDAO(ctx, database.Badger)
+	dao, err := database.NewRepository(ctx, database.Badger)
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +33,7 @@ func mustGetLoginHandler() (*LoginHandler, func()) {
 	if err != nil {
 		panic(err)
 	}
-	return NewLoginHandler(dao, et), func() {
+	return NewLoginHandler(dao, pm, et), func() {
 		err := dao.Close(ctx)
 		if err != nil {
 			panic(err)
@@ -54,7 +54,7 @@ func TestHandleLogout(t *testing.T) {
 	config.LoadConfig(config.Test)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	lh := &LoginHandler{}
+	lh := NewLoginHandler(nil, nil, nil)
 
 	lh.HandleLogout(c)
 
@@ -132,8 +132,6 @@ func getMockOauthConfig(serverURL string) provider.OAuthConfig {
 func TestHandleLogin(t *testing.T) {
 	config.LoadConfig(config.Test)
 
-	lh, closer := mustGetLoginHandler()
-	defer closer()
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -143,11 +141,12 @@ func TestHandleLogin(t *testing.T) {
 	config.Set(config.FrontendApplicationURL, server.URL)
 	config.Set(config.AuthCookieDomain, "localhost")
 
-	pm := provider_mock.NewMockIProviderManager(mockCtrl)
+	pm := provider_mock.NewMockProviderManager(mockCtrl)
 	pm.EXPECT().GetOAuthConfig("mock").Return(getMockOauthConfig(server.URL), true).Times(1)
 	pm.EXPECT().GetOAuthConfig("invalid").Return(provider.OAuthConfig{}, false).Times(1)
 	pm.EXPECT().ExtractUser(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
-	lh.pm = pm
+	lh, closer := mustGetLoginHandlerWithPM(pm)
+	defer closer()
 
 	testCases := []struct {
 		name           string
@@ -225,8 +224,6 @@ func TestHandleLogin(t *testing.T) {
 func TestHandleCallback(t *testing.T) {
 	config.LoadConfig(config.Test)
 
-	lh, closer := mustGetLoginHandler()
-	defer closer()
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -236,7 +233,7 @@ func TestHandleCallback(t *testing.T) {
 	config.Set(config.FrontendApplicationURL, server.URL)
 	config.Set(config.AuthCookieDomain, "localhost")
 
-	pm := provider_mock.NewMockIProviderManager(mockCtrl)
+	pm := provider_mock.NewMockProviderManager(mockCtrl)
 	pm.EXPECT().GetOAuthConfig("mock").Return(getMockOauthConfig(server.URL), true).Times(2)
 	pm.EXPECT().GetOAuthConfig("invalid").Return(provider.OAuthConfig{}, false).Times(1)
 	pm.EXPECT().ExtractUser("mock", gomock.Any(), gomock.Any()).DoAndReturn(
@@ -246,7 +243,8 @@ func TestHandleCallback(t *testing.T) {
 			return model.User{Email: "test@mail.dev"}, nil
 		},
 	)
-	lh.pm = pm
+	lh, closer := mustGetLoginHandlerWithPM(pm)
+	defer closer()
 	testCases := []struct {
 		name                string
 		provider            string
@@ -344,7 +342,7 @@ func TestHandleCallback(t *testing.T) {
 
 func TestHandleLoginUser(t *testing.T) {
 	config.LoadConfig(config.Test)
-	lh := &LoginHandler{}
+	lh := NewLoginHandler(nil, nil, nil)
 	user := model.NewUser("test@mail.dev")
 	jwt, err := GenerateJWT(user, 24*time.Hour)
 	t_util.RequireNoError(t, err)

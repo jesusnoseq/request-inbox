@@ -42,7 +42,7 @@ func JWTMiddleware() gin.HandlerFunc {
 	}
 }
 
-func APIKeyMiddleware(dao database.InboxDAO) gin.HandlerFunc {
+func APIKeyMiddleware(dao database.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		code := c.GetHeader("X-API-KEY")
 		if code == "" {

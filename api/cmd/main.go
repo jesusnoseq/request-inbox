@@ -21,6 +21,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/handler/apikey"
 	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/login"
+	"github.com/jesusnoseq/request-inbox/pkg/login/provider"
 	"github.com/jesusnoseq/request-inbox/pkg/route"
 )
 
@@ -107,7 +108,7 @@ func getRouter() (*gin.Engine, func()) {
 	}))
 
 	ctx := context.Background()
-	dao, err := database.GetInboxDAO(ctx, database.GetDatabaseEngine(config.GetString(config.DBEngine)))
+	dao, err := database.NewRepository(ctx, database.GetDatabaseEngine(config.GetString(config.DBEngine)))
 	closer := func() {
 		err := dao.Close(ctx)
 		if err != nil {
@@ -115,7 +116,7 @@ func getRouter() (*gin.Engine, func()) {
 		}
 	}
 	if err != nil {
-		log.Fatal("failed to obtain InboxDAO:", err)
+		log.Fatal("failed to obtain Repository:", err)
 	}
 
 	eventTracker, err := instrumentation.NewEventTracker()
@@ -127,7 +128,7 @@ func getRouter() (*gin.Engine, func()) {
 	r.Use(login.APIKeyMiddleware(dao))
 	r.Use(instrumentation.MonitoringMiddleware(eventTracker))
 
-	lh := login.NewLoginHandler(dao, eventTracker)
+	lh := login.NewLoginHandler(dao, provider.NewProviderManager(), eventTracker)
 	route.SetLoginRoutes(r, lh)
 
 	ih := handler.NewInboxHandler(dao, eventTracker)

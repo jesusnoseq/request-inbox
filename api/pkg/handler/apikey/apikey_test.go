@@ -20,13 +20,13 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/t_util"
 )
 
-func mustGetAPIKeyHandler() (*APIKeyHandler, func()) {
+func mustGetAPIKeyHandler() (APIKeyHandler, database.Repository, func()) {
 	ctx := context.Background()
-	dao, err := database.GetInboxDAO(ctx, database.Badger)
+	dao, err := database.NewRepository(ctx, database.Badger)
 	if err != nil {
 		panic(err)
 	}
-	return NewAPIKeyHandler(dao), func() {
+	return NewAPIKeyHandler(dao), dao, func() {
 		err := dao.Close(ctx)
 		if err != nil {
 			panic(err)
@@ -60,7 +60,7 @@ type APIKeyParams struct {
 	ExpiryDate time.Time
 }
 
-func mustCreateAndSetLoggedUser(t *testing.T, ctx *gin.Context, dao database.InboxDAO, email string) model.User {
+func mustCreateAndSetLoggedUser(t *testing.T, ctx *gin.Context, dao database.Repository, email string) model.User {
 	t.Helper()
 	user := model.NewUser(email)
 	_, err := dao.UpsertUser(ctx, user)
@@ -73,7 +73,7 @@ func mustCreateAndSetLoggedUser(t *testing.T, ctx *gin.Context, dao database.Inb
 	return user
 }
 
-func mustCreateAPIKey(t *testing.T, dao database.InboxDAO, user model.User, p APIKeyParams) model.APIKey {
+func mustCreateAPIKey(t *testing.T, dao database.Repository, user model.User, p APIKeyParams) model.APIKey {
 	t.Helper()
 	ctx := context.Background()
 	apikey, err := model.NewAPIKey(user.ID)
@@ -93,9 +93,9 @@ func TestCreateAPIKey(t *testing.T) {
 	config.LoadConfig(config.Test)
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
-	handler, closer := mustGetAPIKeyHandler()
+	handler, dao, closer := mustGetAPIKeyHandler()
 	defer closer()
-	user := mustCreateAndSetLoggedUser(t, ginCtx, handler.dao, "test@mail.dev")
+	user := mustCreateAndSetLoggedUser(t, ginCtx, dao, "test@mail.dev")
 	apikey := APIKeyParams{
 		Name:       "TestKey",
 		ExpiryDate: time.Now().AddDate(0, 1, 0),
@@ -132,10 +132,10 @@ func TestCreateAPIKeyUnauthorized(t *testing.T) {
 	config.LoadConfig(config.Test)
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
-	handler, closer := mustGetAPIKeyHandler()
+	handler, dao, closer := mustGetAPIKeyHandler()
 	defer closer()
 	user := model.NewUser("test@mail.com")
-	apikey := mustCreateAPIKey(t, handler.dao, user, APIKeyParams{"testapikey", time.Now().Add(time.Hour)})
+	apikey := mustCreateAPIKey(t, dao, user, APIKeyParams{"testapikey", time.Now().Add(time.Hour)})
 
 	body := t_util.MustJson(t, apikey)
 	req, err := http.NewRequest(
@@ -162,10 +162,10 @@ func TestGetAPIKey(t *testing.T) {
 	config.LoadConfig(config.Test)
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
-	handler, closer := mustGetAPIKeyHandler()
+	handler, dao, closer := mustGetAPIKeyHandler()
 	defer closer()
-	user := mustCreateAndSetLoggedUser(t, ginCtx, handler.dao, "test@mail.dev")
-	apiKey := mustCreateAPIKey(t, handler.dao, user, APIKeyParams{"testapikey", time.Now().Add(time.Hour)})
+	user := mustCreateAndSetLoggedUser(t, ginCtx, dao, "test@mail.dev")
+	apiKey := mustCreateAPIKey(t, dao, user, APIKeyParams{"testapikey", time.Now().Add(time.Hour)})
 
 	req, err := http.NewRequest(
 		"GET",
@@ -195,14 +195,14 @@ func TestListAPIKeysByUser(t *testing.T) {
 	config.LoadConfig(config.Test)
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
-	handler, closer := mustGetAPIKeyHandler()
+	handler, dao, closer := mustGetAPIKeyHandler()
 	defer closer()
-	user := mustCreateAndSetLoggedUser(t, ginCtx, handler.dao, "test@mail.dev")
-	apiKey1 := mustCreateAPIKey(t, handler.dao, user, APIKeyParams{"testapikey1", time.Now().Add(time.Hour)})
-	apiKey2 := mustCreateAPIKey(t, handler.dao, user, APIKeyParams{"testapikey2", time.Now().Add(time.Hour)})
+	user := mustCreateAndSetLoggedUser(t, ginCtx, dao, "test@mail.dev")
+	apiKey1 := mustCreateAPIKey(t, dao, user, APIKeyParams{"testapikey1", time.Now().Add(time.Hour)})
+	apiKey2 := mustCreateAPIKey(t, dao, user, APIKeyParams{"testapikey2", time.Now().Add(time.Hour)})
 
 	otherUser := model.NewUser("other@mail.dev")
-	otherApiKey := mustCreateAPIKey(t, handler.dao, otherUser, APIKeyParams{"testapikey3", time.Now().Add(time.Hour)})
+	otherApiKey := mustCreateAPIKey(t, dao, otherUser, APIKeyParams{"testapikey3", time.Now().Add(time.Hour)})
 
 	req, err := http.NewRequest(
 		"GET",
@@ -238,12 +238,12 @@ func TestDeleteAPIKey(t *testing.T) {
 	config.LoadConfig(config.Test)
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
-	handler, closer := mustGetAPIKeyHandler()
+	handler, dao, closer := mustGetAPIKeyHandler()
 	defer closer()
-	user := mustCreateAndSetLoggedUser(t, ginCtx, handler.dao, "test@mail.dev")
-	apiKey := mustCreateAPIKey(t, handler.dao, user, APIKeyParams{"testapikey", time.Now().Add(time.Hour)})
+	user := mustCreateAndSetLoggedUser(t, ginCtx, dao, "test@mail.dev")
+	apiKey := mustCreateAPIKey(t, dao, user, APIKeyParams{"testapikey", time.Now().Add(time.Hour)})
 	otherUser := model.NewUser("other@mail.dev")
-	otherApiKey := mustCreateAPIKey(t, handler.dao, otherUser, APIKeyParams{"other testapikey", time.Now().Add(time.Hour)})
+	otherApiKey := mustCreateAPIKey(t, dao, otherUser, APIKeyParams{"other testapikey", time.Now().Add(time.Hour)})
 
 	req, err := http.NewRequest("DELETE", "", nil)
 	if err != nil {
@@ -255,11 +255,11 @@ func TestDeleteAPIKey(t *testing.T) {
 	handler.DeleteAPIKey(ginCtx)
 
 	t_util.AssertStatusCode(t, http.StatusNoContent, w.Code)
-	result, err := handler.dao.GetAPIKey(ginCtx, apiKey.ID)
+	result, err := dao.GetAPIKey(ginCtx, apiKey.ID)
 	t_util.AssertError(t, err)
 	t_util.AssertStructIsEmpty(t, result)
 
-	result, err = handler.dao.GetAPIKey(ginCtx, otherApiKey.ID)
+	result, err = dao.GetAPIKey(ginCtx, otherApiKey.ID)
 	t_util.AssertStructIsNotEmpty(t, result)
 	t_util.AssertNoError(t, err)
 }
@@ -268,11 +268,11 @@ func TestDeleteOtherUserAPIKey(t *testing.T) {
 	config.LoadConfig(config.Test)
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
-	handler, closer := mustGetAPIKeyHandler()
+	handler, dao, closer := mustGetAPIKeyHandler()
 	defer closer()
-	_ = mustCreateAndSetLoggedUser(t, ginCtx, handler.dao, "test@mail.dev")
+	_ = mustCreateAndSetLoggedUser(t, ginCtx, dao, "test@mail.dev")
 	otherUser := model.NewUser("other@mail.dev")
-	otherApiKey := mustCreateAPIKey(t, handler.dao, otherUser, APIKeyParams{"other testapikey", time.Now().Add(time.Hour)})
+	otherApiKey := mustCreateAPIKey(t, dao, otherUser, APIKeyParams{"other testapikey", time.Now().Add(time.Hour)})
 
 	req, err := http.NewRequest("DELETE", "", nil)
 	if err != nil {
@@ -284,7 +284,7 @@ func TestDeleteOtherUserAPIKey(t *testing.T) {
 	handler.DeleteAPIKey(ginCtx)
 
 	t_util.AssertStatusCode(t, http.StatusNotFound, w.Code)
-	result, err := handler.dao.GetAPIKey(ginCtx, otherApiKey.ID)
+	result, err := dao.GetAPIKey(ginCtx, otherApiKey.ID)
 	t_util.AssertNoError(t, err)
 	t_util.AssertStructIsNotEmpty(t, result)
 }
