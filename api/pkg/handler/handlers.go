@@ -27,7 +27,7 @@ type inboxHandler struct {
 	et  event.EventTracker
 }
 
-func NewInboxHandler(dao database.Repository, et event.EventTracker) InboxHandler {
+func NewInboxHandler(dao database.Repository, et event.EventTracker) InboxService {
 	return &inboxHandler{
 		dao: dao,
 		et:  et,

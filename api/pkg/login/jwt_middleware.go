@@ -11,11 +11,13 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/model/validation"
 )
 
-const USER_CONTEXT_KEY = "user"
-const IS_LOGGED_IN_CONTEXT_KEY = "is_logged_in"
-const IS_LOGGED_WITH_API_KEY_CONTEXT_KEY = "logged_with_api_key"
-const IS_LOGGED_WITH_COOKIE_CONTEXT_KEY = "logged_with_cookie"
-const LOGIN_ERROR_CONTEXT_KEY = "login_error"
+const (
+	USER_CONTEXT_KEY                   = "user"
+	IS_LOGGED_IN_CONTEXT_KEY           = "is_logged_in"
+	IS_LOGGED_WITH_API_KEY_CONTEXT_KEY = "logged_with_api_key"
+	IS_LOGGED_WITH_COOKIE_CONTEXT_KEY  = "logged_with_cookie"
+	LOGIN_ERROR_CONTEXT_KEY            = "login_error"
+)
 
 func JWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {

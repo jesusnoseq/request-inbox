@@ -13,7 +13,13 @@ const (
 	Warn State = "warn" // healthy, with some concerns
 )
 
-func (ih *inboxHandler) Health(c *gin.Context) {
+type healthHandler struct{}
+
+func NewHealthHandler() HealthHandler {
+	return &healthHandler{}
+}
+
+func (h *healthHandler) Health(c *gin.Context) {
 	c.Header("Content-Type", "application/health+json; charset=utf-8")
 	c.JSON(200, gin.H{
 		"status":    Pass,
