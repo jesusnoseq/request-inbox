@@ -17,7 +17,9 @@ func TestSetInboxRoutes(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	r := gin.New()
-	ih := handler_mock.NewMockInboxHandler(mockCtrl)
+	ih := handler_mock.NewMockInboxService(mockCtrl)
+	hh := handler_mock.NewMockHealthHandler(mockCtrl)
+	uh := handler_mock.NewMockUtilityHandler(mockCtrl)
 	returnOk := func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	}
@@ -28,10 +30,10 @@ func TestSetInboxRoutes(t *testing.T) {
 	ih.EXPECT().UpdateInbox(gomock.Any()).Do(returnOk).Times(1)
 	ih.EXPECT().DeleteInboxRequests(gomock.Any()).Do(returnOk).Times(1)
 	ih.EXPECT().RegisterInboxRequest(gomock.Any()).Do(returnOk).Times(2)
-	ih.EXPECT().Health(gomock.Any()).Do(returnOk).Times(1)
+	hh.EXPECT().Health(gomock.Any()).Do(returnOk).Times(1)
 
 	route.SetInboxRoutes(r, ih)
-	route.SetUtilityRoutes(r, ih)
+	route.SetUtilityRoutes(r, hh, uh)
 
 	testCases := []struct {
 		desc      string

@@ -9,15 +9,15 @@ import (
 
 const APIBasePath = "/api/v1"
 
-func SetUtilityRoutes(r gin.IRouter, ih handler.InboxHandler) {
+func SetUtilityRoutes(r gin.IRouter, hh handler.HealthHandler, uh handler.UtilityHandler) {
 	v1 := r.Group(APIBasePath)
 	{
-		v1.GET("/health", ih.Health)
-		v1.GET("/cookies/accept", ih.AcceptCookies)
+		v1.GET("/health", hh.Health)
+		v1.GET("/cookies/accept", uh.AcceptCookies)
 	}
 }
 
-func SetInboxRoutes(r gin.IRouter, ih handler.InboxHandler) {
+func SetInboxRoutes(r gin.IRouter, ih handler.InboxService) {
 	v1 := r.Group(APIBasePath)
 	{
 		inboxes := v1.Group("/inboxes")

@@ -7,13 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jesusnoseq/request-inbox/pkg/config"
+	"github.com/jesusnoseq/request-inbox/pkg/handler"
 )
 
 func TestInboxHealth(t *testing.T) {
 	config.LoadConfig(config.Test)
 	config.Set(config.DBEngine, config.DBEngineBadger)
-	ih, closer := mustGetInboxHandler()
-	defer closer()
+	hh := handler.NewHealthHandler()
 
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
@@ -26,7 +26,7 @@ func TestInboxHealth(t *testing.T) {
 		t.Error(err)
 	}
 	ginCtx.Request = req
-	ih.Health(ginCtx)
+	hh.Health(ginCtx)
 	resp := w.Result()
 	err = resp.Body.Close()
 	if err != nil {

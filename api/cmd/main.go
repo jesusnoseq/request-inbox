@@ -137,7 +137,7 @@ func getRouter() (*gin.Engine, func()) {
 	akh := apikey.NewAPIKeyHandler(dao)
 	route.SetAPIKeyRoutes(r, akh)
 
-	route.SetUtilityRoutes(r, ih)
+	route.SetUtilityRoutes(r, handler.NewHealthHandler(), handler.NewUtilityHandler())
 
 	return r, closer
 }
