@@ -105,6 +105,7 @@ const HeadersEditor: React.FC<HeadersEditorProps> = ({ initialHeaders, onHeaders
                     options={standardResponseHeaders}
                     sx={{ flex: 0.5 }}
                     value={newHeader.key}
+                    onChange={(_, value) => setNewHeader({ ...newHeader, key: value || '' })}
                     disableClearable
                     renderInput={(params) => <TextField
                         {...params}
