@@ -15,4 +15,13 @@ module.exports = {
             ignoreWarnings: [/Failed to parse source map/],
         },
     },
+    jest: {
+        configure: {
+            moduleNameMapper: {
+                '^react-router/dom$': '<rootDir>/node_modules/react-router/dist/development/dom-export.js',
+                '^@uiw/react-json-view/(light|dark)$': '<rootDir>/node_modules/@uiw/react-json-view/cjs/theme/$1.js',
+                '^#swagger-ui$': '<rootDir>/node_modules/swagger-ui-react/swagger-ui-es-bundle.js',
+            },
+        },
+    },
 }

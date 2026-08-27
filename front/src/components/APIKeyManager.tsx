@@ -21,7 +21,6 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
 import CopyToClipboardButton from './CopyToClipboardButton';
-import { LoadingButton } from '@mui/lab';
 import { useError } from '../context/ErrorContext';
 import { getAPIKeyList, deleteAPIKey, createAPIKey } from '../services/inbox';
 import { type APIKey } from "../types/inbox";
@@ -182,7 +181,7 @@ export default function APIKeyManager() {
                         </FormControl>
                     </Grid>
                     <Grid size={3}>
-                        <LoadingButton
+                        <Button
                             variant="contained"
                             color="primary"
                             startIcon={<AddIcon />}
@@ -191,7 +190,7 @@ export default function APIKeyManager() {
                             loading={isNewKeyLoading}
                         >
                             Create API Key
-                        </LoadingButton>
+                        </Button>
                     </Grid>
                 </Grid>
             </Paper>

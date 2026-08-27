@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { LoadingButton, LoadingButtonProps } from '@mui/lab';
+import { Button, ButtonProps } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { usePostHog } from 'posthog-js/react';
 import { newInbox } from '../services/inbox';
@@ -8,7 +8,7 @@ import { useError } from '../context/ErrorContext';
 
 
 
-interface CreateNewInboxButtonProps extends LoadingButtonProps {
+interface CreateNewInboxButtonProps extends ButtonProps {
     text?: string;
     source?: string;
 }
@@ -48,13 +48,13 @@ const CreateNewInboxButton: React.FC<CreateNewInboxButtonProps> = ({ text = "Cre
     };
 
     return (
-        <LoadingButton
+        <Button
             onClick={handleCreateInbox}
             loading={loading}
             {...props}
         >
             Create new Inbox
-        </LoadingButton>
+        </Button>
     );
 }
 
