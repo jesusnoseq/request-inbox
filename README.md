@@ -2,7 +2,7 @@
 
 ![CI/CD](https://github.com/jesusnoseq/request-inbox/actions/workflows/deploy_app.yaml/badge.svg)
 ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
-![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go)
+![Go Version](https://img.shields.io/badge/Go-1.26.6+-00ADD8?logo=go)
 ![Node Version](https://img.shields.io/badge/Node-20+-339933?logo=node.js)
 ![AWS](https://img.shields.io/badge/AWS-Lambda%20%7C%20DynamoDB-orange?logo=aws)
 
@@ -73,7 +73,7 @@ This will start:
 ### Prerequisites
 
 - Docker and Docker Compose (for containerized deployment)
-- Go 1.24+ (for local development)
+- Go 1.26.6+ (for local development)
 - Node.js 20+ (for local development)
 
 ### Local Development
@@ -104,7 +104,7 @@ make help
 
 ### Technology Stack
 
-- **Backend**: Go 1.24+ with Gin web framework. Can also work as an AWS lambda.
+- **Backend**: Go 1.26.6+ with Gin web framework. Can also work as an AWS lambda.
 - **Frontend**: React 18 with TypeScript and Material-UI
 - **Database**: BadgerDB (embedded) for local development, DynamoDB for production
 - **Infrastructure**: Terraform on AWS (Lambda, API Gateway, S3, CloudFront)
