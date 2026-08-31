@@ -17,7 +17,7 @@ func SetUtilityRoutes(r gin.IRouter, hh handler.HealthHandler, uh handler.Utilit
 	}
 }
 
-func SetInboxRoutes(r gin.IRouter, ih handler.InboxService) {
+func SetInboxRoutes(r gin.IRouter, ih handler.InboxController) {
 	v1 := r.Group(APIBasePath)
 	{
 		inboxes := v1.Group("/inboxes")
@@ -48,7 +48,7 @@ func SetLoginRoutes(r gin.IRouter, lh login.LoginHandler) {
 	}
 }
 
-func SetAPIKeyRoutes(r gin.IRouter, ah apikey.APIKeyHandler) {
+func SetAPIKeyRoutes(r gin.IRouter, ah apikey.APIKeyController) {
 	v1 := r.Group(APIBasePath)
 	{
 		apikey := v1.Group("/api-keys")

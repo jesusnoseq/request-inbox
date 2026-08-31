@@ -17,7 +17,7 @@ func TestSetInboxRoutes(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	r := gin.New()
-	ih := handler_mock.NewMockInboxService(mockCtrl)
+	ih := handler_mock.NewMockInboxController(mockCtrl)
 	hh := handler_mock.NewMockHealthHandler(mockCtrl)
 	uh := handler_mock.NewMockUtilityHandler(mockCtrl)
 	returnOk := func(c *gin.Context) {
@@ -126,7 +126,7 @@ func TestSetUserRoutes(t *testing.T) {
 func TestSetAPIKeyRoutes(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
-	ah := apikey_mock.NewMockAPIKeyHandler(mockCtrl)
+	ah := apikey_mock.NewMockAPIKeyController(mockCtrl)
 	returnOk := func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	}

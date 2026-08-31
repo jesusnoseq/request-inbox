@@ -20,7 +20,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/t_util"
 )
 
-func mustGetAPIKeyHandler() (APIKeyHandler, database.Repository, func()) {
+func mustGetAPIKeyHandler() (APIKeyController, database.Repository, func()) {
 	ctx := context.Background()
 	dao, err := database.NewRepository(ctx, database.Badger)
 	if err != nil {
