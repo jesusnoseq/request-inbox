@@ -5,7 +5,7 @@ import ExternalLink from '../components/ExternalLink';
 export default function Footer() {
     return (
         <footer>
-            <Box component="footer" bgcolor="background.paper" py={2} textAlign="center">
+            <Box component="footer" bgcolor="background.paper" py={4} textAlign="center" sx={{ borderTop: 1, borderColor: 'divider' }}>
                 <Container maxWidth="sm">
                     <Typography>© 2024&nbsp;
                         <ExternalLink href="https://jesusnoseq.com/">Jesusnoseq</ExternalLink>.

@@ -29,12 +29,13 @@ export default function Header() {
 
 
     return (
-        <AppBar position="static" sx={{ flexGrow: 1, marginBottom: 2 }}>
+        <AppBar position="static" sx={{ flexGrow: 1 }}>
             <Toolbar>
 
-                <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
+                {/* Not an <h1>: each page owns its own top-level heading. */}
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontSize: 20 }}>
                     <Link to="/" component={LinkDOM} color="inherit" underline="none" sx={{ display: 'flex', alignItems: 'center' }}>
-                        <img src="/logo128.png" alt="Request Inbox logo" style={{ marginRight: '16px', height: '30px' }} />
+                        <img src="/logo128.png" alt="Request Inbox logo" style={{ marginRight: '12px', height: '30px' }} />
                         Request Inbox
                     </Link>
                 </Typography>

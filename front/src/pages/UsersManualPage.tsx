@@ -4,6 +4,7 @@ import ExternalLink from '../components/ExternalLink';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography, Accordion, AccordionSummary, AccordionDetails, List, ListItem, Paper } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { codeBlockSx } from '../theme';
 
 
 const UsersManualPage: React.FC = () => {
@@ -11,31 +12,30 @@ const UsersManualPage: React.FC = () => {
     return (
         <Container>
             <Box my={4}>
-                <Typography variant="h4" component="h2" gutterBottom>
+                <Typography variant="h3" component="h1" gutterBottom>
                     Request Inbox Docs
                 </Typography>
-                <Typography variant="body1" component="p">
+                <Typography variant="body1" component="p" color="text.secondary" gutterBottom>
                     Here you will find instructions on how to use each feature of our application.
                     This is a work in progress, so please forgive the lack of completeness.
                 </Typography>
 
-                <Typography variant="body1" component="p">
+                <Typography variant="body1" component="p" color="text.secondary">
                     You can also check our API docs for more detailed technical information and integration guidelines.
                 </Typography>
-
 
                 <Button
                     variant="contained"
                     color="primary"
                     onClick={() => navigate('/api-docs')}
-                    sx={{ m: 2 }}
+                    sx={{ my: 3 }}
                 >
                     Explore API Docs
                 </Button>
 
                 <Accordion sx={{ maxWidth: 'md' }}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                        <Typography variant="h5" component="h3" >Core Concepts</Typography>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="concepts-content" id="concepts-header">
+                        <Typography variant="h5" component="h2" >Core Concepts</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <List>
@@ -104,8 +104,8 @@ const UsersManualPage: React.FC = () => {
                 </Accordion>
 
                 <Accordion sx={{ maxWidth: 'md' }}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                        <Typography variant="h5" component="h3" >Anonymous, Public and Private Inboxes</Typography>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="inbox-types-content" id="inbox-types-header">
+                        <Typography variant="h5" component="h2" >Anonymous, Public and Private Inboxes</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography component="p">
@@ -167,8 +167,8 @@ const UsersManualPage: React.FC = () => {
                 </Accordion>
 
                 <Accordion sx={{ maxWidth: 'md' }}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                        <Typography variant="h5" component="h3" >Dynamic Responses</Typography>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="dynamic-responses-content" id="dynamic-responses-header">
+                        <Typography variant="h5" component="h2" >Dynamic Responses</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography component="p">
@@ -211,10 +211,10 @@ const UsersManualPage: React.FC = () => {
                                             Searches for values in a JSON document with a GJSON Path.
                                             If the path is not found, then the value is <code>&lt;no value&gt;</code>
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ gjsonPath .Request.Body "path" }}'}
                                             </code>
@@ -238,10 +238,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Same as GJSON Path, but it provides a way to set a fallback value
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ gjsonPathOrDefault .Request.Body "Path" "default" }}'}
                                             </code>
@@ -262,10 +262,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Converts a string to uppercase
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ toUpper "this will be in uppercase"}}'}
                                             </code>
@@ -288,10 +288,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Converts a string to lowercase
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ toLower "THIS WILL BE IN LOWERCASE"}}'}
                                             </code>
@@ -314,10 +314,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Splits a string into an array of substrings based on a specified separator
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ split "1,2,3" ","}}'}
                                             </code>
@@ -339,10 +339,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Removes whitespace from both ends of a string
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ trimSpace " a string with spaces at the beginning and end  " }}'}
                                             </code>
@@ -364,10 +364,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Gets the current timestamp in seconds
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ currentTimestampSeconds }}'}
                                             </code>
@@ -389,10 +389,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Gets the current date and time in 2006-01-02 15:04:05 format
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ now }}'}
                                             </code>
@@ -414,10 +414,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Gets the current date in 2006-01-02 format
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ today }}'}
                                             </code>
@@ -439,10 +439,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Generates a random string of the specified length
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ randomString 10 }}'}
                                             </code>
@@ -464,10 +464,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Generates a random integer within the specified range
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ randomInt 0 10 }}'}
                                             </code>
@@ -490,10 +490,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Generates a random float within the specified range
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ randomFloat 0 1 }}'}
                                             </code>
@@ -515,10 +515,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Generates a random boolean value, either true or false
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ randomBool }}'}
                                             </code>
@@ -539,10 +539,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Generates a random UUID as a string
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ randomUUID }}'}
                                             </code>
@@ -564,10 +564,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Sums two integer values
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ intAdd 2 2 }}'}
                                             </code>
@@ -589,10 +589,10 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Performs subtraction on two integer values
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ intSubtract 2 2 }}'}
                                             </code>
@@ -615,10 +615,10 @@ const UsersManualPage: React.FC = () => {
                                             Converts a string representing an integer into an actual integer value.
                                             If it fails, returns 0 as an integer
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ $n:= stringToInt .Inbox.Response.Body }}'}
                                             </code>
@@ -642,10 +642,10 @@ const UsersManualPage: React.FC = () => {
                                             For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value, 
                                             this returns /extrapath?query=value
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ extractURI .Request.URI }}'}
                                             </code>
@@ -669,10 +669,10 @@ const UsersManualPage: React.FC = () => {
                                             For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
                                             this returns /extrapath
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ extractPath .Request.URI }}'}
                                             </code>
@@ -696,10 +696,10 @@ const UsersManualPage: React.FC = () => {
                                             For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
                                             this returns ?query=value
                                         </Typography>
-                                        <Typography sx={{ mt: 0.1 }}>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
                                         </Typography>
-                                        <Paper >
+                                        <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
                                                 {'{{ extractQueryParams .Request.URI }}'}
                                             </code>

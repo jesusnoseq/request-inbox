@@ -75,7 +75,7 @@ const InboxDetailPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <Container>
+            <Container sx={{ mt: 2 }}>
                 <Grid container spacing={0} justifyContent="center" alignItems="center" >
                     <CircularProgress />
                 </Grid>
@@ -85,7 +85,7 @@ const InboxDetailPage: React.FC = () => {
 
     if (error) {
         return (
-            <Container>
+            <Container sx={{ mt: 2 }}>
                 <Alert variant="outlined" severity="error">
                     {error}
                 </Alert>
@@ -134,7 +134,7 @@ const InboxDetailPage: React.FC = () => {
     };
 
     return (
-        <Container>
+        <Container sx={{ mt: 2 }}>
             {!isLoggedIn() && (
                 <Alert 
                     severity="info" 

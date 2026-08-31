@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Container } from '@mui/material';
 import { getUser, deleteUser } from '../services/inbox';
 import Profile from '../components/Profile';
 
@@ -28,14 +29,12 @@ const UserProfilePage: React.FC = () => {
 
 
     return (
-        <>
+        <Container maxWidth="md" sx={{ my: 4 }}>
             {
                 user != null &&
-                <>
-                    <Profile user={user} onDeleteAccount={handleDelete} />
-                </>
+                <Profile user={user} onDeleteAccount={handleDelete} />
             }
-        </>
+        </Container>
     );
 };
 

@@ -13,7 +13,7 @@ interface CreateNewInboxButtonProps extends ButtonProps {
     source?: string;
 }
 
-const CreateNewInboxButton: React.FC<CreateNewInboxButtonProps> = ({ text = "Create new Inbox", source = "unknown", ...props }) => {
+const CreateNewInboxButton: React.FC<CreateNewInboxButtonProps> = ({ text = "Create new Inbox", source = "unknown", children, ...props }) => {
     const [loading, setLoading] = useState(false);
     const { setError } = useError();
     const posthog = usePostHog();
@@ -53,7 +53,7 @@ const CreateNewInboxButton: React.FC<CreateNewInboxButtonProps> = ({ text = "Cre
             loading={loading}
             {...props}
         >
-            Create new Inbox
+            {children ?? text}
         </Button>
     );
 }

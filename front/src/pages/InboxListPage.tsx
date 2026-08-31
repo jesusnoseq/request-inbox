@@ -56,7 +56,7 @@ const InboxListPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <Container>
+            <Container sx={{ mt: 2 }}>
                 <CircularProgress />
             </Container>
         );
@@ -64,7 +64,7 @@ const InboxListPage: React.FC = () => {
 
     if (error) {
         return (
-            <Container>
+            <Container sx={{ mt: 2 }}>
                 <Alert variant="outlined" severity="error">
                     {error}
                 </Alert>
@@ -73,9 +73,9 @@ const InboxListPage: React.FC = () => {
     }
 
     return (
-        <Container>
+        <Container sx={{ mt: 2 }}>
 
-            <Typography variant="h2" fontSize={'2.5rem'} gutterBottom>
+            <Typography variant="h2" component="h1" fontSize={'2.5rem'} gutterBottom>
                 Inbox List
             </Typography>
 

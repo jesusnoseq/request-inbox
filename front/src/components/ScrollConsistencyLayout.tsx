@@ -1,40 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
+/**
+ * Keeps the horizontal layout stable between pages by always reserving the
+ * scrollbar gutter, so navigating from a short page to a long one doesn't
+ * shift content sideways.
+ *
+ * This used to also pad the body by the measured scrollbar width and cap the
+ * wrapper at `100vw - scrollbarWidth`. With `overflow-y: scroll` the gutter is
+ * already reserved, so that padding was double-counting - and it left a strip
+ * of page background down the right edge of any full-bleed section.
+ */
 export default function ScrollConsistencyLayout({ children }: { children: React.ReactNode }) {
-    const [scrollbarWidth, setScrollbarWidth] = useState(0);
-
     useEffect(() => {
-        // Calculate scrollbar width
-        const outer = document.createElement('div');
-        outer.style.visibility = 'hidden';
-        outer.style.overflow = 'scroll';
-        document.body.appendChild(outer);
-
-        const inner = document.createElement('div');
-        outer.appendChild(inner);
-
-        const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
-        setScrollbarWidth(scrollbarWidth);
-
-        document.body.removeChild(outer);
-
-        // Apply padding to body
-        document.body.style.paddingRight = `${scrollbarWidth}px`;
+        const previousOverflowY = document.body.style.overflowY;
         document.body.style.overflowY = 'scroll';
 
         return () => {
-            // Cleanup
-            document.body.style.paddingRight = '';
-            document.body.style.overflowY = '';
+            document.body.style.overflowY = previousOverflowY;
         };
     }, []);
 
-    return (
-        <div style={{
-            maxWidth: `calc(100vw - ${scrollbarWidth}px)`,
-            margin: '0 auto',
-        }}>
-            {children}
-        </div>
-    );
+    return <>{children}</>;
 }

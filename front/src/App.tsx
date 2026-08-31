@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 
 import LandingPage from './pages/LandingPage';
 import AboutPage from './pages/AboutPage';
@@ -30,30 +30,35 @@ function App() {
     <ScrollConsistencyLayout>
       <Router>
         <PageTracker />
-        <Container>
+        {/* No app-level <Container>: every page supplies its own, and the
+            landing page needs full-bleed sections. The column keeps the
+            footer at the bottom on short pages. */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <Header />
-          <Routes>
-            {isLoggedIn() ? (
-              <Route path="/" element={<InboxListPage />} />
-            ) : (
-              <Route path="/" element={<LandingPage />} />
-            )}
-            <Route path="/inbox" element={<InboxListPage />} />
-            <Route path="/api-docs" element={<APIDocPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/users-manual" element={<UsersManualPage />} />
-            <Route path="/docs" element={<UsersManualPage />} />
-            <Route path="/inbox/:inboxId" element={<InboxDetailPage />} />
-            <Route path="/profile" element={<UserProfilePage />} />
-            <Route path="/health" element={<HealthPage />} />
-            <Route path="/home" element={<LandingPage />} />
-            <Route path="/cookies" element={<CookiePolicyPage />} />
-            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms" element={<TermsOfServicePage />} />
-          </Routes>
+          <Box component="main" sx={{ flexGrow: 1 }}>
+            <Routes>
+              {isLoggedIn() ? (
+                <Route path="/" element={<InboxListPage />} />
+              ) : (
+                <Route path="/" element={<LandingPage />} />
+              )}
+              <Route path="/inbox" element={<InboxListPage />} />
+              <Route path="/api-docs" element={<APIDocPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/users-manual" element={<UsersManualPage />} />
+              <Route path="/docs" element={<UsersManualPage />} />
+              <Route path="/inbox/:inboxId" element={<InboxDetailPage />} />
+              <Route path="/profile" element={<UserProfilePage />} />
+              <Route path="/health" element={<HealthPage />} />
+              <Route path="/home" element={<LandingPage />} />
+              <Route path="/cookies" element={<CookiePolicyPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms" element={<TermsOfServicePage />} />
+            </Routes>
+          </Box>
           <CookieBanner />
           <Footer />
-        </Container>
+        </Box>
       </Router>
     </ScrollConsistencyLayout>
   );

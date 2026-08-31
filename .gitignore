@@ -46,3 +46,4 @@ e2e/*report
 api/.env.development
 
 blog/*
+design/*
