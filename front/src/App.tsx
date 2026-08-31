@@ -33,7 +33,7 @@ function App() {
         {/* No app-level <Container>: every page supplies its own, and the
             landing page needs full-bleed sections. The column keeps the
             footer at the bottom on short pages. */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Header />
           <Box component="main" sx={{ flexGrow: 1 }}>
             <Routes>

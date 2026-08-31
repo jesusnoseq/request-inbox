@@ -1,39 +1,50 @@
 import React from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, useTheme } from '@mui/material';
 import ExternalLink from '../components/ExternalLink';
 import { useNavigate } from 'react-router-dom';
 import { Container, Typography, Accordion, AccordionSummary, AccordionDetails, List, ListItem, Paper } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { codeBlockSx } from '../theme';
+import { codeBlockSx, bandBackground } from '../theme';
 
+const SECTION_PADDING = { xs: 6, md: 9 };
 
 const UsersManualPage: React.FC = () => {
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
+    const band = bandBackground(isDark);
+    const ground = theme.palette.background.default;
+
     return (
-        <Container>
-            <Box my={4}>
-                <Typography variant="h3" component="h1" gutterBottom>
-                    Request Inbox Docs
-                </Typography>
-                <Typography variant="body1" component="p" color="text.secondary" gutterBottom>
-                    Here you will find instructions on how to use each feature of our application.
-                    This is a work in progress, so please forgive the lack of completeness.
-                </Typography>
+        <>
+            <Box component="section" sx={{ bgcolor: band, borderBottom: 1, borderColor: 'divider', py: SECTION_PADDING }}>
+                <Container maxWidth="md">
+                    <Typography variant="h3" component="h1" gutterBottom>
+                        Request Inbox Docs
+                    </Typography>
+                    <Typography variant="body1" component="p" color="text.secondary" gutterBottom>
+                        Here you will find instructions on how to use each feature of our application.
+                        This is a work in progress, so please forgive the lack of completeness.
+                    </Typography>
 
-                <Typography variant="body1" component="p" color="text.secondary">
-                    You can also check our API docs for more detailed technical information and integration guidelines.
-                </Typography>
+                    <Typography variant="body1" component="p" color="text.secondary">
+                        You can also check our API docs for more detailed technical information and integration guidelines.
+                    </Typography>
 
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => navigate('/api-docs')}
-                    sx={{ my: 3 }}
-                >
-                    Explore API Docs
-                </Button>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => navigate('/api-docs')}
+                        sx={{ mt: 3 }}
+                    >
+                        Explore API Docs
+                    </Button>
+                </Container>
+            </Box>
 
-                <Accordion sx={{ maxWidth: 'md' }}>
+            <Box component="section" sx={{ bgcolor: ground, py: SECTION_PADDING }}>
+                <Container maxWidth="md">
+                <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="concepts-content" id="concepts-header">
                         <Typography variant="h5" component="h2" >Core Concepts</Typography>
                     </AccordionSummary>
@@ -103,7 +114,7 @@ const UsersManualPage: React.FC = () => {
                     </AccordionDetails>
                 </Accordion>
 
-                <Accordion sx={{ maxWidth: 'md' }}>
+                <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="inbox-types-content" id="inbox-types-header">
                         <Typography variant="h5" component="h2" >Anonymous, Public and Private Inboxes</Typography>
                     </AccordionSummary>
@@ -166,7 +177,7 @@ const UsersManualPage: React.FC = () => {
                     </AccordionDetails>
                 </Accordion>
 
-                <Accordion sx={{ maxWidth: 'md' }}>
+                <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="dynamic-responses-content" id="dynamic-responses-header">
                         <Typography variant="h5" component="h2" >Dynamic Responses</Typography>
                     </AccordionSummary>
@@ -718,8 +729,9 @@ const UsersManualPage: React.FC = () => {
 
                     </AccordionDetails>
                 </Accordion>
-            </Box >
-        </Container >
+                </Container>
+            </Box>
+        </>
     );
 };
 
