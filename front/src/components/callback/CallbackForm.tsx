@@ -36,6 +36,8 @@ interface CallbackFormProps {
 
 const httpMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 
+const URL_SCHEME_AND_DOMAIN = /^https?:\/\/[^/\s]+/i;
+
 const defaultCallback: InboxCallback = {
     IsEnabled: true,
     IsDynamic: false,
@@ -75,8 +77,11 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
     const validateForm = (): boolean => {
         const newErrors: { [key: string]: string } = {};
 
-        if (!callback.ToURL.trim()) {
+        const trimmedURL = callback.ToURL.trim();
+        if (!trimmedURL) {
             newErrors.ToURL = 'URL is required';
+        } else if (!URL_SCHEME_AND_DOMAIN.test(trimmedURL)) {
+            newErrors.ToURL = 'URL must start with http:// or https:// followed by a domain (the path can use templates)';
         }
 
         if (!callback.Method) {

@@ -29,7 +29,7 @@ export default function Header() {
 
 
     return (
-        <AppBar position="static" sx={{ flexGrow: 1 }}>
+        <AppBar position="static" elevation={0} sx={{ flexGrow: 1, borderBottom: 1, borderColor: 'divider' }}>
             <Toolbar>
 
                 {/* Not an <h1>: each page owns its own top-level heading. */}

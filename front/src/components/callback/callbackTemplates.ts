@@ -12,7 +12,7 @@ export const callbackTemplates: CallbackTemplate[] = [
         description: 'Forward all headers, HTTP method, and body from the original request',
         callback: {
             IsDynamic: true,
-            ToURL: '{{extractURI .Request.URI}}',
+            ToURL: 'https://your-domain.example.com/{{extractURI .Request.URI}}',
             Method: '{{.Request.Method}}',
             Headers: {},
             Body: '{{.Request.Body}}',
