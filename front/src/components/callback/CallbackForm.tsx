@@ -77,12 +77,6 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
 
         if (!callback.ToURL.trim()) {
             newErrors.ToURL = 'URL is required';
-        } else {
-            try {
-                new URL(callback.ToURL);
-            } catch {
-                newErrors.ToURL = 'Please enter a valid URL';
-            }
         }
 
         if (!callback.Method) {

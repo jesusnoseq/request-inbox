@@ -3,7 +3,6 @@ import {
     Box,
     Typography,
     Button,
-    IconButton,
     Paper,
     Dialog,
     DialogTitle,
@@ -12,7 +11,6 @@ import {
     DialogActions
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { InboxCallback } from '../../types/inbox';
 import CallbackList from './CallbackList';
 import CallbackForm from './CallbackForm';
@@ -28,14 +26,14 @@ const CallbackManager: React.FC<CallbackManagerProps> = ({
     onCallbacksChange,
     readonly = false
 }) => {
-    const [editMode, setEditMode] = useState<boolean>(true);
     const [formOpen, setFormOpen] = useState<boolean>(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
-    const enableEditMode = () => {
-        setEditMode(true);
+    const handleToggleEnabled = async (index: number) => {
+        const newCallbacks = callbacks.map((c, i) => i === index ? { ...c, IsEnabled: !c.IsEnabled } : c);
+        await onCallbacksChange(newCallbacks);
     };
 
     const handleAddCallback = () => {
@@ -88,39 +86,17 @@ const CallbackManager: React.FC<CallbackManagerProps> = ({
 
     return (
         <>
-            {!editMode && (
-                <Box sx={{ mb: 2 }}>
-                    <Box display="flex" alignItems="center" gap={1} mb={2}>
+            <Box sx={{ mb: 2 }}>
+                <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+                    <Box display="flex" alignItems="baseline" gap={1}>
                         <Typography variant="h6">
-                            Callbacks ({callbacks.length})
+                            Callbacks
                         </Typography>
-                        {!readonly && (
-                            <IconButton 
-                                aria-label="edit callbacks" 
-                                size="small" 
-                                onClick={enableEditMode}
-                            >
-                                <ModeEditIcon fontSize="medium" />
-                            </IconButton>
-                        )}
+                        <Typography variant="body2" color="text.secondary">
+                            {callbacks.length} configured
+                        </Typography>
                     </Box>
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                        <CallbackList 
-                            callbacks={callbacks} 
-                            onEdit={() => {}} 
-                            onDelete={() => {}}
-                            readonly={true}
-                        />
-                    </Paper>
-                </Box>
-            )}
-
-            {editMode && (
-                <Box sx={{ mb: 2 }}>
-                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                        <Typography variant="h6">
-                            Manage Callbacks
-                        </Typography>
+                    {!readonly && (
                         <Button
                             variant="contained"
                             startIcon={<AddIcon />}
@@ -129,18 +105,25 @@ const CallbackManager: React.FC<CallbackManagerProps> = ({
                         >
                             Add Callback
                         </Button>
-                    </Box>
-
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                        <CallbackList
-                            callbacks={callbacks}
-                            onEdit={handleEditCallback}
-                            onDelete={handleDeleteCallback}
-                            readonly={false}
-                        />
-                    </Paper>
+                    )}
                 </Box>
-            )}
+
+                {callbacks.length === 0 ? (
+                    <Paper variant="outlined" sx={{ p: 4, textAlign: 'center' }}>
+                        <Typography color="text.secondary">
+                            No callbacks yet &mdash; add one to forward incoming requests elsewhere.
+                        </Typography>
+                    </Paper>
+                ) : (
+                    <CallbackList
+                        callbacks={callbacks}
+                        onEdit={handleEditCallback}
+                        onDelete={handleDeleteCallback}
+                        onToggleEnabled={handleToggleEnabled}
+                        readonly={readonly}
+                    />
+                )}
+            </Box>
 
             {/* Callback Form Dialog */}
             <CallbackForm

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { InboxRequest } from '../types/inbox';
-import { Typography, Card, CardContent, Button, List, ListItem, ListItemText, Collapse, Box } from '@mui/material';
+import { Typography, Card, CardContent, Button, Chip, List, ListItem, ListItemText, Collapse, Box } from '@mui/material';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import BodyView from './BodyView';
 import CallbackResponseView from './callback/CallbackResponseView';
+import MethodChip from './MethodChip';
+import { monoFontFamily } from '../theme';
 
 dayjs.extend(localizedFormat);
 
@@ -13,10 +15,19 @@ type RequestDetailProps = {
     request: InboxRequest;
 };
 
+const callbackChipColor = (error: string, code: number): 'success' | 'warning' | 'error' | 'default' => {
+    if (error) return 'error';
+    if (code >= 500) return 'error';
+    if (code >= 400) return 'warning';
+    if (code >= 200 && code < 400) return 'success';
+    return 'default';
+};
+
 const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
     const headerEntries: [string, string][] = Object.entries(request.Headers);
     const [headersOpen, setHeadersOpen] = useState<boolean>(false);
     const [callbacksOpen, setCallbacksOpen] = useState<boolean>(false);
+    const callbackResponses = request.CallbackResponses || [];
 
     const handleHeadersCollapse = () => {
         setHeadersOpen(!headersOpen);
@@ -41,17 +52,33 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                     Nº {request.ID + 1}<br />
                     {dayjs(request.Timestamp).format('LLL')}
                 </Typography>
-                <Typography variant="h6">
-                    <code>{request.Protocol} {request.Method} </code>
-                    <Box component="code"
-                        sx={{
-                            opacity: '0.5',
-                            fontSize: '1rem',
-                            letterSpacing: '-0.5px',
-                        }}>{URIDefaulPath}</Box>
-                    <code>{URICustomPath}</code>
-                </Typography>
+                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap" mb={callbackResponses.length > 0 ? 1 : 0}>
+                    <MethodChip method={request.Method} />
+                    <Typography variant="h6" component="span">
+                        <Box component="code"
+                            sx={{
+                                opacity: '0.5',
+                                fontSize: '1rem',
+                                letterSpacing: '-0.5px',
+                            }}>{URIDefaulPath}</Box>
+                        <code>{URICustomPath}</code>
+                    </Typography>
+                </Box>
 
+                {/* At-a-glance callback outcomes, visible without expanding */}
+                {callbackResponses.length > 0 && (
+                    <Box display="flex" alignItems="center" gap={0.75} flexWrap="wrap" mb={1}>
+                        {callbackResponses.map((cr, index) => (
+                            <Chip
+                                key={index}
+                                size="small"
+                                color={callbackChipColor(cr.Error, cr.Code)}
+                                label={cr.Error ? 'Failed' : `${cr.Method || 'POST'} ${cr.Code}`}
+                                sx={{ fontFamily: monoFontFamily, fontSize: '0.7rem' }}
+                            />
+                        ))}
+                    </Box>
+                )}
 
                 <Typography>
                     <Button onClick={handleHeadersCollapse}>
@@ -73,19 +100,19 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                 </Collapse>
 
                 {/* Callback Results Section */}
-                {request.CallbackResponses && request.CallbackResponses.length > 0 && (
+                {callbackResponses.length > 0 && (
                     <>
                         <Typography sx={{ marginTop: 2 }}>
                             <Button onClick={handleCallbacksCollapse}>
-                                <Typography>Show callback results ({request.CallbackResponses.length})</Typography>
+                                <Typography>Show callback results ({callbackResponses.length})</Typography>
                                 {callbacksOpen ? <ExpandLess /> : <ExpandMore />}
                             </Button>
                         </Typography>
 
                         <Collapse in={callbacksOpen} timeout="auto" unmountOnExit>
                             <Box sx={{ marginTop: 1 }}>
-                                {request.CallbackResponses.map((callbackResponse, index) => (
-                                    <CallbackResponseView 
+                                {callbackResponses.map((callbackResponse, index) => (
+                                    <CallbackResponseView
                                         key={index}
                                         callbackResponse={callbackResponse}
                                         index={index}

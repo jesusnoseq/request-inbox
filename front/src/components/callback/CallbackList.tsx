@@ -3,6 +3,7 @@ import {
     Box,
     Typography,
     Chip,
+    Switch,
     Accordion,
     AccordionSummary,
     AccordionDetails,
@@ -19,15 +20,17 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { InboxCallback } from '../../types/inbox';
+import MethodChip from '../MethodChip';
 
 interface CallbackListProps {
     callbacks: InboxCallback[];
     onEdit: (index: number) => void;
     onDelete: (index: number) => void;
+    onToggleEnabled?: (index: number) => void;
     readonly?: boolean;
 }
 
-const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete, readonly = false }) => {
+const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete, onToggleEnabled, readonly = false }) => {
     if (!callbacks || callbacks.length === 0) {
         return (
             <Box sx={{ p: 2, textAlign: 'center' }}>
@@ -37,17 +40,6 @@ const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete
             </Box>
         );
     }
-
-    const getMethodColor = (method: string) => {
-        const colors: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info'> = {
-            'GET': 'default',
-            'POST': 'default',
-            'PUT': 'default',
-            'DELETE': 'default',
-            'PATCH': 'default',
-        };
-        return colors[method.toUpperCase()] || 'primary';
-    };
 
     const getMethodLabel = (method: string) => {
         if (method === '{{.Request.Method}}') {
@@ -64,17 +56,28 @@ const CallbackList: React.FC<CallbackListProps> = ({ callbacks, onEdit, onDelete
             {callbacks.map((callback, index) => (
                 <Accordion key={index} sx={{ mb: 1 }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                            <Chip
-                                label={callback.IsEnabled ? 'Enabled' : 'Disabled'}
-                                color={callback.IsEnabled ? 'info' : 'default'}
-                                size="small"
-                            />
-                            <Chip
-                                label={getMethodLabel(callback.Method || 'GET')}
-                                color={getMethodColor(callback.Method || 'GET')}
-                                size="small"
-                            />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%' }}>
+                            {readonly ? (
+                                <Chip
+                                    label={callback.IsEnabled ? 'Enabled' : 'Disabled'}
+                                    color={callback.IsEnabled ? 'info' : 'default'}
+                                    size="small"
+                                />
+                            ) : (
+                                <Tooltip title={callback.IsEnabled ? 'Disable callback' : 'Enable callback'}>
+                                    <Switch
+                                        checked={callback.IsEnabled}
+                                        size="small"
+                                        onClick={(e) => e.stopPropagation()}
+                                        onChange={(e) => {
+                                            e.stopPropagation();
+                                            onToggleEnabled?.(index);
+                                        }}
+                                        inputProps={{ 'aria-label': 'Toggle callback enabled' }}
+                                    />
+                                </Tooltip>
+                            )}
+                            <MethodChip method={callback.Method || 'GET'} label={getMethodLabel(callback.Method || 'GET')} />
                             <Typography sx={{ flexGrow: 1, fontSize: '0.9rem' }} noWrap>
                                 {callback.ToURL || 'No URL set'}
                             </Typography>

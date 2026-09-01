@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Inbox } from '../types/inbox';
 import Container from '@mui/material/Container';
-import { Typography, Divider, Alert, Grid, Switch, Box, SvgIcon, Fab } from '@mui/material';
+import { Typography, Divider, Alert, Grid, Box } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import RequestList from '../components/RequestList';
 import { getInbox, deleteInboxRequests } from '../services/inbox';
 import InboxDetail from '../components/InboxDetail';
-import UpdateIcon from '@mui/icons-material/Update';
-import UpdateDisabledIcon from '@mui/icons-material/UpdateDisabled';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import Dialog from '@mui/material/Dialog';
@@ -17,7 +15,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import SignUpButton from '../components/SignUpButton';
 import { useUser } from '../context/UserContext';
 
@@ -93,19 +90,6 @@ const InboxDetailPage: React.FC = () => {
         );
     }
 
-    const iconStyle = {
-        borderRadius: '50%',
-        backgroundColor: "#eee",
-        color: "#ce93d8"
-    };
-
-    const scrollToBottom = () => {
-        window.scrollTo({
-            top: document.documentElement.scrollHeight || document.body.scrollHeight,
-            behavior: 'smooth',
-        });
-    };
-
     const openDeleteRequestsDialog = () => {
         setConfirmDialogOpen(true);
     };
@@ -176,32 +160,51 @@ const InboxDetailPage: React.FC = () => {
             </Dialog>
             {inbox && (
                 <><InboxDetail inbox={inbox} />
-                    <Box margin={1} padding={1} width="100%" display="flex" justifyContent="space-between">
-                        <Switch
-                            color="secondary"
-                            checked={autoUpdate}
-                            onChange={() => setAutoUpdate(!autoUpdate)}
-                            icon={<SvgIcon style={iconStyle}><UpdateDisabledIcon /></SvgIcon>}
-                            checkedIcon={<SvgIcon style={iconStyle}><UpdateIcon /></SvgIcon>}
-                        />
-                        <Tooltip title="Delete All Request">
-                            <Fab size="small" color="secondary" aria-label="Delete requests" onClick={openDeleteRequestsDialog}
-                                style={{ marginLeft: 'auto', marginRight: '20px' }}>
-                                <DeleteSweepIcon />
-                            </Fab>
-                        </Tooltip>
-                        <Tooltip title="Go Down">
-                            <Fab size="small" color="secondary" aria-label="go down" onClick={scrollToBottom} >
-                                <ArrowDownwardIcon />
-                            </Fab>
-                        </Tooltip>
+                    <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1} sx={{ my: 1.5 }}>
+                        <Box
+                            onClick={() => setAutoUpdate(!autoUpdate)}
+                            sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
+                            <Box
+                                sx={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    bgcolor: autoUpdate ? 'success.main' : 'action.disabled',
+                                    '@keyframes livePulse': {
+                                        '0%': { boxShadow: '0 0 0 0 rgba(46,125,50,0.45)' },
+                                        '70%': { boxShadow: '0 0 0 6px rgba(46,125,50,0)' },
+                                        '100%': { boxShadow: '0 0 0 0 rgba(46,125,50,0)' },
+                                    },
+                                    animation: autoUpdate ? 'livePulse 2s infinite' : 'none',
+                                }}
+                            />
+                            <Typography variant="body2" sx={{ color: autoUpdate ? 'success.main' : 'text.secondary', fontWeight: 500 }}>
+                                {autoUpdate ? 'Live — auto-refreshing' : 'Auto-refresh paused'}
+                            </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                                startIcon={<DeleteSweepIcon />}
+                                onClick={openDeleteRequestsDialog}
+                            >
+                                Clear requests
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                href="#bottom-anchor"
+                                startIcon={<ArrowDownwardIcon />}
+                            >
+                                Jump to latest
+                            </Button>
+                        </Box>
                     </Box>
                     <Divider sx={{ my: 2 }} />
-                    {inbox.Requests && inbox.Requests.length > 0 ? (
-                        <RequestList requests={inbox.Requests} />
-                    ) : (
-                        <Typography>No requests found for this inbox.</Typography>
-                    )}
+                    <RequestList requests={inbox.Requests || []} />
                 </>
             )
             }

@@ -35,7 +35,7 @@ function App() {
             footer at the bottom on short pages. */}
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Header />
-          <Box component="main" sx={{ flexGrow: 1 }}>
+          <Box component="main" sx={{ flexGrow: 1, pb: 6 }}>
             <Routes>
               {isLoggedIn() ? (
                 <Route path="/" element={<InboxListPage />} />

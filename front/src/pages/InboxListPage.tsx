@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Grid, CircularProgress, Box, Alert } from '@mui/material';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import SearchOffIcon from '@mui/icons-material/SearchOff';
 import { Inbox } from '../types/inbox';
 import { getInboxList, deleteInbox } from '../services/inbox';
 import InboxListItem from '../components/InboxListItem';
@@ -86,16 +88,45 @@ const InboxListPage: React.FC = () => {
                 <SearchBar onChange={handleSearch} />
             </Box>
 
-            <Grid container spacing={2}>
-                {inboxes.filter((inbox) => 
-                    inbox.ID.toLowerCase().includes(filter.toLowerCase()) || 
+            {(() => {
+                const filteredInboxes = inboxes.filter((inbox) =>
+                    inbox.ID.toLowerCase().includes(filter.toLowerCase()) ||
                     inbox.Name.toLowerCase().includes(filter.toLowerCase())
-                ).map((inbox) => (
-                    <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }} key={inbox.ID}>
-                        <InboxListItem inbox={inbox} onDelete={handleDeleteInbox} />
+                );
+                if (filteredInboxes.length === 0) {
+                    return inboxes.length === 0 ? (
+                        <Box
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="center"
+                            textAlign="center"
+                            gap={1}
+                            sx={{ py: 8, bgcolor: 'background.paper', border: 1, borderStyle: 'dashed', borderColor: 'divider', borderRadius: 2 }}
+                        >
+                            <InboxIcon sx={{ fontSize: 36, color: 'text.disabled' }} />
+                            <Typography color="text.secondary">
+                                No inboxes yet &mdash; create one to get a live endpoint.
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <Box display="flex" flexDirection="column" alignItems="center" textAlign="center" gap={1} sx={{ py: 6 }}>
+                            <SearchOffIcon sx={{ fontSize: 28, color: 'text.disabled' }} />
+                            <Typography color="text.secondary">
+                                No inboxes match &ldquo;{filter}&rdquo;.
+                            </Typography>
+                        </Box>
+                    );
+                }
+                return (
+                    <Grid container spacing={2}>
+                        {filteredInboxes.map((inbox) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }} key={inbox.ID}>
+                                <InboxListItem inbox={inbox} onDelete={handleDeleteInbox} />
+                            </Grid>
+                        ))}
                     </Grid>
-                ))}
-            </Grid>
+                );
+            })()}
         </Container >
     );
 };
