@@ -131,7 +131,7 @@ const InboxDetailPage: React.FC = () => {
                         Create Your Free Account
                     </Typography>
                     <Typography variant="body2">
-                        List all your inboxes · Generate API keys · Enjoy higher limits · Keep inboxes permanently
+                        List all your inboxes · Generate API keys · Keep inboxes permanently
                     </Typography>
                 </Alert>
             )}

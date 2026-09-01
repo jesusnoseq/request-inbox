@@ -116,11 +116,12 @@ const UsersManualPage: React.FC = () => {
 
                 <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="inbox-types-content" id="inbox-types-header">
-                        <Typography variant="h5" component="h2" >Anonymous, Public, and Private Inboxes</Typography>
+                        <Typography variant="h5" component="h2" >Inbox Ownership and Visibility</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography component="p">
-                            The application provides three types of inboxes: anonymous, public, and private. Each type has distinct permissions for accessing and managing captured requests.
+                            Access to an inbox depends on its ownership and visibility.
+                            Anonymous inboxes have no owner and are public, while account-owned inboxes can be either public or private.
                         </Typography>
                         <List>
                             <ListItem>
@@ -133,9 +134,9 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            An anonymous inbox is a type of public inbox with open access that is created by an unregistered user.
+                                            An anonymous inbox is a public inbox created by an unregistered user.
                                             Anyone can read, modify, or delete its contents.
-                                            Anonymous inboxes are not listed in the web interface or API and are accessible only through a direct link to their unique URL.
+                                            Anonymous inboxes do not appear in a user's inbox list and are normally accessed through a direct link to their unique URL.
                                             This makes them suitable for temporary testing when access control and visibility are not required.
                                             However, you should not use anonymous inboxes for sensitive or persistent data because they are not protected.
                                         </Typography>
@@ -144,7 +145,7 @@ const UsersManualPage: React.FC = () => {
                             </ListItem>
                             <ListItem>
                                 <Box>
-                                    <Typography variant="body1">Public Inbox</Typography>
+                                    <Typography variant="body1">Public Owned Inbox</Typography>
                                     <Box sx={{ mt: 0.5 }}>
                                         <Typography
                                             sx={{ display: 'inline' }}
@@ -152,14 +153,15 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            A public inbox is visible to everyone, so any user can read its contents. However, only the owner can modify or delete the inbox and its contents.
+                                            Anyone with the direct link can read a public owned inbox and its contents.
+                                            Only the owner can modify or delete them. Public visibility does not mean that the inbox appears in a public directory.
                                         </Typography>
                                     </Box>
                                 </Box>
                             </ListItem>
                             <ListItem>
                                 <Box>
-                                    <Typography variant="body1">Private Inbox</Typography>
+                                    <Typography variant="body1">Private Owned Inbox</Typography>
                                     <Box sx={{ mt: 0.5 }}>
                                         <Typography
                                             sx={{ display: 'inline' }}
@@ -169,6 +171,71 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             A private inbox is accessible only to its owner. Only the owner can read, modify, or delete the inbox and its contents.
                                             The inbox will still capture all incoming requests sent to its URL, but only the owner can access or manage them.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                        </List>
+                    </AccordionDetails>
+                </Accordion>
+
+                <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="callbacks-content" id="callbacks-header">
+                        <Typography variant="h5" component="h2">Callbacks</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Typography component="p">
+                            Callbacks send an HTTP request to another service whenever an inbox captures a request.
+                            You can use them to forward requests, trigger webhooks, notify other applications, or test integrations.
+                        </Typography>
+                        <Typography component="p">
+                            Add and manage callbacks from the inbox details page. Each callback can be enabled or disabled and configured with a destination URL, HTTP method, headers, and request body.
+                            The destination must be a valid HTTP or HTTPS URL.
+                        </Typography>
+                        <List>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Templates</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            Built-in templates are available for common use cases, including request forwarding, JSON webhooks, Slack, Discord, and Stripe.
+                                            Select a template as a starting point, then review and customize its settings before saving the callback.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Forwarding Headers</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            Enable header forwarding to include headers from the captured request in the callback.
+                                            Headers configured directly on the callback override forwarded headers with the same name.
+                                            Set a Content-Type header explicitly when the receiving service requires one.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Dynamic Callbacks</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            Enable dynamic mode to use Go templates in the destination URL, HTTP method, header values, and request body.
+                                            The Inbox, Request, and Index variables are available, along with the template functions described in the Dynamic Responses section.
+                                            Index is the callback's zero-based position in the inbox callback list.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Callback Results</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            Enabled callbacks are sent when a request is captured. The inbox waits for all callbacks to finish before returning its configured response.
+                                            Open a captured request to view each callback's destination, method, status code, response headers, response body, or delivery error.
+                                            Each callback is attempted once and is not retried automatically.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -189,9 +256,10 @@ const UsersManualPage: React.FC = () => {
                         </Typography>
                         <Typography component="p">
                             The status code template is an optional field available when dynamic responses are enabled.
-                            It lets you define a template that generates the response status code. The template should output an integer between 100 and 999.
-                            If the template renders a valid number, that number overrides the configured status code.
-                            The configured status code is used as a fallback if the template does not render a valid HTTP status code.
+                            It lets you define a template that generates the response status code. The template should output an integer in the application-supported range of 100 to 999.
+                            If the template renders an integer in that range, that number overrides the configured status code.
+                            If rendering succeeds but the result is not an accepted integer, the configured status code is used as a fallback.
+                            A template syntax or execution error does not use the fallback and causes the inbox endpoint to return a 500 response.
                         </Typography>
                         <Typography component="p">
                             The response templates are rendered in the following order: status code, body, and headers.
@@ -334,6 +402,30 @@ const UsersManualPage: React.FC = () => {
                                             </code>
                                         </Paper >
 
+                                    </Box>
+                                </Box>
+                            </ListItem>
+
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">join</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography
+                                            sx={{ display: 'inline' }}
+                                            component="span"
+                                            variant="body2"
+                                            color="text.primary"
+                                        >
+                                            Joins an array of strings using the specified separator.
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
+                                            Example
+                                        </Typography>
+                                        <Paper elevation={0} sx={codeBlockSx}>
+                                            <code>
+                                                {'{{ join (split "1,2,3" ",") " | " }}'}
+                                            </code>
+                                        </Paper >
                                     </Box>
                                 </Box>
                             </ListItem>
@@ -650,7 +742,7 @@ const UsersManualPage: React.FC = () => {
                                             color="text.primary"
                                         >
                                             Extracts the portion of the URI after /in/. This is useful for passthrough inbox scenarios.
-                                            For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
+                                            For example, if the request URI is /api/v1/inboxes/123e4567-e89b-12d3-a456-426614174000/in/extrapath?query=value,
                                             the function returns /extrapath?query=value.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
@@ -677,7 +769,7 @@ const UsersManualPage: React.FC = () => {
                                             color="text.primary"
                                         >
                                             Extracts only the path portion after /in/ (excluding query parameters).
-                                            For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
+                                            For example, if the request URI is /api/v1/inboxes/123e4567-e89b-12d3-a456-426614174000/in/extrapath?query=value,
                                             the function returns /extrapath.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
@@ -704,7 +796,7 @@ const UsersManualPage: React.FC = () => {
                                             color="text.primary"
                                         >
                                             Extracts the query string from a URI, including the ? prefix.
-                                            For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
+                                            For example, if the request URI is /api/v1/inboxes/123e4567-e89b-12d3-a456-426614174000/in/extrapath?query=value,
                                             the function returns ?query=value.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
