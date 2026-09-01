@@ -883,22 +883,68 @@ const UsersManualPage: React.FC = () => {
                 </Accordion>
 
                 <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="dynamic-template-errors-content" id="dynamic-template-errors-header">
-                        <Typography variant="h5" component="h2">Dynamic Template Limits and Errors</Typography>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="limits-errors-content" id="limits-errors-header">
+                        <Typography variant="h5" component="h2">Limits and Errors</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography component="p">
-                            Templates are evaluated when an inbox captures a request, rather than when the inbox or callback configuration is saved.
-                            Test templates with non-sensitive sample requests before relying on them in an integration.
+                            Some limits are enforced by Request Inbox, while others depend on the web server, proxy, database, or cloud platform used by the deployment.
+                            Infrastructure errors may not use the JSON error format described below.
                         </Typography>
                         <List>
                             <ListItem>
                                 <Box>
-                                    <Typography variant="body1">Response Template Errors</Typography>
+                                    <Typography variant="body1">Request Capture and Payload Size</Typography>
                                     <Box sx={{ mt: 0.5 }}>
                                         <Typography variant="body2" color="text.primary">
-                                            A syntax or execution error in a status code, body, or response header template causes the inbox endpoint to return a JSON 500 response.
-                                            Callbacks have already completed and the incoming request has already been stored when response rendering begins, so the request still appears in the inbox.
+                                            The capture endpoint accepts any body format and stores the body without parsing or validating its Content-Type.
+                                            Request Inbox does not impose a separate application-level limit on body size, path length, query parameters, or the number of captured headers.
+                                            Effective limits still apply at the server and infrastructure layers. For example, the standalone server allows up to 1 MiB of request headers and uses 10-second read and write timeouts; proxies and hosted platforms may use different or lower limits.
+                                            An oversized request may be rejected with 413, while a request that exceeds a deadline may be disconnected or return a gateway or timeout error.
+                                            The instance running at request-inbox.com executes each capture as a short-lived function invocation with a total execution budget of about 15 seconds, covering parsing the incoming request, storing it, and running any enabled callbacks.
+                                            A very large payload or a slow callback chain can exhaust that budget, in which case the invocation is terminated and the caller sees a gateway or timeout error even though the request itself was within the size limits described above.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Capacity, History, and Retention</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            The application does not define a fixed maximum number of inboxes, requests per inbox, or API keys per user, and list responses are not paginated.
+                                            Large request histories can therefore take longer to load and produce large API responses.
+                                            Available disk space, memory, database item size, service quotas, and deployment retention policies provide the practical limits.
+                                            A captured request includes its body, headers, URI, and callback results, so large callback responses also consume storage and can cause the capture operation to fail.
+                                            Delete inboxes, requests, and API keys that you no longer need, and do not treat an anonymous inbox as permanent storage.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Callback Limits and Errors</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            By default, an inbox can contain up to three callbacks, including disabled callbacks, and each callback has a five-second timeout. Deployments can change both values.
+                                            Enabled callbacks run concurrently, but the capture request waits for all of them to finish.
+                                            A callback template or delivery failure is stored with the captured request and does not change the inbox response.
+                                            A callback status code of 0 indicates a template, URL, timeout, network, request-construction, or response-reading error; inspect the callback's Error field for details.
+                                            HTTP 4xx and 5xx results mean the destination responded and are recorded as completed callback responses. Callbacks are attempted once and are not retried automatically.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Dynamic Template Limits and Errors</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            Templates are evaluated when a request is captured, not when the inbox or callback is saved. Test them with non-sensitive sample requests before relying on them.
+                                            A syntax or execution error in a response status, body, or header template returns a JSON 500 response.
+                                            Callbacks have already completed and the request has already been stored when response rendering begins, so the request still appears in the inbox.
+                                            Header names cannot contain templates; only header values are rendered.
+                                            The application does not impose separate size or execution limits on template source or rendered output, but request deadlines, response transport, storage, and memory still apply. Keep templates and generated payloads reasonably small.
                                         </Typography>
                                         <Paper elevation={0} sx={codeBlockSx}>
                                             <code>
@@ -910,36 +956,30 @@ const UsersManualPage: React.FC = () => {
                             </ListItem>
                             <ListItem>
                                 <Box>
-                                    <Typography variant="body1">Status Code Limits</Typography>
+                                    <Typography variant="body1">Response Status Codes</Typography>
                                     <Box sx={{ mt: 0.5 }}>
                                         <Typography variant="body2" color="text.primary">
-                                            The complete rendered status code must be an integer from 100 through 999, without surrounding whitespace or line breaks.
-                                            If rendering succeeds but the value is not accepted, the configured status code is used. Use conventional final HTTP status codes, normally from 200 through 599; informational and nonstandard codes may not deliver a body as expected.
+                                            A configured or dynamically rendered response status must be an integer from 100 through 999. Dynamic values cannot contain surrounding whitespace or line breaks.
+                                            If a status template renders successfully but its value is invalid, the configured static status is used; a template execution error returns 500 instead.
+                                            Use conventional final HTTP status codes, normally 200 through 599, because clients and proxies may handle informational or nonstandard values unexpectedly.
                                         </Typography>
                                     </Box>
                                 </Box>
                             </ListItem>
                             <ListItem>
                                 <Box>
-                                    <Typography variant="body1">Callback Errors</Typography>
+                                    <Typography variant="body1">Common HTTP Errors</Typography>
                                     <Box sx={{ mt: 0.5 }}>
                                         <Typography variant="body2" color="text.primary">
-                                            A callback template or delivery failure is stored with the captured request and does not change the inbox response.
-                                            A callback status code of 0 indicates a template, URL, timeout, network, request-construction, or response-reading error; inspect the callback's Error field for details.
-                                            HTTP 4xx and 5xx results mean the destination responded and are recorded as completed callback responses. Callbacks are attempted once and are not retried automatically.
+                                            Application errors normally use a JSON object with code and message fields.
+                                            A 400 response indicates invalid input such as malformed JSON, an invalid inbox ID, or an invalid configuration; 401 means authentication is missing or invalid; 403 means the authenticated user is not allowed to perform the operation; 404 means the resource or route was not found; and 405 means the route does not support that HTTP method.
+                                            A 500 response indicates a rendering, storage, or other internal processing failure. Responses such as 413, 429, gateway errors, and timeout errors are commonly produced by deployment infrastructure and may use a different response format.
                                         </Typography>
-                                    </Box>
-                                </Box>
-                            </ListItem>
-                            <ListItem>
-                                <Box>
-                                    <Typography variant="body1">Template and Callback Limits</Typography>
-                                    <Box sx={{ mt: 0.5 }}>
-                                        <Typography variant="body2" color="text.primary">
-                                            Header names cannot contain templates; only header values are rendered.
-                                            By default, an inbox can have up to three callbacks, and each callback has a five-second timeout. Deployments can change these values.
-                                            The application does not impose separate size limits on template source or rendered output, but web servers, proxies, databases, and available memory may impose their own limits. Keep templates and generated payloads reasonably small.
-                                        </Typography>
+                                        <Paper elevation={0} sx={codeBlockSx}>
+                                            <code>
+                                                {'{"code":400,"message":"..."}'}
+                                            </code>
+                                        </Paper>
                                     </Box>
                                 </Box>
                             </ListItem>
@@ -948,9 +988,10 @@ const UsersManualPage: React.FC = () => {
                                     <Typography variant="body1">Troubleshooting</Typography>
                                     <Box sx={{ mt: 0.5 }}>
                                         <Typography variant="body2" color="text.primary">
-                                            A missing variable or map key may render as &lt;no value&gt; instead of returning an error.
-                                            Check field names and use Go template actions such as with and index for optional or multi-value data.
+                                            Confirm the inbox ID and route first, then inspect the stored request and callback results.
+                                            A missing template variable or map key may render as &lt;no value&gt; instead of returning an error; check field names and use Go template actions such as with and index for optional or multi-value data.
                                             Set Content-Type explicitly when generating JSON or another structured format, and make sure inserted values do not make the rendered body invalid.
+                                            If the application does not return its usual JSON error object, check the deployment's proxy, server, and platform logs for payload, quota, or timeout failures.
                                         </Typography>
                                     </Box>
                                 </Box>
