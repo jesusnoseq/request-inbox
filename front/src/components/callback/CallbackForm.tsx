@@ -312,11 +312,10 @@ const CallbackForm: React.FC<CallbackFormProps> = ({
                                 },
                                 endAdornment: callback.Body && (
                                     <InputAdornment position="end">
-                                        <Button 
-                                            onClick={formatAsJson} 
-                                            variant="outlined" 
-                                            size="small" 
-                                            color="secondary"
+                                        <Button
+                                            onClick={formatAsJson}
+                                            variant="outlined"
+                                            size="small"
                                         >
                                             Format as JSON
                                         </Button>

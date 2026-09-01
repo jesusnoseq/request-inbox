@@ -190,6 +190,14 @@ const InboxDetailPage: React.FC = () => {
                                 size="small"
                                 startIcon={<DeleteSweepIcon />}
                                 onClick={openDeleteRequestsDialog}
+                                sx={(theme) => theme.palette.mode === 'dark' ? {
+                                    color: '#ef9a9a',
+                                    borderColor: 'rgba(244,67,54,0.4)',
+                                    '&:hover': {
+                                        borderColor: 'rgba(244,67,54,0.6)',
+                                        bgcolor: 'rgba(244,67,54,0.08)',
+                                    },
+                                } : {}}
                             >
                                 Clear requests
                             </Button>

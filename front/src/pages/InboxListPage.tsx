@@ -118,9 +118,9 @@ const InboxListPage: React.FC = () => {
                     );
                 }
                 return (
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} alignItems="stretch">
                         {filteredInboxes.map((inbox) => (
-                            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }} key={inbox.ID}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }} key={inbox.ID} sx={{ display: 'flex' }}>
                                 <InboxListItem inbox={inbox} onDelete={handleDeleteInbox} />
                             </Grid>
                         ))}

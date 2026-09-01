@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { InboxResponse } from '../types/inbox';
 import {
     TextField, Box, FormControl, FormControlLabel, FormGroup, IconButton, Typography, Button,
-    InputAdornment, TextareaAutosize, Switch, Tooltip, Autocomplete, Chip, Collapse
+    InputAdornment, TextareaAutosize, Switch, Tooltip, Autocomplete, Collapse
 } from '@mui/material';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import InfoIcon from '@mui/icons-material/Info';
@@ -16,6 +16,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import BodyView from './BodyView';
 import HeadersEditor, { Header, convertRecordToHeaders, convertHeadersToRecord } from './HeadersEditor';
+import StatusChip from './StatusChip';
 import { monoFontFamily } from '../theme';
 
 type ResponseInlineEditorProps = {
@@ -52,13 +53,6 @@ const STATUS_CODES: StatusCodeOption[] = [
     { code: 503, text: 'Service Unavailable' },
     { code: 504, text: 'Gateway Timeout' },
 ];
-
-const getStatusChipColor = (code: number): 'success' | 'warning' | 'error' | 'default' => {
-    if (code >= 500) return 'error';
-    if (code >= 400) return 'warning';
-    if (code >= 200 && code < 400) return 'success';
-    return 'default';
-};
 
 const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, onSave, readonly }) => {
     const [editMode, setEditMode] = useState<boolean>(false);
@@ -185,12 +179,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                             <Typography variant="h6">
                                 Response
                             </Typography>
-                            <Chip
-                                label={statusCode}
-                                size="small"
-                                color={getStatusChipColor(statusCode)}
-                                sx={{ fontFamily: monoFontFamily, fontWeight: 500 }}
-                            />
+                            <StatusChip code={statusCode} />
                             {contentTypeHeader &&
                                 <Typography variant="caption" color="text.secondary" sx={{ fontFamily: monoFontFamily }} noWrap>
                                     {contentTypeHeader.value}
@@ -282,12 +271,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                                         onBlur={handleStatusCodeBlur}
                                         renderOption={(props, option) => (
                                             <Box component="li" {...props} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                <Chip
-                                                    label={option.code}
-                                                    size="small"
-                                                    color={getStatusChipColor(option.code)}
-                                                    sx={{ fontFamily: monoFontFamily, fontWeight: 500 }}
-                                                />
+                                                <StatusChip code={option.code} />
                                                 <Typography variant="body2">{option.text}</Typography>
                                             </Box>
                                         )}
@@ -366,7 +350,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                                             },
                                             endAdornment: (
                                                 <InputAdornment position="end">
-                                                    <Button onClick={formatAsJson} variant="outlined" size="small" color="secondary">
+                                                    <Button onClick={formatAsJson} variant="outlined" size="small">
                                                         Format as JSON
                                                     </Button>
                                                 </InputAdornment>

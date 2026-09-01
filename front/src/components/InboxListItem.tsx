@@ -23,8 +23,8 @@ const InboxListItem: React.FC<InboxListItemProps> = ({ inbox, onDelete }) => {
     };
 
     return (
-        <Card variant="outlined" sx={{ marginBottom: 2 }}>
-            <CardContent>
+        <Card variant="outlined" sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <CardContent sx={{ flexGrow: 1 }}>
                 <Typography color="textSecondary" gutterBottom>
                     {inbox.ID}
                 </Typography>
