@@ -105,12 +105,13 @@ func ParseCallback(c context.Context, index int, inbox model.Inbox, req model.Re
 	}
 
 	return model.Callback{
-		IsEnabled: cb.IsEnabled,
-		IsDynamic: cb.IsDynamic,
-		ToURL:     parsedURL,
-		Method:    parsedMethod,
-		Headers:   parsedHeaders,
-		Body:      parsedBody,
+		IsEnabled:           cb.IsEnabled,
+		IsDynamic:           cb.IsDynamic,
+		ToURL:               parsedURL,
+		Method:              parsedMethod,
+		Headers:             parsedHeaders,
+		Body:                parsedBody,
+		IsForwardingHeaders: cb.IsForwardingHeaders,
 	}, nil
 }
 

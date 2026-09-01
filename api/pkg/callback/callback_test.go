@@ -675,6 +675,43 @@ func TestSendCallbacks_DynamicCallbacks(t *testing.T) {
 	}
 }
 
+func TestSendCallbacks_DynamicCallbackForwardsIncomingHeaders(t *testing.T) {
+	receivedHeader := make(chan string, 1)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedHeader <- r.Header.Get("X-Forwarding-Test")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	inbox := model.Inbox{
+		ID: uuid.New(),
+		Callbacks: []model.Callback{
+			{
+				IsEnabled:           true,
+				IsDynamic:           true,
+				IsForwardingHeaders: true,
+				ToURL:               server.URL,
+				Method:              "{{.Request.Method}}",
+				Headers:             map[string]string{},
+			},
+		},
+	}
+	request := createTestRequest()
+	request.Headers["X-Forwarding-Test"] = []string{"dynamic-value"}
+
+	responses := SendCallbacks(context.Background(), inbox, request)
+
+	if len(responses) != 1 {
+		t.Fatalf("Expected 1 response, got %d", len(responses))
+	}
+	if responses[0].Error != "" {
+		t.Fatalf("Expected callback delivery to succeed, got error %q", responses[0].Error)
+	}
+	if got := <-receivedHeader; got != "dynamic-value" {
+		t.Errorf("Expected forwarded header dynamic-value, got %q", got)
+	}
+}
+
 func TestSendCallbacks_DynamicCallbacksWithJSONPath(t *testing.T) {
 	// Create test server that will verify gjsonPath functionality
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
