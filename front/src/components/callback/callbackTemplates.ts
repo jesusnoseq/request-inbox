@@ -30,7 +30,7 @@ export const callbackTemplates: CallbackTemplate[] = [
                 'Content-Type': 'application/json',
                 'User-Agent': 'RequestInbox-Webhook/1.0'
             },
-            Body: '{"message": "Webhook received", "timestamp": "{{.Timestamp}}"}',
+            Body: '{"message": "Webhook received", "timestamp": {{.Request.Timestamp}}}',
             IsForwardingHeaders: false
         }
     },
@@ -71,7 +71,7 @@ export const callbackTemplates: CallbackTemplate[] = [
             Method: 'POST',
             Headers: {
                 'Content-Type': 'application/json',
-                'Stripe-Signature': '{{.Request.Header.Stripe-Signature}}'
+                'Stripe-Signature': '{{with index .Request.Headers "Stripe-Signature"}}{{index . 0}}{{end}}'
             },
             Body: '{{.Request.Body}}',
             IsForwardingHeaders: false
