@@ -23,12 +23,12 @@ const UsersManualPage: React.FC = () => {
                         Request Inbox Docs
                     </Typography>
                     <Typography variant="body1" component="p" color="text.secondary" gutterBottom>
-                        Here you will find instructions on how to use each feature of our application.
-                        This is a work in progress, so please forgive the lack of completeness.
+                        Here you will find instructions for using each feature of the application.
+                        This documentation is a work in progress, so some sections may be incomplete.
                     </Typography>
 
                     <Typography variant="body1" component="p" color="text.secondary">
-                        You can also check our API docs for more detailed technical information and integration guidelines.
+                        You can also read the API documentation for detailed technical information and integration guidelines.
                     </Typography>
 
                     <Button
@@ -60,7 +60,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Manages incoming requests. Each Inbox has a unique URL that receives and captures all requests sent to it.
+                                            Manages incoming requests. Each inbox has a unique URL that receives and captures all requests sent to it.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -75,7 +75,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Represents each individual HTTP request sent to the Inbox's unique URL. This entity logs important details of the incoming request, such as headers, body content, and timestamp.
+                                            Represents an individual HTTP request sent to an inbox's unique URL. It records important details about the incoming request, such as its headers, body content, and timestamp.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -90,7 +90,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Defines the default reply sent back to the client when a request is captured by an Inbox. The Response entity can be customized to return specific data or statuses based on testing needs.
+                                            Defines the default reply sent to the client when an inbox captures a request. The response can be customized to return specific data or status codes based on your testing needs.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -105,7 +105,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Represents an automated HTTP request that is triggered when the Inbox receives a request. Callbacks allow you to forward, relay, or notify external services about incoming requests, enabling integration workflows and webhooks. Each callback can be configured with its own URL, method, headers, and body, and can optionally use dynamic templates.
+                                            Represents an automated HTTP request triggered when an inbox receives a request. Callbacks let you forward incoming requests or notify external services about them, enabling integration workflows and webhooks. Each callback can be configured with its own URL, method, headers, and body and can optionally use dynamic templates.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -116,11 +116,11 @@ const UsersManualPage: React.FC = () => {
 
                 <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="inbox-types-content" id="inbox-types-header">
-                        <Typography variant="h5" component="h2" >Anonymous, Public and Private Inboxes</Typography>
+                        <Typography variant="h5" component="h2" >Anonymous, Public, and Private Inboxes</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography component="p">
-                            The application provides three types of inboxes: Anonymous, Public and Private. Each has distinct permissions for managing access to captured requests.
+                            The application provides three types of inboxes: anonymous, public, and private. Each type has distinct permissions for accessing and managing captured requests.
                         </Typography>
                         <List>
                             <ListItem>
@@ -133,11 +133,11 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            An Anonymous Inbox is a type of Public Inbox with open access, created by unregistered users.
-                                            Anyone can read, modify, or delete the contents of an Anonymous Inbox, making it completely open.
-                                            Anonymous Inboxes are not listed within the web interface or API, making them accessible only via a direct link to their unique URL.
-                                            This makes them suitable for temporary testing needs where access control and visibility are not required.
-                                            However, it's important to avoid using Anonymous Inboxes for sensitive or persistent data due to their lack of protection.
+                                            An anonymous inbox is a type of public inbox with open access that is created by an unregistered user.
+                                            Anyone can read, modify, or delete its contents.
+                                            Anonymous inboxes are not listed in the web interface or API and are accessible only through a direct link to their unique URL.
+                                            This makes them suitable for temporary testing when access control and visibility are not required.
+                                            However, you should not use anonymous inboxes for sensitive or persistent data because they are not protected.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -152,7 +152,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            A Public Inbox is visible to everyone, allowing any user to read its contents. However, only the owner has permission to modify or delete the inbox and its contents.
+                                            A public inbox is visible to everyone, so any user can read its contents. However, only the owner can modify or delete the inbox and its contents.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -167,7 +167,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            A Private Inbox is fully restricted to the owner. Only the owner can read, modify, or delete the inbox and its contents.
+                                            A private inbox is accessible only to its owner. Only the owner can read, modify, or delete the inbox and its contents.
                                             The inbox will still capture all incoming requests sent to its URL, but only the owner can access or manage them.
                                         </Typography>
                                     </Box>
@@ -183,30 +183,30 @@ const UsersManualPage: React.FC = () => {
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography component="p">
-                            Dynamic responses can be activated for each inbox individually.
-                            This feature ensures that for each request sent to the inbox URL, a specific response will be calculated by rendering templates.
-                            Once enabled, header values and response body are treated as templates.
+                            Dynamic responses can be enabled for each inbox individually.
+                            When this feature is enabled, a response is generated for every request sent to the inbox URL by rendering templates.
+                            Response header values and the response body are treated as templates.
                         </Typography>
                         <Typography component="p">
-                            The status code template is an optional special field that can be filled once dynamic response is activated.
-                            It allows you to set up a template to calculate the status code of a response. The template should output an integer between 100 and 999.
-                            If the template renders a number successfully, it will override the status code.
-                            The status code value will be used as a fallback when rendering the status code template does not result in a valid HTTP status code number.
+                            The status code template is an optional field available when dynamic responses are enabled.
+                            It lets you define a template that generates the response status code. The template should output an integer between 100 and 999.
+                            If the template renders a valid number, that number overrides the configured status code.
+                            The configured status code is used as a fallback if the template does not render a valid HTTP status code.
                         </Typography>
                         <Typography component="p">
-                            The rendering order of the response templates is: status code template, body, and headers.
-                            In this way, for example, headers and body can use the result of rendering the status code template in the status code field, and headers can use a rendered response body.
+                            The response templates are rendered in the following order: status code, body, and headers.
+                            As a result, the body and headers can use the rendered status code, and the headers can use the rendered response body.
                         </Typography>
                         <Typography component="p">
-                            Request Inbox templates are based on <ExternalLink href="https://pkg.go.dev/text/template">Golang templates</ExternalLink>.
-                            The documentation is comprehensive, and this manual will provide some examples.
+                            Request Inbox templates are based on <ExternalLink href="https://pkg.go.dev/text/template">Go templates</ExternalLink>.
+                            The official documentation provides comprehensive guidance, while this manual includes several examples.
                         </Typography>
                         <Typography>
-                            Inbox and Request are variables available for use. Both refer to the current inbox and request and have the same structure as they have in the REST API.
+                            The Inbox and Request variables are available in templates. They refer to the current inbox and request and use the same structure as their REST API representations.
                         </Typography>
                         <Typography>
-                            In addition to <ExternalLink href="https://pkg.go.dev/text/template">Golang templates</ExternalLink> features,
-                            the following functions have been implemented:
+                            In addition to the features provided by <ExternalLink href="https://pkg.go.dev/text/template">Go templates</ExternalLink>,
+                            the following functions are available:
                         </Typography>
                         <List>
                             <ListItem>
@@ -219,8 +219,8 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Searches for values in a JSON document with a GJSON Path.
-                                            If the path is not found, then the value is <code>&lt;no value&gt;</code>
+                                            Searches for a value in a JSON document using a GJSON path.
+                                            If the path is not found, the function returns <code>&lt;no value&gt;</code>.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -232,7 +232,7 @@ const UsersManualPage: React.FC = () => {
                                         </Paper >
 
                                         <Typography>
-                                            For more information about GJSON Path syntax expressions, check <ExternalLink href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md">GJSON Path syntax</ExternalLink>
+                                            For more information about GJSON path expressions, see the <ExternalLink href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md">GJSON Path Syntax</ExternalLink> documentation.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -247,7 +247,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Same as GJSON Path, but it provides a way to set a fallback value
+                                            Works like gjsonPath but lets you specify a fallback value.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -271,7 +271,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Converts a string to uppercase
+                                            Converts a string to uppercase.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -297,7 +297,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Converts a string to lowercase
+                                            Converts a string to lowercase.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -323,7 +323,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Splits a string into an array of substrings based on a specified separator
+                                            Splits a string into an array of substrings using the specified separator.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -348,7 +348,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Removes whitespace from both ends of a string
+                                            Removes whitespace from both ends of a string.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -373,7 +373,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Gets the current timestamp in seconds
+                                            Returns the current timestamp in seconds.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -398,7 +398,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Gets the current date and time in 2006-01-02 15:04:05 format
+                                            Returns the current date and time in the 2006-01-02 15:04:05 format.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -423,7 +423,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Gets the current date in 2006-01-02 format
+                                            Returns the current date in the 2006-01-02 format.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -448,7 +448,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Generates a random string of the specified length
+                                            Generates a random string of the specified length.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -473,7 +473,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Generates a random integer within the specified range
+                                            Generates a random integer within the specified range.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -499,7 +499,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Generates a random float within the specified range
+                                            Generates a random floating-point number within the specified range.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -524,7 +524,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Generates a random boolean value, either true or false
+                                            Generates a random Boolean value: either true or false.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -548,7 +548,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Generates a random UUID as a string
+                                            Generates a random UUID as a string.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -573,7 +573,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Sums two integer values
+                                            Adds two integer values.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -598,7 +598,7 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Performs subtraction on two integer values
+                                            Subtracts one integer value from another.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -623,8 +623,8 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Converts a string representing an integer into an actual integer value.
-                                            If it fails, returns 0 as an integer
+                                            Converts a string representation of an integer to an integer value.
+                                            If the conversion fails, the function returns 0.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -649,9 +649,9 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Extracts the portion of the URI after /in/. Useful for pass-through inbox scenarios.
-                                            For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value, 
-                                            this returns /extrapath?query=value
+                                            Extracts the portion of the URI after /in/. This is useful for passthrough inbox scenarios.
+                                            For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
+                                            the function returns /extrapath?query=value.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -678,7 +678,7 @@ const UsersManualPage: React.FC = () => {
                                         >
                                             Extracts only the path portion after /in/ (excluding query parameters).
                                             For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
-                                            this returns /extrapath
+                                            the function returns /extrapath.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -703,9 +703,9 @@ const UsersManualPage: React.FC = () => {
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Extracts the query parameters portion from a URI (including the ? prefix).
+                                            Extracts the query string from a URI, including the ? prefix.
                                             For example, if the request URI is /api/v1/inboxes/123/in/extrapath?query=value,
-                                            this returns ?query=value
+                                            the function returns ?query=value.
                                         </Typography>
                                         <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
                                             Example
@@ -724,7 +724,7 @@ const UsersManualPage: React.FC = () => {
                         </List>
 
                         <Typography>
-                            More functions can be added in the future.
+                            More functions may be added in the future.
                         </Typography>
 
                     </AccordionDetails>
