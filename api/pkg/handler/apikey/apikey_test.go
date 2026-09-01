@@ -128,6 +128,50 @@ func TestCreateAPIKey(t *testing.T) {
 	t_util.AssertTimeDiffFromNow(t, createdAPIKey.ExpiryDate, 30*time.Duration(24)*time.Hour, 3*time.Duration(24)*time.Hour)
 }
 
+func TestCreateAPIKeyForbiddenWithAPIKeyAuthentication(t *testing.T) {
+	config.LoadConfig(config.Test)
+	handler, dao, closer := mustGetAPIKeyHandler()
+	defer closer()
+
+	ctx := context.Background()
+	user := model.NewUser("test@mail.dev")
+	if _, err := dao.UpsertUser(ctx, user); err != nil {
+		t.Fatalf("Failed to create API key owner: %v", err)
+	}
+	authenticatingKey := mustCreateAPIKey(t, dao, user, APIKeyParams{
+		Name:       "Authentication key",
+		ExpiryDate: time.Now().Add(time.Hour),
+	})
+
+	params := APIKeyParams{
+		Name:       "Key created with API key authentication",
+		ExpiryDate: time.Now().AddDate(0, 1, 0),
+	}
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/api-keys", bytes.NewReader(t_util.MustJson(t, params)))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-API-KEY", authenticatingKey.APIKey)
+	w := httptest.NewRecorder()
+
+	router := gin.New()
+	router.Use(login.JWTMiddleware(), login.APIKeyMiddleware(dao))
+	router.POST("/api/v1/api-keys", handler.CreateAPIKey)
+	router.ServeHTTP(w, req)
+
+	t_util.AssertStatusCode(t, http.StatusForbidden, w.Code)
+	var errorResponse model.ErrorResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &errorResponse); err != nil {
+		t.Fatalf("Expected a valid error response, got %v", err)
+	}
+	if errorResponse.Message != "API keys cannot create other API keys" {
+		t.Errorf("Expected API key creation to be forbidden, got %q", errorResponse.Message)
+	}
+	apiKeys, err := dao.ListAPIKeyByUser(ctx, user.ID)
+	t_util.AssertNoError(t, err)
+	if len(apiKeys) != 1 || apiKeys[0].ID != authenticatingKey.ID {
+		t.Fatalf("Expected only the authenticating key to remain, got %+v", apiKeys)
+	}
+}
+
 func TestCreateAPIKeyUnauthorized(t *testing.T) {
 	config.LoadConfig(config.Test)
 	w := httptest.NewRecorder()

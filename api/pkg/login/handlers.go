@@ -150,6 +150,10 @@ func IsUserLoggedIn(c *gin.Context) bool {
 	return c.GetBool(IS_LOGGED_IN_CONTEXT_KEY)
 }
 
+func IsLoggedWithAPIKey(c *gin.Context) bool {
+	return c.GetBool(IS_LOGGED_WITH_API_KEY_CONTEXT_KEY)
+}
+
 func GetUser(c *gin.Context) (model.User, error) {
 	errVal, _ := c.Get(LOGIN_ERROR_CONTEXT_KEY)
 	err, _ := errVal.(error)

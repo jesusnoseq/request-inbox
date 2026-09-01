@@ -59,6 +59,10 @@ func (h *apiKeyHandler) CreateAPIKey(c *gin.Context) {
 	if !ok {
 		return
 	}
+	if login.IsLoggedWithAPIKey(c) {
+		c.AbortWithStatusJSON(model.ErrorResponseMsg("API keys cannot create other API keys", http.StatusForbidden))
+		return
+	}
 
 	apiKey, err := model.NewAPIKey(user.ID)
 	if err != nil {
