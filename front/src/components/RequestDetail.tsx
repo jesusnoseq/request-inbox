@@ -1,26 +1,18 @@
 import React, { useState } from 'react';
 import { InboxRequest } from '../types/inbox';
-import { Typography, Card, CardContent, Button, Chip, List, ListItem, ListItemText, Collapse, Box } from '@mui/material';
+import { Typography, Card, CardContent, Button, List, ListItem, ListItemText, Collapse, Box } from '@mui/material';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import BodyView from './BodyView';
 import CallbackResponseView from './callback/CallbackResponseView';
 import MethodChip from './MethodChip';
-import { monoFontFamily } from '../theme';
+import StatusChip from './StatusChip';
 
 dayjs.extend(localizedFormat);
 
 type RequestDetailProps = {
     request: InboxRequest;
-};
-
-const callbackChipColor = (error: string, code: number): 'success' | 'warning' | 'error' | 'default' => {
-    if (error) return 'error';
-    if (code >= 500) return 'error';
-    if (code >= 400) return 'warning';
-    if (code >= 200 && code < 400) return 'success';
-    return 'default';
 };
 
 const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
@@ -52,7 +44,7 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                     Nº {request.ID + 1}<br />
                     {dayjs(request.Timestamp).format('LLL')}
                 </Typography>
-                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap" mb={callbackResponses.length > 0 ? 1 : 0}>
+                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                     <MethodChip method={request.Method} />
                     <Typography variant="h6" component="span">
                         <Box component="code"
@@ -64,21 +56,6 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                         <code>{URICustomPath}</code>
                     </Typography>
                 </Box>
-
-                {/* At-a-glance callback outcomes, visible without expanding */}
-                {callbackResponses.length > 0 && (
-                    <Box display="flex" alignItems="center" gap={0.75} flexWrap="wrap" mb={1}>
-                        {callbackResponses.map((cr, index) => (
-                            <Chip
-                                key={index}
-                                size="small"
-                                color={callbackChipColor(cr.Error, cr.Code)}
-                                label={cr.Error ? 'Failed' : `${cr.Method || 'POST'} ${cr.Code}`}
-                                sx={{ fontFamily: monoFontFamily, fontSize: '0.7rem' }}
-                            />
-                        ))}
-                    </Box>
-                )}
 
                 <Typography>
                     <Button onClick={handleHeadersCollapse}>
@@ -102,12 +79,22 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                 {/* Callback Results Section */}
                 {callbackResponses.length > 0 && (
                     <>
-                        <Typography sx={{ marginTop: 2 }}>
+                        <Box display="flex" alignItems="center" flexWrap="wrap" gap={1} sx={{ marginTop: 2 }}>
                             <Button onClick={handleCallbacksCollapse}>
                                 <Typography>Show callback results ({callbackResponses.length})</Typography>
                                 {callbacksOpen ? <ExpandLess /> : <ExpandMore />}
                             </Button>
-                        </Typography>
+                            <Box display="flex" alignItems="center" gap={0.75} flexWrap="wrap">
+                                {callbackResponses.map((cr, index) => (
+                                    <StatusChip
+                                        key={index}
+                                        code={cr.Code}
+                                        forceError={!!cr.Error}
+                                        label={cr.Error ? 'Failed' : `${cr.Method || 'POST'} ${cr.Code}`}
+                                    />
+                                ))}
+                            </Box>
+                        </Box>
 
                         <Collapse in={callbacksOpen} timeout="auto" unmountOnExit>
                             <Box sx={{ marginTop: 1 }}>

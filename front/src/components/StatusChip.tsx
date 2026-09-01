@@ -27,12 +27,16 @@ export const statusChipColors = (code: number, isDarkMode: boolean): [string, st
 interface StatusChipProps {
     code: number;
     size?: 'small' | 'medium';
+    /** Overrides the displayed text (defaults to the numeric code), e.g. a method + code summary. */
+    label?: string;
+    /** Forces the ERROR palette regardless of code, for outcomes with no real status (e.g. a callback that never got a response). */
+    forceError?: boolean;
 }
 
 /** Color-coded HTTP status code badge, muted to match MethodChip in both themes. */
-const StatusChip: React.FC<StatusChipProps> = ({ code, size = 'small' }) => {
+const StatusChip: React.FC<StatusChipProps> = ({ code, size = 'small', label, forceError }) => {
     const theme = useTheme();
-    const [bg, text, border] = statusChipColors(code, theme.palette.mode === 'dark');
+    const [bg, text, border] = statusChipColors(forceError ? 500 : code, theme.palette.mode === 'dark');
     const isSmall = size === 'small';
 
     return (
@@ -55,7 +59,7 @@ const StatusChip: React.FC<StatusChipProps> = ({ code, size = 'small' }) => {
                 whiteSpace: 'nowrap',
             }}
         >
-            {code}
+            {label ?? code}
         </Box>
     );
 };
