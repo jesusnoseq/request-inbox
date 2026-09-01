@@ -180,6 +180,66 @@ const UsersManualPage: React.FC = () => {
                 </Accordion>
 
                 <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="api-keys-content" id="api-keys-header">
+                        <Typography variant="h5" component="h2">API Keys</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Typography component="p">
+                            API keys let scripts and external applications access Request Inbox as your user account.
+                            Sign in, open your profile, and use API Key Management to create and delete keys.
+                        </Typography>
+                        <List>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Creating and Storing a Key</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            Enter an optional description, choose an expiration period, and create the key.
+                                            Copy the complete key immediately and store it securely. The complete value is available when the key is created; later listings show only a masked value, and the key cannot be recovered.
+                                            Creating a key requires a signed-in browser session. An existing API key cannot be used to create another key.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Using a Key</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            Send the key in the X-API-KEY request header. Use the key value directly without a Bearer prefix.
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'text.secondary', fontWeight: 500 }}>
+                                            Example
+                                        </Typography>
+                                        <Paper elevation={0} sx={codeBlockSx}>
+                                            <code>
+                                                {'curl -H "X-API-KEY: YOUR_API_KEY" \\\n  https://api.request-inbox.com/api/v1/inboxes'}
+                                            </code>
+                                        </Paper>
+                                        <Typography variant="body2" color="text.primary">
+                                            An authenticated request can list your inboxes and create, read, update, or delete inboxes as your account.
+                                            It can also access your private inboxes.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Security and Errors</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            Treat an API key like a password: do not include it in URLs, client-side code, logs, or public repositories.
+                                            Delete keys that are no longer needed. Deletion takes effect immediately.
+                                            Invalid, inactive, or expired keys return a 401 response. If no key is provided, the request continues anonymously and can access only operations available to anonymous users.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                        </List>
+                    </AccordionDetails>
+                </Accordion>
+
+                <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="callbacks-content" id="callbacks-header">
                         <Typography variant="h5" component="h2">Callbacks</Typography>
                     </AccordionSummary>
@@ -819,6 +879,83 @@ const UsersManualPage: React.FC = () => {
                             More functions may be added in the future.
                         </Typography>
 
+                    </AccordionDetails>
+                </Accordion>
+
+                <Accordion elevation={0} sx={{ maxWidth: 'md', border: 1, borderColor: 'divider', borderRadius: 1.5, mb: 1.5, '&::before': { display: 'none' } }}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="dynamic-template-errors-content" id="dynamic-template-errors-header">
+                        <Typography variant="h5" component="h2">Dynamic Template Limits and Errors</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Typography component="p">
+                            Templates are evaluated when an inbox captures a request, rather than when the inbox or callback configuration is saved.
+                            Test templates with non-sensitive sample requests before relying on them in an integration.
+                        </Typography>
+                        <List>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Response Template Errors</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            A syntax or execution error in a status code, body, or response header template causes the inbox endpoint to return a JSON 500 response.
+                                            Callbacks have already completed and the incoming request has already been stored when response rendering begins, so the request still appears in the inbox.
+                                        </Typography>
+                                        <Paper elevation={0} sx={codeBlockSx}>
+                                            <code>
+                                                {'{"code":500,"message":"body template error: ..."}'}
+                                            </code>
+                                        </Paper>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Status Code Limits</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            The complete rendered status code must be an integer from 100 through 999, without surrounding whitespace or line breaks.
+                                            If rendering succeeds but the value is not accepted, the configured status code is used. Use conventional final HTTP status codes, normally from 200 through 599; informational and nonstandard codes may not deliver a body as expected.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Callback Errors</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            A callback template or delivery failure is stored with the captured request and does not change the inbox response.
+                                            A callback status code of 0 indicates a template, URL, timeout, network, request-construction, or response-reading error; inspect the callback's Error field for details.
+                                            HTTP 4xx and 5xx results mean the destination responded and are recorded as completed callback responses. Callbacks are attempted once and are not retried automatically.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Template and Callback Limits</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            Header names cannot contain templates; only header values are rendered.
+                                            By default, an inbox can have up to three callbacks, and each callback has a five-second timeout. Deployments can change these values.
+                                            The application does not impose separate size limits on template source or rendered output, but web servers, proxies, databases, and available memory may impose their own limits. Keep templates and generated payloads reasonably small.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                            <ListItem>
+                                <Box>
+                                    <Typography variant="body1">Troubleshooting</Typography>
+                                    <Box sx={{ mt: 0.5 }}>
+                                        <Typography variant="body2" color="text.primary">
+                                            A missing variable or map key may render as &lt;no value&gt; instead of returning an error.
+                                            Check field names and use Go template actions such as with and index for optional or multi-value data.
+                                            Set Content-Type explicitly when generating JSON or another structured format, and make sure inserted values do not make the rendered body invalid.
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </ListItem>
+                        </List>
                     </AccordionDetails>
                 </Accordion>
                 </Container>
