@@ -19,7 +19,10 @@ import {
     Box,
     Button,
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import CopyToClipboardButton from './CopyToClipboardButton';
 import { useError } from '../context/ErrorContext';
 import { getAPIKeyList, deleteAPIKey, createAPIKey } from '../services/inbox';

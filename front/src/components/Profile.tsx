@@ -14,7 +14,9 @@ import {
     ListItemIcon,
     ListItemText,
 } from '@mui/material'
-import { Person, Email, DeleteForever } from '@mui/icons-material'
+import DeleteForever from '@mui/icons-material/DeleteForever';
+import Email from '@mui/icons-material/Email';
+import Person from '@mui/icons-material/Person';
 import { User } from '../types/inbox';
 import APIKeyManager from './APIKeyManager';
 

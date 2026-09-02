@@ -2,7 +2,7 @@
 import { type InboxList, type Inbox, type APIKey, APIKeyList } from "../types/inbox";
 import dayjs from 'dayjs';
 
-const BASE_URL = process.env.REACT_APP_REQUEST_INBOX_API_URL;
+const BASE_URL = import.meta.env.VITE_REQUEST_INBOX_API_URL;
 
 const defaultHeaders = {
     "Content-Type": "application/json",

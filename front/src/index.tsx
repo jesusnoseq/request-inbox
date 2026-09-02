@@ -19,8 +19,8 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-const posthogHost = process.env.REACT_APP_POSTHOG_HOST || '';
-const posthogKey = process.env.REACT_APP_POSTHOG_KEY || '';
+const posthogHost = import.meta.env.VITE_POSTHOG_HOST || '';
+const posthogKey = import.meta.env.VITE_POSTHOG_KEY || '';
 
 
 root.render(
@@ -33,7 +33,7 @@ root.render(
         defaults: '2025-05-24',
         capture_exceptions: true,
         capture_performance: true,
-        debug: process.env.NODE_ENV === 'development',
+        debug: import.meta.env.DEV,
       }}
     >
       <ErrorBoundary>

@@ -1,5 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { type Mock, type MockedFunction, vi } from 'vitest';
 
 import { buildInboxURL, getInbox, getInboxList, newInbox } from '../services/inbox';
 import { type Inbox, type InboxRequest } from '../types/inbox';
@@ -7,21 +8,21 @@ import WebMCPTools from './WebMCPTools';
 
 let mockLoggedIn = false;
 
-jest.mock('../context/UserContext', () => ({
+vi.mock('../context/UserContext', () => ({
   useUser: () => ({ isLoggedIn: () => mockLoggedIn }),
 }));
 
-jest.mock('../services/inbox', () => ({
-  buildInboxURL: jest.fn(),
-  getInbox: jest.fn(),
-  getInboxList: jest.fn(),
-  newInbox: jest.fn(),
+vi.mock('../services/inbox', () => ({
+  buildInboxURL: vi.fn(),
+  getInbox: vi.fn(),
+  getInboxList: vi.fn(),
+  newInbox: vi.fn(),
 }));
 
-const mockBuildInboxURL = buildInboxURL as jest.MockedFunction<typeof buildInboxURL>;
-const mockGetInbox = getInbox as jest.MockedFunction<typeof getInbox>;
-const mockGetInboxList = getInboxList as jest.MockedFunction<typeof getInboxList>;
-const mockNewInbox = newInbox as jest.MockedFunction<typeof newInbox>;
+const mockBuildInboxURL = buildInboxURL as MockedFunction<typeof buildInboxURL>;
+const mockGetInbox = getInbox as MockedFunction<typeof getInbox>;
+const mockGetInboxList = getInboxList as MockedFunction<typeof getInboxList>;
+const mockNewInbox = newInbox as MockedFunction<typeof newInbox>;
 
 /** Descriptor the hook hands to `document.modelContext.registerTool`. */
 type RegisteredTool = {
@@ -67,7 +68,7 @@ const aRequest = (id: number, overrides: Partial<InboxRequest> = {}): InboxReque
   ...overrides,
 });
 
-const setModelContext = (registerTool?: jest.Mock) => {
+const setModelContext = (registerTool?: Mock) => {
   Object.defineProperty(document, 'modelContext', {
     configurable: true,
     value: registerTool ? { registerTool } : undefined,
@@ -88,12 +89,12 @@ const renderTools = (initialEntry = '/') =>
     </MemoryRouter>
   );
 
-const registeredTool = (registerTool: jest.Mock, name: string) =>
+const registeredTool = (registerTool: Mock, name: string) =>
   registerTool.mock.calls.map((call) => call[0] as RegisteredTool).find((tool) => tool.name === name)!;
 
 afterEach(() => {
   mockLoggedIn = false;
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   setModelContext();
 });
 
@@ -104,7 +105,7 @@ test('does nothing when WebMCP is unavailable', () => {
 });
 
 test('registers global tools but not authenticated tools while logged out', () => {
-  const registerTool = jest.fn().mockResolvedValue(undefined);
+  const registerTool = vi.fn().mockResolvedValue(undefined);
   setModelContext(registerTool);
 
   const { unmount } = renderTools();
@@ -136,7 +137,7 @@ test('registers global tools but not authenticated tools while logged out', () =
 
 test('lists and searches inboxes only while logged in', async () => {
   mockLoggedIn = true;
-  const registerTool = jest.fn().mockResolvedValue(undefined);
+  const registerTool = vi.fn().mockResolvedValue(undefined);
   setModelContext(registerTool);
   mockBuildInboxURL.mockImplementation((id) => `https://api.example.test/inboxes/${id}/in`);
   mockGetInboxList.mockResolvedValue([
@@ -167,7 +168,7 @@ test('lists and searches inboxes only while logged in', async () => {
 
 test('inspects only the requested number of newest inbox requests', async () => {
   mockLoggedIn = true;
-  const registerTool = jest.fn().mockResolvedValue(undefined);
+  const registerTool = vi.fn().mockResolvedValue(undefined);
   setModelContext(registerTool);
   mockBuildInboxURL.mockReturnValue('https://api.example.test/inboxes/inbox-1/in');
   mockGetInbox.mockResolvedValue(
@@ -193,7 +194,7 @@ test('inspects only the requested number of newest inbox requests', async () => 
 });
 
 test('opens the API and user documentation pages', async () => {
-  const registerTool = jest.fn().mockResolvedValue(undefined);
+  const registerTool = vi.fn().mockResolvedValue(undefined);
   setModelContext(registerTool);
 
   renderTools();
@@ -210,7 +211,7 @@ test('opens the API and user documentation pages', async () => {
 });
 
 test('creates an inbox and returns URLs and the anonymous access warning', async () => {
-  const registerTool = jest.fn().mockResolvedValue(undefined);
+  const registerTool = vi.fn().mockResolvedValue(undefined);
   setModelContext(registerTool);
   mockBuildInboxURL.mockReturnValue('https://api.example.test/api/v1/inboxes/inbox-1/in');
   mockNewInbox.mockResolvedValue(anInbox());
@@ -232,7 +233,7 @@ test('creates an inbox and returns URLs and the anonymous access warning', async
 });
 
 test('navigates to the inbox detail page and returns its details', async () => {
-  const registerTool = jest.fn().mockResolvedValue(undefined);
+  const registerTool = vi.fn().mockResolvedValue(undefined);
   setModelContext(registerTool);
   mockBuildInboxURL.mockReturnValue('https://api.example.test/api/v1/inboxes/inbox-1/in');
   mockGetInbox.mockResolvedValue(
@@ -266,7 +267,7 @@ test('navigates to the inbox detail page and returns its details', async () => {
 });
 
 test('rejects an empty inbox id without navigating', async () => {
-  const registerTool = jest.fn().mockResolvedValue(undefined);
+  const registerTool = vi.fn().mockResolvedValue(undefined);
   setModelContext(registerTool);
 
   renderTools();

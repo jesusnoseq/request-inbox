@@ -3,25 +3,26 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import App from './App';
 import * as inboxService from './services/inbox';
 import { type Inbox } from './types/inbox';
+import { vi } from 'vitest';
 
-jest.mock('./context/UserContext', () => ({
+vi.mock('./context/UserContext', () => ({
   useUser: () => ({
     user: null,
-    logout: jest.fn(),
+    logout: vi.fn(),
     isLoggedIn: () => false,
   }),
 }));
 
-jest.mock('./context/ErrorContext', () => ({
+vi.mock('./context/ErrorContext', () => ({
   useError: () => ({
     error: null,
-    setError: jest.fn(),
-    clearError: jest.fn(),
+    setError: vi.fn(),
+    clearError: vi.fn(),
   }),
 }));
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  vi.restoreAllMocks();
 });
 
 test('renders the landing page', () => {
@@ -61,9 +62,9 @@ test('returns the created inbox from an agent-invoked home page action', async (
     OwnerID: '',
     Callbacks: [],
   };
-  jest.spyOn(inboxService, 'newInbox').mockResolvedValue(inbox);
-  jest.spyOn(inboxService, 'getInbox').mockResolvedValue(inbox);
-  jest.spyOn(inboxService, 'buildInboxURL').mockReturnValue('https://api.example.test/inboxes/inbox-1/in');
+  vi.spyOn(inboxService, 'newInbox').mockResolvedValue(inbox);
+  vi.spyOn(inboxService, 'getInbox').mockResolvedValue(inbox);
+  vi.spyOn(inboxService, 'buildInboxURL').mockReturnValue('https://api.example.test/inboxes/inbox-1/in');
   render(<App />);
 
   const form = screen.getByRole('form', { name: /create request inbox/i });
@@ -71,7 +72,7 @@ test('returns the created inbox from an agent-invoked home page action', async (
   const submitEvent = new Event('submit', { bubbles: true, cancelable: true }) as SubmitEvent;
   Object.defineProperties(submitEvent, {
     agentInvoked: { value: true },
-    respondWith: { value: jest.fn((value: Promise<unknown>) => { response = value; }) },
+    respondWith: { value: vi.fn((value: Promise<unknown>) => { response = value; }) },
   });
 
   fireEvent(form, submitEvent);

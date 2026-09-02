@@ -9,13 +9,11 @@ import {
     Tooltip,
     useTheme 
 } from '@mui/material';
-import { 
-    ExpandMore, 
-    ExpandLess, 
-    Code, 
-    TextFields,
-    DataObject 
-} from '@mui/icons-material';
+import Code from '@mui/icons-material/Code';
+import DataObject from '@mui/icons-material/DataObject';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import TextFields from '@mui/icons-material/TextFields';
 import CopyToClipboardButton from './CopyToClipboardButton';
 import JsonView from '@uiw/react-json-view';
 import { lightTheme } from '@uiw/react-json-view/light';
