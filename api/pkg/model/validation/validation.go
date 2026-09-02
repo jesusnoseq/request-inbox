@@ -77,6 +77,21 @@ func IsValidCallbackURL(urlStr string) (bool, error) {
 		return false, &ValidationError{message: "Callback URL cannot be empty"}
 	}
 
+	for {
+		start := strings.Index(urlStr, "{{")
+		if start == -1 {
+			break
+		}
+		end := strings.Index(urlStr[start+2:], "}}")
+		if end == -1 {
+			return false, &ValidationError{message: "Callback URL is not a valid URL"}
+		}
+		urlStr = urlStr[:start] + urlStr[start+end+4:]
+	}
+	if strings.Contains(urlStr, "}}") {
+		return false, &ValidationError{message: "Callback URL is not a valid URL"}
+	}
+
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
 		return false, &ValidationError{message: "Callback URL is not a valid URL"}

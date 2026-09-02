@@ -121,6 +121,22 @@ func TestIsValidCallbackURL(t *testing.T) {
 			url:         "https://webhook.site/#!/12345678-1234-1234-1234-123456789012?param=value",
 			expectValid: true,
 		},
+		{
+			name:        "valid external URL - with extractURI template",
+			url:         "https://example.com{{extractURI .Request.URI}}",
+			expectValid: true,
+		},
+		{
+			name:        "valid external URL - with concatenated templates",
+			url:         "https://example.com/hooks/{{.Inbox.ID}}?method={{.Request.Method}}",
+			expectValid: true,
+		},
+		{
+			name:        "invalid external URL - with unfinished template",
+			url:         "https://example.com/{{.Request.URI}",
+			expectValid: false,
+			expectError: "Callback URL is not a valid URL",
+		},
 	}
 
 	for _, tt := range tests {
