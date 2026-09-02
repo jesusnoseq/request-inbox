@@ -15,6 +15,17 @@ const mockBuildInboxURL = buildInboxURL as jest.MockedFunction<typeof buildInbox
 const mockGetInbox = getInbox as jest.MockedFunction<typeof getInbox>;
 const mockNewInbox = newInbox as jest.MockedFunction<typeof newInbox>;
 
+/** Descriptor the hook hands to `document.modelContext.registerTool`. */
+type RegisteredTool = {
+  name: string;
+  title: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  outputSchema: Record<string, unknown>;
+  annotations?: Record<string, unknown>;
+  execute: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
+};
+
 const anInbox = (overrides: Partial<Inbox> = {}): Inbox => ({
   ID: 'inbox-1',
   Name: 'New Inbox',
@@ -53,7 +64,7 @@ const renderTools = () =>
   );
 
 const registeredTool = (registerTool: jest.Mock, name: string) =>
-  registerTool.mock.calls.map((call) => call[0] as WebMCPTool).find((tool) => tool.name === name)!;
+  registerTool.mock.calls.map((call) => call[0] as RegisteredTool).find((tool) => tool.name === name)!;
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -77,20 +88,24 @@ test('registers the inbox tools and unregisters them on cleanup', () => {
     'open_request_inbox',
   ]);
   expect(registeredTool(registerTool, 'create_request_inbox')).toMatchObject({
+    title: 'Create Request Inbox',
     inputSchema: {
       type: 'object',
       properties: {},
       additionalProperties: false,
     },
-    annotations: { readOnlyHint: false },
+    annotations: { readOnlyHint: false, untrustedContentHint: false },
   });
   expect(registeredTool(registerTool, 'open_request_inbox')).toMatchObject({
+    title: 'Open Request Inbox',
     inputSchema: {
       type: 'object',
       properties: { inboxId: { type: 'string' } },
       required: ['inboxId'],
       additionalProperties: false,
     },
+    outputSchema: { required: expect.arrayContaining(['requestCount']) },
+    annotations: { untrustedContentHint: true },
   });
 
   const registrationSignals = registerTool.mock.calls.map((call) => call[1].signal as AbortSignal);
@@ -109,10 +124,8 @@ test('creates an inbox and returns URLs and the anonymous access warning', async
 
   renderTools();
   const tool = registeredTool(registerTool, 'create_request_inbox');
-  const executionController = new AbortController();
-  const result = await tool.execute({}, { signal: executionController.signal });
+  const result = await tool.execute({});
 
-  expect(mockNewInbox).toHaveBeenCalledWith(executionController.signal);
   expect(result).toEqual({
     inboxId: 'inbox-1',
     name: 'New Inbox',
@@ -121,6 +134,8 @@ test('creates an inbox and returns URLs and the anonymous access warning', async
     isPrivate: false,
     warning: 'This inbox is anonymous and can be accessed or modified by anyone with its ID.',
   });
+
+  expect(mockNewInbox).toHaveBeenCalledWith();
 });
 
 test('navigates to the inbox detail page and returns its details', async () => {
@@ -140,13 +155,12 @@ test('navigates to the inbox detail page and returns its details', async () => {
   expect(screen.getByText('home page')).toBeInTheDocument();
 
   const tool = registeredTool(registerTool, 'open_request_inbox');
-  const executionController = new AbortController();
-  let result: WebMCPToolResult | undefined;
+  let result: Record<string, unknown> | undefined;
   await act(async () => {
-    result = await tool.execute({ inboxId: ' inbox-1 ' }, { signal: executionController.signal });
+    result = await tool.execute({ inboxId: ' inbox-1 ' });
   });
 
-  expect(mockGetInbox).toHaveBeenCalledWith('inbox-1', executionController.signal);
+  expect(mockGetInbox).toHaveBeenCalledWith('inbox-1');
   expect(result).toEqual({
     inboxId: 'inbox-1',
     name: 'Stripe webhooks',
@@ -165,9 +179,7 @@ test('rejects an empty inbox id without navigating', async () => {
   renderTools();
   const tool = registeredTool(registerTool, 'open_request_inbox');
 
-  await expect(tool.execute({ inboxId: '  ' }, { signal: new AbortController().signal })).rejects.toThrow(
-    'inboxId is required'
-  );
+  await expect(tool.execute({ inboxId: '  ' })).rejects.toThrow('inboxId is required');
   expect(mockGetInbox).not.toHaveBeenCalled();
   expect(screen.getByText('home page')).toBeInTheDocument();
 });

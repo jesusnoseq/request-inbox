@@ -8,115 +8,109 @@ const defaultHeaders = {
     "Content-Type": "application/json",
 }
 
+/**
+ * Optional last argument of every service function, so any caller that can be
+ * cancelled (WebMCP tool executions, React effects) can pass its signal down
+ * without each function growing its own parameter.
+ */
+export type RequestOptions = {
+    signal?: AbortSignal;
+}
 
-export const getInboxList = async () => {
-    const resp = await fetch(`${BASE_URL}/api/v1/inboxes`, {
-        method: "GET",
+type APIRequest = RequestOptions & {
+    method?: string;
+    /** Serialized as JSON. Omit for requests without a body. */
+    body?: unknown;
+    /** Endpoints that are reachable without a session opt out of cookies. */
+    credentials?: RequestCredentials;
+    /** Used when the API answers with an error that carries no message. */
+    errorMessage?: string;
+}
+
+const apiFetch = async (path: string, options: APIRequest = {}) => {
+    const { method = "GET", body, credentials = 'include', signal } = options;
+    return fetch(`${BASE_URL}${path}`, {
+        method,
         headers: defaultHeaders,
-        credentials: 'include',
+        credentials,
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal,
     });
+}
+
+const apiError = async (resp: Response, fallback: string) => {
+    // A failing endpoint does not always answer with JSON (gateway errors, empty
+    // bodies), so parsing must not mask the response error itself.
+    const data = await resp.json().catch(() => null);
+    return new Error(data?.message || data?.error || fallback, { cause: data });
+}
+
+/** Performs the request and throws on any error status, without reading the body. */
+const apiVoid = async (path: string, options: APIRequest = {}) => {
+    const resp = await apiFetch(path, options);
     if (!resp.ok) {
-        throw new Error('API response error ', await resp.json());
+        throw await apiError(resp, options.errorMessage ?? 'API response error');
     }
-    const { results: inboxes } = (await resp.json()) as InboxList
+    return resp;
+}
+
+/** Performs the request and returns its parsed body, throwing on any error status. */
+const apiJSON = async <T>(path: string, options: APIRequest = {}): Promise<T> => {
+    const resp = await apiVoid(path, options);
+    return (await resp.json()) as T;
+}
+
+
+export const getInboxList = async (options: RequestOptions = {}) => {
+    const { results: inboxes } = await apiJSON<InboxList>(`/api/v1/inboxes`, options);
     const sortedInboxes = inboxes.sort((a, b) => b.Timestamp - a.Timestamp);
     return sortedInboxes
 }
 
 
-export const getInbox = async (id: string, signal?: AbortSignal) => {
-    const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}`, {
-        method: "GET",
-        headers: defaultHeaders,
-        credentials: 'include',
-        signal,
-    });
-    if (!resp.ok) {
-        throw new Error('API response error ', await resp.json());
-    }
-    const inbox = (await resp.json()) as Inbox;
-    return inbox;
+export const getInbox = async (id: string, options: RequestOptions = {}) => {
+    return apiJSON<Inbox>(`/api/v1/inboxes/${id}`, options);
 }
 
-export const newInbox = async (signal?: AbortSignal) => {
-    const resp = await fetch(`${BASE_URL}/api/v1/inboxes`, {
-        method: "POST",
-        headers: defaultHeaders,
-        credentials: 'include',
-        body: JSON.stringify({}),
-        signal,
-    });
-    if (!resp.ok) {
-        throw new Error('API response error ', await resp.json());
-    }
-    const inbox = (await resp.json()) as Inbox;
-    return inbox;
+export const newInbox = async (options: RequestOptions = {}) => {
+    return apiJSON<Inbox>(`/api/v1/inboxes`, { ...options, method: "POST", body: {} });
 }
 
-export const updateInbox = async (inbox: Inbox) => {
+export const updateInbox = async (inbox: Inbox, options: RequestOptions = {}) => {
     const reqInbox = {
         ...inbox,
         Requests: []
     }
 
-    const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${inbox.ID}`, {
+    return apiJSON<Inbox>(`/api/v1/inboxes/${inbox.ID}`, {
+        ...options,
         method: "PUT",
-        headers: defaultHeaders,
-        credentials: 'include',
-        body: JSON.stringify(reqInbox),
+        body: reqInbox,
+        errorMessage: 'Failed to update inbox',
     });
-    
-    if (!resp.ok) {
-        const errorData = await resp.json();
-        // Extract the error message, fallback to generic message
-        const errorMessage = errorData?.message || errorData?.error || 'Failed to update inbox';
-        throw new Error(errorMessage);
-    }
-    
-    const updatedInbox = (await resp.json()) as Inbox;
-    return updatedInbox;
 }
 
 
-export const deleteInbox = async (id: string) => {
-    const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}`, {
-        method: "DELETE",
-        headers: defaultHeaders,
-        credentials: 'include',
-    });
+export const deleteInbox = async (id: string, options: RequestOptions = {}) => {
+    const resp = await apiFetch(`/api/v1/inboxes/${id}`, { ...options, method: "DELETE" });
     return resp.status === 204;
 }
 
 
-export const deleteInboxRequests = async (id: string) => {
-    const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}/requests`, {
-        method: "DELETE",
-        headers: defaultHeaders,
-        credentials: 'include',
-    });
+export const deleteInboxRequests = async (id: string, options: RequestOptions = {}) => {
+    const resp = await apiFetch(`/api/v1/inboxes/${id}/requests`, { ...options, method: "DELETE" });
     return resp.status === 204;
 }
 
-export const health = async () => {
-    const resp = await fetch(`${BASE_URL}/api/v1/health`, {
-        method: "GET",
-        headers: defaultHeaders,
-    });
-    if (!resp.ok) {
-        throw new Error('API response error ', await resp.json());
-    }
-    return await resp.json()
+export const health = async (options: RequestOptions = {}) => {
+    return apiJSON<unknown>(`/api/v1/health`, { ...options, credentials: 'same-origin' });
 }
 
 
-export const getUser = async () => {
-    const resp = await fetch(`${BASE_URL}/api/v1/auth/user`, {
-        method: "GET",
-        credentials: 'include',
-        headers: defaultHeaders,
-    });
+export const getUser = async (options: RequestOptions = {}) => {
+    const resp = await apiFetch(`/api/v1/auth/user`, options);
     if (!resp.ok) {
-        throw new Error('API response error ', await resp.json());
+        throw await apiError(resp, 'API response error');
     }
     if (resp.status === 204) {
         return null;
@@ -125,49 +119,24 @@ export const getUser = async () => {
 }
 
 
-export const deleteUser = async () => {
-    const resp = await fetch(`${BASE_URL}/api/v1/auth/user`, {
-        method: "DELETE",
-        headers: defaultHeaders,
-        credentials: 'include',
-    });
+export const deleteUser = async (options: RequestOptions = {}) => {
+    const resp = await apiFetch(`/api/v1/auth/user`, { ...options, method: "DELETE" });
     return resp.status === 200;
 }
 
 
-export const logout = async () => {
-    const resp = await fetch(`${BASE_URL}/api/v1/auth/logout`, {
-        method: "GET",
-        credentials: 'include',
-        headers: defaultHeaders,
-    });
-    if (!resp.ok) {
-        throw new Error('API response error ', await resp.json());
-    }
-    return await resp.json()
+export const logout = async (options: RequestOptions = {}) => {
+    return apiJSON<unknown>(`/api/v1/auth/logout`, options);
 }
 
-export const acceptCookies = async () => {
-    const resp = await fetch(`${BASE_URL}/api/v1/cookies/accept`, {
-        method: "GET",
-        headers: defaultHeaders,
-    });
-    if (!resp.ok) {
-        throw new Error('API response error ', await resp.json());
-    }
+export const acceptCookies = async (options: RequestOptions = {}) => {
+    // Answers 204 with no body, so nothing to parse here.
+    await apiVoid(`/api/v1/cookies/accept`, { ...options, credentials: 'same-origin' });
     return
 }
 
-export const getAPIKeyList = async () => {
-    const resp = await fetch(`${BASE_URL}/api/v1/api-keys`, {
-        method: "GET",
-        headers: defaultHeaders,
-        credentials: 'include',
-    });
-    if (!resp.ok) {
-        throw new Error('API response error ', await resp.json());
-    }
-    const { results: apikeys } = (await resp.json()) as APIKeyList
+export const getAPIKeyList = async (options: RequestOptions = {}) => {
+    const { results: apikeys } = await apiJSON<APIKeyList>(`/api/v1/api-keys`, options);
     const sortedAPIKeys = apikeys.sort((a, b) => {
         const dateA = new Date(a.CreationDate);
         const dateB = new Date(b.CreationDate);
@@ -176,27 +145,19 @@ export const getAPIKeyList = async () => {
     return sortedAPIKeys
 }
 
-export const createAPIKey = async (name: string, expiryDate: Date | null) => {
-    const resp = await fetch(`${BASE_URL}/api/v1/api-keys`, {
+export const createAPIKey = async (name: string, expiryDate: Date | null, options: RequestOptions = {}) => {
+    return apiJSON<APIKey>(`/api/v1/api-keys`, {
+        ...options,
         method: "POST",
-        headers: defaultHeaders,
-        credentials: 'include',
-        body: `{"name": "${name}", "expiryDate": "${dayjs(expiryDate).format('YYYY-MM-DDTHH:mm:ss')}Z"}` // 
+        body: { name, expiryDate: `${dayjs(expiryDate).format('YYYY-MM-DDTHH:mm:ss')}Z` },
+        errorMessage: 'Failed to create a new API key',
     });
-    //resp.status === 200
-    return (await resp.json()) as APIKey;
 }
 
-export const deleteAPIKey = async (ID: string) => {
-    const resp = await fetch(`${BASE_URL}/api/v1/api-keys/${ID}`, {
-        method: "DELETE",
-        headers: defaultHeaders,
-        credentials: 'include',
-    });
+export const deleteAPIKey = async (ID: string, options: RequestOptions = {}) => {
+    const resp = await apiFetch(`/api/v1/api-keys/${ID}`, { ...options, method: "DELETE" });
     return resp.status === 200;
 }
-
-
 
 
 

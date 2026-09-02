@@ -45,12 +45,23 @@ module.exports = {
         return devServerConfig;
     },
     jest: {
-        configure: {
-            moduleNameMapper: {
+        // A function instead of an object: craco appends to array settings, and
+        // transformIgnorePatterns has to replace CRA's entry, not extend it.
+        configure: (jestConfig) => {
+            jestConfig.moduleNameMapper = {
+                ...jestConfig.moduleNameMapper,
                 '^react-router/dom$': '<rootDir>/node_modules/react-router/dist/development/dom-export.js',
                 '^@uiw/react-json-view/(light|dark)$': '<rootDir>/node_modules/@uiw/react-json-view/cjs/theme/$1.js',
                 '^#swagger-ui$': '<rootDir>/node_modules/swagger-ui-react/swagger-ui-es-bundle.js',
-            },
+            };
+
+            // The @mcp-b packages ship ESM only, so they must be carved out of the
+            // rule that leaves node_modules untransformed.
+            jestConfig.transformIgnorePatterns = jestConfig.transformIgnorePatterns.map((pattern) =>
+                pattern.replace(/node_modules(\[[^\]]*\])/, 'node_modules$1(?!@mcp-b)')
+            );
+
+            return jestConfig;
         },
     },
 }

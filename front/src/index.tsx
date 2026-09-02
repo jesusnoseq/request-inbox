@@ -8,7 +8,12 @@ import { UserProvider } from './context/UserContext';
 import { PostHogProvider } from 'posthog-js/react';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ErrorProvider } from './context/ErrorContext';
+import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
+
+// Installs document.modelContext where the browser has no native WebMCP, so the
+// tools in WebMCPTools register everywhere instead of only behind Chrome's flag.
+initializeWebMCPPolyfill();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
