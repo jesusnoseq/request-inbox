@@ -24,11 +24,12 @@ export const getInboxList = async () => {
 }
 
 
-export const getInbox = async (id: string) => {
+export const getInbox = async (id: string, signal?: AbortSignal) => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes/${id}`, {
         method: "GET",
         headers: defaultHeaders,
         credentials: 'include',
+        signal,
     });
     if (!resp.ok) {
         throw new Error('API response error ', await resp.json());
@@ -37,12 +38,13 @@ export const getInbox = async (id: string) => {
     return inbox;
 }
 
-export const newInbox = async () => {
+export const newInbox = async (signal?: AbortSignal) => {
     const resp = await fetch(`${BASE_URL}/api/v1/inboxes`, {
         method: "POST",
         headers: defaultHeaders,
         credentials: 'include',
         body: JSON.stringify({}),
+        signal,
     });
     if (!resp.ok) {
         throw new Error('API response error ', await resp.json());

@@ -14,11 +14,11 @@ import CookiePolicyPage from './pages/legal/CookiePolicyPage';
 import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/legal/TermsOfServicePage';
 
-import ScrollConsistencyLayout from './components/ScrollConsistencyLayout';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CookieBanner from './components/legal/CookieBanner';
 import PageTracker from './components/PageTracker';
+import WebMCPTools from './components/WebMCPTools';
 import { useUser } from './context/UserContext';
 
 
@@ -27,8 +27,10 @@ function App() {
   const { isLoggedIn } = useUser();
 
   return (
-    <ScrollConsistencyLayout>
+    <>
       <Router>
+        {/* Inside the router so its tools can navigate between pages. */}
+        <WebMCPTools />
         <PageTracker />
         {/* No app-level <Container>: every page supplies its own, and the
             landing page needs full-bleed sections. The column keeps the
@@ -60,7 +62,7 @@ function App() {
           <Footer />
         </Box>
       </Router>
-    </ScrollConsistencyLayout>
+    </>
   );
 }
 
