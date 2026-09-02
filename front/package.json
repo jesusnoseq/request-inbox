@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
+    "@mcp-b/react-webmcp": "5.1.0",
     "@mcp-b/webmcp-polyfill": "5.1.0",
     "@mcp-b/webmcp-types": "5.1.0",
     "@mui/icons-material": "7.3.11",

@@ -80,6 +80,7 @@ const renderTools = (initialEntry = '/') =>
       <WebMCPTools />
       <Routes>
         <Route path="/" element={<span>home page</span>} />
+        <Route path="/inbox" element={<span>inbox list page</span>} />
         <Route path="/inbox/:inboxId" element={<span>inbox detail page</span>} />
         <Route path="/api-docs" element={<span>api documentation page</span>} />
         <Route path="/docs" element={<span>user documentation page</span>} />
@@ -109,20 +110,10 @@ test('registers global tools but not authenticated tools while logged out', () =
   const { unmount } = renderTools();
 
   expect(registerTool.mock.calls.map((call) => call[0].name)).toEqual([
-    'create_request_inbox',
     'open_request_inbox',
     'open_api_documentation',
     'open_user_documentation',
   ]);
-  expect(registeredTool(registerTool, 'create_request_inbox')).toMatchObject({
-    title: 'Create Request Inbox',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-    annotations: { readOnlyHint: false, untrustedContentHint: false },
-  });
   expect(registeredTool(registerTool, 'open_request_inbox')).toMatchObject({
     title: 'Open Request Inbox',
     inputSchema: {
@@ -224,7 +215,7 @@ test('creates an inbox and returns URLs and the anonymous access warning', async
   mockBuildInboxURL.mockReturnValue('https://api.example.test/api/v1/inboxes/inbox-1/in');
   mockNewInbox.mockResolvedValue(anInbox());
 
-  renderTools();
+  renderTools('/inbox');
   const tool = registeredTool(registerTool, 'create_request_inbox');
   const result = await tool.execute({});
 

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useUser } from '../context/UserContext';
 import useWebMCPTool from '../hooks/useWebMCPTool';
@@ -71,8 +71,10 @@ const documentationToolSchema = {
 
 const WebMCPTools = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isLoggedIn } = useUser();
   const authenticated = isLoggedIn();
+  const declarativeCreateToolActive = location.pathname === '/home' || (location.pathname === '/' && !authenticated);
 
   useWebMCPTool({
     name: 'create_request_inbox',
@@ -106,7 +108,7 @@ const WebMCPTools = () => {
           : { warning: 'This inbox is anonymous and can be accessed or modified by anyone with its ID.' }),
       };
     },
-  });
+  }, !declarativeCreateToolActive);
 
   useWebMCPTool({
     name: 'open_request_inbox',

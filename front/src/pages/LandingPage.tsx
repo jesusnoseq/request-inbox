@@ -222,6 +222,7 @@ export default function LandingPage() {
                             sx={{ pt: 1, width: { xs: '100%', sm: 'auto' } }}
                         >
                             <CreateInboxButton
+                                webMCP
                                 variant="contained"
                                 color="primary"
                                 size="large"
