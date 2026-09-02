@@ -28,6 +28,7 @@ func SetInboxRoutes(r gin.IRouter, ih handler.InboxController) {
 			inboxes.GET("/:id", ih.GetInbox)
 			inboxes.PUT("/:id", ih.UpdateInbox)
 			inboxes.DELETE("/:id/requests", ih.DeleteInboxRequests)
+			inboxes.POST("/:id/requests/:requestID/callbacks/:callbackIndex/retry", ih.RetryInboxRequestCallback)
 			inboxes.Any("/:id/in", ih.RegisterInboxRequest)
 			inboxes.Any("/:id/in/*path", ih.RegisterInboxRequest)
 		}

@@ -106,6 +106,18 @@ func (mr *MockInboxControllerMockRecorder) RegisterInboxRequest(arg0 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterInboxRequest", reflect.TypeOf((*MockInboxController)(nil).RegisterInboxRequest), arg0)
 }
 
+// RetryInboxRequestCallback mocks base method.
+func (m *MockInboxController) RetryInboxRequestCallback(arg0 *gin.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "RetryInboxRequestCallback", arg0)
+}
+
+// RetryInboxRequestCallback indicates an expected call of RetryInboxRequestCallback.
+func (mr *MockInboxControllerMockRecorder) RetryInboxRequestCallback(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetryInboxRequestCallback", reflect.TypeOf((*MockInboxController)(nil).RetryInboxRequestCallback), arg0)
+}
+
 // UpdateInbox mocks base method.
 func (m *MockInboxController) UpdateInbox(arg0 *gin.Context) {
 	m.ctrl.T.Helper()

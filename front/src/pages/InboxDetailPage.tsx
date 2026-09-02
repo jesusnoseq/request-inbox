@@ -212,7 +212,7 @@ const InboxDetailPage: React.FC = () => {
                         </Box>
                     </Box>
                     <Divider sx={{ my: 2 }} />
-                    <RequestList requests={inbox.Requests || []} />
+                    <RequestList requests={inbox.Requests || []} inboxId={inbox.ID} />
                 </>
             )
             }

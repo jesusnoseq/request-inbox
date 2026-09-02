@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { InboxRequest } from '../types/inbox';
-import { Typography, Card, CardContent, Button, List, ListItem, ListItemText, Collapse, Box } from '@mui/material';
+import { CallbackResponse, InboxRequest } from '../types/inbox';
+import { Alert, Typography, Card, CardContent, Button, List, ListItem, ListItemText, Collapse, Box } from '@mui/material';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import ExpandLess from '@mui/icons-material/ExpandLess';
@@ -11,18 +11,39 @@ import MethodChip from './MethodChip';
 import StatusChip from './StatusChip';
 import CopyToClipboardButton from './CopyToClipboardButton';
 import { buildCurlCommand } from '../utils/curl';
+import { retryCallback } from '../services/inbox';
 
 dayjs.extend(localizedFormat);
 
 type RequestDetailProps = {
     request: InboxRequest;
+    inboxId: string;
 };
 
-const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
+const RequestDetail: React.FC<RequestDetailProps> = ({ request, inboxId }) => {
     const headerEntries: [string, string][] = Object.entries(request.Headers);
     const [headersOpen, setHeadersOpen] = useState<boolean>(false);
     const [callbacksOpen, setCallbacksOpen] = useState<boolean>(false);
-    const callbackResponses = request.CallbackResponses || [];
+    // A retry does not change what is stored, so its response only lives here, keyed by callback index.
+    const [retriedResponses, setRetriedResponses] = useState<Record<number, CallbackResponse>>({});
+    const [retryingIndex, setRetryingIndex] = useState<number | null>(null);
+    const [retryError, setRetryError] = useState<string | null>(null);
+    const callbackResponses = (request.CallbackResponses || [])
+        .map((cr, index) => retriedResponses[index] ?? cr);
+
+    const handleRetryCallback = async (index: number) => {
+        setRetryingIndex(index);
+        setRetryError(null);
+        try {
+            const response = await retryCallback(inboxId, request.ID, index);
+            setRetriedResponses((previous) => ({ ...previous, [index]: response }));
+            setCallbacksOpen(true);
+        } catch (err) {
+            setRetryError(err instanceof Error ? err.message : 'Failed to retry callback');
+        } finally {
+            setRetryingIndex(null);
+        }
+    };
 
     const handleHeadersCollapse = () => {
         setHeadersOpen(!headersOpen);
@@ -107,6 +128,12 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                             </Box>
                         </Box>
 
+                        {retryError && (
+                            <Alert severity="error" onClose={() => setRetryError(null)} sx={{ marginTop: 1 }}>
+                                {retryError}
+                            </Alert>
+                        )}
+
                         <Collapse in={callbacksOpen} timeout="auto" unmountOnExit>
                             <Box sx={{ marginTop: 1 }}>
                                 {callbackResponses.map((callbackResponse, index) => (
@@ -114,6 +141,9 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                                         key={index}
                                         callbackResponse={callbackResponse}
                                         index={index}
+                                        onRetry={() => handleRetryCallback(index)}
+                                        isRetrying={retryingIndex === index}
+                                        isRetried={retriedResponses[index] !== undefined}
                                     />
                                 ))}
                             </Box>

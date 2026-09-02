@@ -1,5 +1,5 @@
 
-import { type InboxList, type Inbox, type APIKey, APIKeyList } from "../types/inbox";
+import { type InboxList, type Inbox, type APIKey, type CallbackResponse, APIKeyList } from "../types/inbox";
 import dayjs from 'dayjs';
 
 const BASE_URL = import.meta.env.VITE_REQUEST_INBOX_API_URL;
@@ -100,6 +100,14 @@ export const deleteInbox = async (id: string, options: RequestOptions = {}) => {
 export const deleteInboxRequests = async (id: string, options: RequestOptions = {}) => {
     const resp = await apiFetch(`/api/v1/inboxes/${id}/requests`, { ...options, method: "DELETE" });
     return resp.status === 204;
+}
+
+export const retryCallback = async (inboxId: string, requestId: number, callbackIndex: number, options: RequestOptions = {}) => {
+    return apiJSON<CallbackResponse>(`/api/v1/inboxes/${inboxId}/requests/${requestId}/callbacks/${callbackIndex}/retry`, {
+        ...options,
+        method: "POST",
+        errorMessage: 'Failed to retry callback',
+    });
 }
 
 export const health = async (options: RequestOptions = {}) => {

@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -17,6 +18,15 @@ func parseInboxID(c *gin.Context) (uuid.UUID, bool) {
 		return uuid.UUID{}, false
 	}
 	return id, true
+}
+
+func parseIntParam(c *gin.Context, name string) (int, bool) {
+	value, err := strconv.Atoi(c.Param(name))
+	if err != nil {
+		c.AbortWithStatusJSON(model.ErrorResponseWithError("invalid "+name, err, http.StatusBadRequest))
+		return 0, false
+	}
+	return value, true
 }
 
 func abortWithDBError(c *gin.Context, action string, err error) {

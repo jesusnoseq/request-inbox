@@ -12,6 +12,7 @@ type InboxController interface {
 	ListInbox(c *gin.Context)
 	DeleteInboxRequests(c *gin.Context)
 	RegisterInboxRequest(c *gin.Context)
+	RetryInboxRequestCallback(c *gin.Context)
 }
 
 type HealthHandler interface {

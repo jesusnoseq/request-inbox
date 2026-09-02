@@ -30,6 +30,7 @@ func TestSetInboxRoutes(t *testing.T) {
 	ih.EXPECT().UpdateInbox(gomock.Any()).Do(returnOk).Times(1)
 	ih.EXPECT().DeleteInboxRequests(gomock.Any()).Do(returnOk).Times(1)
 	ih.EXPECT().RegisterInboxRequest(gomock.Any()).Do(returnOk).Times(2)
+	ih.EXPECT().RetryInboxRequestCallback(gomock.Any()).Do(returnOk).Times(1)
 	hh.EXPECT().Health(gomock.Any()).Do(returnOk).Times(1)
 
 	route.SetInboxRoutes(r, ih)
@@ -47,6 +48,7 @@ func TestSetInboxRoutes(t *testing.T) {
 		{"update inbox detail", http.MethodPut, "/api/v1/inboxes/123", false},
 		{"delete inbox detail", http.MethodDelete, "/api/v1/inboxes/123", false},
 		{"delete inbox requests", http.MethodDelete, "/api/v1/inboxes/123/requests", false},
+		{"retry a request callback", http.MethodPost, "/api/v1/inboxes/123/requests/0/callbacks/1/retry", false},
 		{"make request to the inbox", http.MethodTrace, "/api/v1/inboxes/111/in", false},
 		{"make request to the inbox with more complex path", http.MethodPost, "/api/v1/inboxes/222/in/some/path", false},
 		{"get health", http.MethodGet, "/api/v1/health", false},

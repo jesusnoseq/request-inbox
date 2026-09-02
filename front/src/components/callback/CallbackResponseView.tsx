@@ -5,24 +5,34 @@ import {
     Typography, 
     Box, 
     Button, 
-    List, 
-    ListItem, 
-    ListItemText, 
-    Collapse 
+    List,
+    ListItem,
+    ListItemText,
+    Collapse,
+    CircularProgress
 } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { CallbackResponse } from '../../types/inbox';
 import BodyView from '../BodyView';
 
 type CallbackResponseViewProps = {
     callbackResponse: CallbackResponse;
     index: number;
+    /** Sends the callback again. Omitted when the callback can not be retried. */
+    onRetry?: () => void;
+    isRetrying?: boolean;
+    /** True once this callback has been retried, so the shown response is not the captured one. */
+    isRetried?: boolean;
 };
 
-const CallbackResponseView: React.FC<CallbackResponseViewProps> = ({ 
-    callbackResponse, 
-    index 
+const CallbackResponseView: React.FC<CallbackResponseViewProps> = ({
+    callbackResponse,
+    index,
+    onRetry,
+    isRetrying = false,
+    isRetried = false
 }) => {
     const [headersOpen, setHeadersOpen] = useState<boolean>(false);
     
@@ -35,10 +45,25 @@ const CallbackResponseView: React.FC<CallbackResponseViewProps> = ({
     return (
         <Card variant="outlined" sx={{ marginBottom: 1, marginLeft: 2 }}>
             <CardContent sx={{ paddingBottom: '16px !important' }}>
-                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                    Callback {index + 1}
-                </Typography>
-                
+                <Box display="flex" alignItems="center" justifyContent="space-between" gap={1} sx={{ marginBottom: 1 }}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                        Callback {index + 1}{isRetried && ' · retried'}
+                    </Typography>
+                    {onRetry && (
+                        <Button
+                            size="small"
+                            startIcon={isRetrying
+                                ? <CircularProgress size={14} color="inherit" />
+                                : <ReplayIcon fontSize="small" />}
+                            onClick={onRetry}
+                            disabled={isRetrying}
+                            sx={{ textTransform: 'none', flexShrink: 0 }}
+                        >
+                            {isRetrying ? 'Retrying…' : 'Retry'}
+                        </Button>
+                    )}
+                </Box>
+
                 {callbackResponse.URL && (
                     <Typography variant="body2" sx={{ marginBottom: 1 }}>
                         <strong>URL:</strong>{' '}

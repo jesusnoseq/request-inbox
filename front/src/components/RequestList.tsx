@@ -9,9 +9,10 @@ import MethodChip from './MethodChip';
 
 type Props = {
     requests: InboxRequest[];
+    inboxId: string;
 };
 
-const RequestList: React.FC<Props> = ({ requests }) => {
+const RequestList: React.FC<Props> = ({ requests, inboxId }) => {
     const [methodFilter, setMethodFilter] = useState<string>('ALL');
 
     const methods = useMemo(() => {
@@ -93,7 +94,7 @@ const RequestList: React.FC<Props> = ({ requests }) => {
             ) : (
                 filtered.slice().reverse().map((request) => (
                     <React.Fragment key={request.ID}>
-                        <RequestDetail request={request} />
+                        <RequestDetail request={request} inboxId={inboxId} />
                     </React.Fragment>
                 ))
             )}

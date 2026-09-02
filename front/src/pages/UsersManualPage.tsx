@@ -296,6 +296,8 @@ const UsersManualPage: React.FC = () => {
                                             Enabled callbacks are sent when a request is captured. The inbox waits for all callbacks to finish before returning its configured response.
                                             Open a captured request to view each callback's destination, method, status code, response headers, response body, or delivery error.
                                             Each callback is attempted once and is not retried automatically.
+                                            Use the Retry button next to a callback result to send that callback again with the stored request.
+                                            The retried response is shown in place of the captured one, which stays stored with the request.
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -930,7 +932,8 @@ const UsersManualPage: React.FC = () => {
                                             Enabled callbacks run concurrently, but the capture request waits for all of them to finish.
                                             A callback template or delivery failure is stored with the captured request and does not change the inbox response.
                                             A callback status code of 0 indicates a template, URL, timeout, network, request-construction, or response-reading error; inspect the callback's Error field for details.
-                                            HTTP 4xx and 5xx results mean the destination responded and are recorded as completed callback responses. Callbacks are attempted once and are not retried automatically.
+                                            HTTP 4xx and 5xx results mean the destination responded and are recorded as completed callback responses. Callbacks are attempted once and are not retried automatically, but a callback result can be retried manually from the captured request.
+                                            A manual retry re-renders a dynamic callback against the stored request, so a template that depends on the current time or on random values produces a different request than the original one.
                                         </Typography>
                                     </Box>
                                 </Box>

@@ -55,7 +55,7 @@ const FEATURES = [
     {
         title: 'Callbacks & forwarding',
         Icon: CallbackIcon,
-        body: 'Have an inbox call another URL when a request lands — forward the headers, template the body, and read each callback’s response inline.',
+        body: 'Have an inbox call another URL when a request lands — forward the headers, template the body, read each callback’s response inline, and retry the ones that failed.',
     },
 ];
 

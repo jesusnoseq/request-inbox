@@ -160,6 +160,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /inboxes/{inboxID}/requests/{requestID}/callbacks/{callbackIndex}/retry:
+    post:
+      summary: Send again a callback of a captured request
+      description: >
+        Sends the callback again, rendering it with the stored request, and answers with the
+        fresh callback response. The callback responses stored with the request are not modified.
+      parameters:
+        - name: inboxID
+          description: The unique identifier of the inbox
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/InboxID"
+        - name: requestID
+          description: The identifier of the captured request
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: callbackIndex
+          description: The position of the callback in the inbox callback list
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: The callback was sent again
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CallbackResponse"
+        400:
+          description: Invalid identifiers, or the callback is disabled or has an invalid URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: No inbox, request or callback found for the provided identifiers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /inboxes/{inboxID}/in:
     summary: Collect request in a specific Inbox
     parameters:

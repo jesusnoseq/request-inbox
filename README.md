@@ -19,6 +19,8 @@ A web application to collect and inspect HTTP requests for testing and debugging
 - 🔧 **Custom responses** - Configure response headers and body content
 - 👀 **Request inspection** - View detailed request information including headers, body, and metadata
 - 🗑️ **Request management** - Remove requests from an inbox
+- 🔔 **Callbacks** - Call another service when a request lands, forwarding headers and templating the body
+- 🔁 **Callback retry** - Send any callback of a captured request again and inspect the new response
 
 ### User Experience
 
@@ -228,6 +230,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 - ✅ **Docker images** - Production-ready Docker image with nginx and API
 - ✅ **GitHub Container Registry** - Automated image publishing
+- ✅ **Callbacks** - Request callback/passthrough, including manual retry of a callback result
 
 ### Planned Features
 
@@ -241,5 +244,4 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - WebSocket support for real-time updates
 - Custom domain support for inboxes
 - Advanced filtering and search
-- Request callback/passthrough
 - Performance monitoring and metrics
