@@ -2,10 +2,4 @@
 User-agent: *
 Disallow: /profile
 Disallow: /inbox
-Disallow: /api-docs
-Disallow: /users-manual
-Disallow: /docs
 Disallow: /health
-Disallow: /cookies
-Disallow: /privacy
-Disallow: /terms
