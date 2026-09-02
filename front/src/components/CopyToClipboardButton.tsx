@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { IconButton, Tooltip, Snackbar } from '@mui/material';
+import { Button, IconButton, Tooltip, Snackbar } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 type CopyToClipboardButtonProps = {
     textToCopy: string;
     tooltipTitle?: string;
     copyEventMessage?: string;
+    label?: string;
 };
 
 const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = (
     {
         textToCopy,
         tooltipTitle = 'Copy to Clipboard',
-        copyEventMessage = "Copied to clipboard"
+        copyEventMessage = "Copied to clipboard",
+        label
     }) => {
     const [open, setOpen] = useState(false);
 
@@ -34,9 +36,19 @@ const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = (
     return (
         <>
             <Tooltip title={tooltipTitle}>
-                <IconButton onClick={handleCopyToClipboard}>
-                    <ContentCopyIcon />
-                </IconButton>
+                {label ? (
+                    <Button
+                        size="small"
+                        startIcon={<ContentCopyIcon fontSize="small" />}
+                        onClick={handleCopyToClipboard}
+                    >
+                        {label}
+                    </Button>
+                ) : (
+                    <IconButton onClick={handleCopyToClipboard}>
+                        <ContentCopyIcon />
+                    </IconButton>
+                )}
             </Tooltip>
             <Snackbar
                 open={open}

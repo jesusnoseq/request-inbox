@@ -9,6 +9,8 @@ import BodyView from './BodyView';
 import CallbackResponseView from './callback/CallbackResponseView';
 import MethodChip from './MethodChip';
 import StatusChip from './StatusChip';
+import CopyToClipboardButton from './CopyToClipboardButton';
+import { buildCurlCommand } from '../utils/curl';
 
 dayjs.extend(localizedFormat);
 
@@ -38,6 +40,8 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
 
     const [URIDefaulPath, URICustomPath] = splitPath(request.URI)
 
+    const curlCommand = buildCurlCommand(request);
+
     return (
         <Card variant="outlined" sx={{ marginBottom: 2 }}>
             <CardContent>
@@ -58,12 +62,18 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request }) => {
                     </Typography>
                 </Box>
 
-                <Typography>
+                <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
                     <Button onClick={handleHeadersCollapse}>
                         <Typography>Show headers</Typography>
                         {headersOpen ? <ExpandLess /> : <ExpandMore />}
                     </Button>
-                </Typography>
+                    <CopyToClipboardButton
+                        textToCopy={curlCommand}
+                        label="Copy cURL"
+                        tooltipTitle="Copy this request as a cURL command"
+                        copyEventMessage="cURL command copied to clipboard"
+                    />
+                </Box>
 
                 <Collapse in={headersOpen} timeout="auto" unmountOnExit>
                     <List dense sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
