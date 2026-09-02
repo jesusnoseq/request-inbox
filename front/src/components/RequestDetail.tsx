@@ -1,12 +1,24 @@
 import React, { useState } from 'react';
 import { CallbackResponse, InboxRequest } from '../types/inbox';
-import { Alert, Typography, Card, CardContent, Button, List, ListItem, ListItemText, Collapse, Box } from '@mui/material';
+import {
+    Typography,
+    Card,
+    CardContent,
+    Button,
+    CircularProgress,
+    List,
+    ListItem,
+    ListItemText,
+    Collapse,
+    Box,
+    Tooltip,
+} from '@mui/material';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import BodyView from './BodyView';
-import CallbackResponseView from './callback/CallbackResponseView';
+import CallbackResponseView, { CallbackRetry } from './callback/CallbackResponseView';
 import MethodChip from './MethodChip';
 import StatusChip from './StatusChip';
 import CopyToClipboardButton from './CopyToClipboardButton';
@@ -20,26 +32,41 @@ type RequestDetailProps = {
     inboxId: string;
 };
 
+const callbackOutcome = (cr: CallbackResponse) => cr.Error ? 'Failed' : `${cr.Method || 'POST'} ${cr.Code}`;
+
 const RequestDetail: React.FC<RequestDetailProps> = ({ request, inboxId }) => {
     const headerEntries: [string, string][] = Object.entries(request.Headers);
     const [headersOpen, setHeadersOpen] = useState<boolean>(false);
     const [callbacksOpen, setCallbacksOpen] = useState<boolean>(false);
-    // A retry does not change what is stored, so its response only lives here, keyed by callback index.
-    const [retriedResponses, setRetriedResponses] = useState<Record<number, CallbackResponse>>({});
+    // A retry does not change what is stored, so its result only lives here, keyed by callback index.
+    const [retries, setRetries] = useState<Record<number, CallbackRetry>>({});
     const [retryingIndex, setRetryingIndex] = useState<number | null>(null);
-    const [retryError, setRetryError] = useState<string | null>(null);
-    const callbackResponses = (request.CallbackResponses || [])
-        .map((cr, index) => retriedResponses[index] ?? cr);
+    // Keyed by callback index too, so a failed retry is reported inside the box of its own callback.
+    const [retryErrors, setRetryErrors] = useState<Record<number, string>>({});
+    const capturedResponses = request.CallbackResponses || [];
+    const callbackResponses = capturedResponses.map((cr, index) => retries[index]?.response ?? cr);
+
+    const dismissRetryError = (index: number) => {
+        setRetryErrors(({ [index]: _dismissed, ...rest }) => rest);
+    };
 
     const handleRetryCallback = async (index: number) => {
         setRetryingIndex(index);
-        setRetryError(null);
+        dismissRetryError(index);
+        setCallbacksOpen(true);
         try {
             const response = await retryCallback(inboxId, request.ID, index);
-            setRetriedResponses((previous) => ({ ...previous, [index]: response }));
-            setCallbacksOpen(true);
+            setRetries((previous) => ({
+                ...previous,
+                [index]: {
+                    response,
+                    at: Date.now(),
+                    attempts: (previous[index]?.attempts ?? 0) + 1,
+                },
+            }));
         } catch (err) {
-            setRetryError(err instanceof Error ? err.message : 'Failed to retry callback');
+            const reason = err instanceof Error ? err.message : 'Failed to retry callback';
+            setRetryErrors((previous) => ({ ...previous, [index]: reason }));
         } finally {
             setRetryingIndex(null);
         }
@@ -117,22 +144,29 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request, inboxId }) => {
                                 {callbacksOpen ? <ExpandLess /> : <ExpandMore />}
                             </Button>
                             <Box display="flex" alignItems="center" gap={0.75} flexWrap="wrap">
-                                {callbackResponses.map((cr, index) => (
-                                    <StatusChip
-                                        key={index}
-                                        code={cr.Code}
-                                        forceError={!!cr.Error}
-                                        label={cr.Error ? 'Failed' : `${cr.Method || 'POST'} ${cr.Code}`}
-                                    />
-                                ))}
+                                {callbackResponses.map((cr, index) => {
+                                    const retry = retries[index];
+                                    const isRetrying = retryingIndex === index;
+                                    const tooltip = isRetrying
+                                        ? `Retrying callback ${index + 1}…`
+                                        : retry
+                                            ? `Callback ${index + 1} retried at ${dayjs(retry.at).format('LTS')} · captured: ${callbackOutcome(capturedResponses[index])}`
+                                            : `Callback ${index + 1}`;
+                                    return (
+                                        <Tooltip key={index} title={tooltip}>
+                                            <Box display="flex" alignItems="center" gap={0.5}>
+                                                {isRetrying && <CircularProgress size={12} />}
+                                                <StatusChip
+                                                    code={cr.Code}
+                                                    forceError={!!cr.Error}
+                                                    label={`${retry ? '↻ ' : ''}${callbackOutcome(cr)}`}
+                                                />
+                                            </Box>
+                                        </Tooltip>
+                                    );
+                                })}
                             </Box>
                         </Box>
-
-                        {retryError && (
-                            <Alert severity="error" onClose={() => setRetryError(null)} sx={{ marginTop: 1 }}>
-                                {retryError}
-                            </Alert>
-                        )}
 
                         <Collapse in={callbacksOpen} timeout="auto" unmountOnExit>
                             <Box sx={{ marginTop: 1 }}>
@@ -143,7 +177,9 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request, inboxId }) => {
                                         index={index}
                                         onRetry={() => handleRetryCallback(index)}
                                         isRetrying={retryingIndex === index}
-                                        isRetried={retriedResponses[index] !== undefined}
+                                        retry={retries[index]}
+                                        retryError={retryErrors[index]}
+                                        onDismissRetryError={() => dismissRetryError(index)}
                                     />
                                 ))}
                             </Box>

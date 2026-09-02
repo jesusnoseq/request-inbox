@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type MockedFunction, vi } from 'vitest';
 
@@ -38,12 +38,26 @@ const aRequest = (overrides: Partial<InboxRequest> = {}): InboxRequest => ({
   ...overrides,
 });
 
+const twoCallbacksRequest = () =>
+  aRequest({
+    CallbackResponses: [
+      aCallbackResponse({ Body: 'first attempt' }),
+      aCallbackResponse({ Body: 'second callback', Code: 0, Error: 'connection refused' }),
+    ],
+  });
+
 const renderDetail = (request: InboxRequest = aRequest()) =>
   render(<RequestDetail request={request} inboxId="inbox-1" />);
 
-const showCallbacks = async (user: ReturnType<typeof userEvent.setup>) => {
-  await user.click(screen.getByText('Show callback results (1)'));
+const showCallbacks = async (user: ReturnType<typeof userEvent.setup>, count = 1) => {
+  await user.click(screen.getByText(`Show callback results (${count})`));
 };
+
+/** The box of one callback, so the retry feedback can be checked where it belongs. */
+const callbackBox = (position: number) => screen.getByRole('group', { name: `Callback ${position}` });
+
+const retryButtonOf = (position: number) =>
+  within(callbackBox(position)).getByRole('button', { name: /retry/i });
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -57,46 +71,109 @@ test('retries the callback of a request and shows the new response', async () =>
   await showCallbacks(user);
   expect(screen.getByText('first attempt')).toBeInTheDocument();
 
-  await user.click(screen.getByRole('button', { name: /retry/i }));
+  await user.click(retryButtonOf(1));
 
   expect(await screen.findByText('retried body')).toBeInTheDocument();
   expect(mockRetryCallback).toHaveBeenCalledWith('inbox-1', 3, 0);
   expect(screen.queryByText('first attempt')).not.toBeInTheDocument();
-  expect(screen.getByText('Callback 1 · retried')).toBeInTheDocument();
-  // The summary chip follows the retried response.
-  expect(screen.getByText('POST 200')).toBeInTheDocument();
+  expect(within(callbackBox(1)).getByText(/the destination answered 200/)).toBeInTheDocument();
+  // The summary chip follows the retried response and marks it as a retry.
+  expect(screen.getByText('↻ POST 200')).toBeInTheDocument();
 });
 
-test('shows the error when the retry fails and keeps the captured response', async () => {
+test('reports the outcome of a retry that reached the destination', async () => {
   const user = userEvent.setup();
-  mockRetryCallback.mockRejectedValue(new Error('Failed to retry callback'));
+  mockRetryCallback.mockResolvedValue(aCallbackResponse({ Code: 503, Body: 'still down' }));
+
+  renderDetail();
+  await showCallbacks(user);
+  await user.click(retryButtonOf(1));
+
+  expect(await within(callbackBox(1)).findByText(/Retried at .* · the destination answered 503/)).toBeInTheDocument();
+});
+
+test('reports a retry that got no response at all', async () => {
+  const user = userEvent.setup();
+  mockRetryCallback.mockResolvedValue(aCallbackResponse({ Code: 0, Body: '', Error: 'connection refused' }));
+
+  renderDetail();
+  await showCallbacks(user);
+  await user.click(retryButtonOf(1));
+
+  expect(await within(callbackBox(1)).findByText(/no response: connection refused/)).toBeInTheDocument();
+});
+
+test('counts the retries of the same callback', async () => {
+  const user = userEvent.setup();
+  mockRetryCallback.mockResolvedValue(aCallbackResponse({ Code: 200, Body: 'retried body' }));
 
   renderDetail();
   await showCallbacks(user);
 
-  await user.click(screen.getByRole('button', { name: /retry/i }));
+  await user.click(retryButtonOf(1));
+  expect(await within(callbackBox(1)).findByText(/Retried at/)).toBeInTheDocument();
 
-  expect(await screen.findByText('Failed to retry callback')).toBeInTheDocument();
+  await user.click(retryButtonOf(1));
+
+  expect(await within(callbackBox(1)).findByText(/· 2 retries ·/)).toBeInTheDocument();
+});
+
+test('shows the error when the retry fails and keeps the captured response', async () => {
+  const user = userEvent.setup();
+  mockRetryCallback.mockRejectedValue(new Error('callback is disabled'));
+
+  renderDetail();
+  await showCallbacks(user);
+
+  await user.click(retryButtonOf(1));
+
+  expect(await within(callbackBox(1)).findByText(/Could not be retried: callback is disabled/)).toBeInTheDocument();
   expect(screen.getByText('first attempt')).toBeInTheDocument();
 });
 
 test('has one retry button per callback response', async () => {
   const user = userEvent.setup();
-  const request = aRequest({
-    CallbackResponses: [
-      aCallbackResponse({ Body: 'first attempt' }),
-      aCallbackResponse({ Body: 'second callback', Error: 'connection refused' }),
-    ],
-  });
 
-  renderDetail(request);
-  await user.click(screen.getByText('Show callback results (2)'));
+  renderDetail(twoCallbacksRequest());
+  await showCallbacks(user, 2);
 
   expect(screen.getAllByRole('button', { name: /retry/i })).toHaveLength(2);
 
   mockRetryCallback.mockResolvedValue(aCallbackResponse({ Code: 201, Body: 'second retried' }));
-  await user.click(screen.getAllByRole('button', { name: /retry/i })[1]);
+  await user.click(retryButtonOf(2));
 
   await waitFor(() => expect(mockRetryCallback).toHaveBeenCalledWith('inbox-1', 3, 1));
   expect(screen.getByText('first attempt')).toBeInTheDocument();
+});
+
+test('keeps the retry outcome inside the box of the retried callback', async () => {
+  const user = userEvent.setup();
+  mockRetryCallback.mockResolvedValue(aCallbackResponse({ Code: 201, Body: 'second retried' }));
+
+  renderDetail(twoCallbacksRequest());
+  await showCallbacks(user, 2);
+
+  await user.click(retryButtonOf(2));
+
+  expect(await within(callbackBox(2)).findByText(/the destination answered 201/)).toBeInTheDocument();
+  expect(within(callbackBox(1)).queryByText(/Retried at/)).not.toBeInTheDocument();
+});
+
+test('keeps a failed retry inside the box of the retried callback', async () => {
+  const user = userEvent.setup();
+  mockRetryCallback.mockRejectedValue(new Error('callback is disabled'));
+
+  renderDetail(twoCallbacksRequest());
+  await showCallbacks(user, 2);
+
+  await user.click(retryButtonOf(2));
+
+  expect(await within(callbackBox(2)).findByText(/Could not be retried: callback is disabled/)).toBeInTheDocument();
+  expect(within(callbackBox(1)).queryByText(/Could not be retried/)).not.toBeInTheDocument();
+
+  // Dismissing it clears only that callback's error.
+  await user.click(within(callbackBox(2)).getByRole('button', { name: /close/i }));
+  await waitFor(() =>
+    expect(within(callbackBox(2)).queryByText(/Could not be retried/)).not.toBeInTheDocument()
+  );
 });
