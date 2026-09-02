@@ -34,12 +34,17 @@ export type WebMCPToolDefinition<
  * against the current render's props without re-registering.
  */
 const useWebMCPTool = <TInputSchema extends InputSchema, TOutputSchema extends InputSchema>(
-  tool: WebMCPToolDefinition<TInputSchema, TOutputSchema>
+  tool: WebMCPToolDefinition<TInputSchema, TOutputSchema>,
+  enabled = true
 ) => {
   const toolRef = useRef(tool);
   toolRef.current = tool;
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     const modelContext = document.modelContext;
     if (!modelContext) {
       return;
@@ -71,7 +76,7 @@ const useWebMCPTool = <TInputSchema extends InputSchema, TOutputSchema extends I
     });
 
     return () => controller.abort();
-  }, []);
+  }, [enabled]);
 };
 
 export default useWebMCPTool;

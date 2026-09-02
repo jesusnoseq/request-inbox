@@ -19,6 +19,7 @@ import Footer from './components/Footer';
 import CookieBanner from './components/legal/CookieBanner';
 import PageTracker from './components/PageTracker';
 import WebMCPTools from './components/WebMCPTools';
+import PageWebMCPTools from './components/PageWebMCPTools';
 import { useUser } from './context/UserContext';
 
 
@@ -31,6 +32,7 @@ function App() {
       <Router>
         {/* Inside the router so its tools can navigate between pages. */}
         <WebMCPTools />
+        <PageWebMCPTools />
         <PageTracker />
         {/* No app-level <Container>: every page supplies its own, and the
             landing page needs full-bleed sections. The column keeps the
