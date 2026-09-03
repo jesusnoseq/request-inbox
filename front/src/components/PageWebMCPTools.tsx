@@ -20,6 +20,130 @@ const hasTemplateAction = (value: string) => value.includes('{{');
 /** Tools that operate on the inbox currently open in the app. */
 const InboxDetailWebMCPTools = ({ inboxId }: { inboxId: string }) => {
   useWebMCPTool({
+    name: 'update_request_inbox',
+    title: 'Update Request Inbox',
+    description:
+      'Edit the open request inbox. You can change its display name, switch its visibility between public and private, and update any part of its HTTP response: the static fallback status code, optional dynamic status-code template, body, complete header map, and whether Go-template rendering is enabled. Omitted inbox and response fields keep their current values; every response update must explicitly set isDynamic.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', minLength: 1, description: 'New display name. Omit to preserve the current name.' },
+        isPrivate: {
+          type: 'boolean',
+          description: 'Whether only the owner can read the inbox. Omit to preserve the current visibility.',
+        },
+        response: {
+          type: 'object',
+          description: 'HTTP response fields to update. Omitted fields retain their current values.',
+          properties: {
+            code: {
+              type: 'integer',
+              minimum: 100,
+              maximum: 999,
+              description: 'Static status code, also used as the fallback when a dynamic code template renders an invalid value.',
+            },
+            codeTemplate: {
+              type: 'string',
+              description: 'Optional Go template that must render an integer from 100 through 999. Used only in dynamic mode; an empty string disables this override.',
+            },
+            body: {
+              type: 'string',
+              description: 'Complete response body. In dynamic mode it is rendered as a Go template for each captured request.',
+            },
+            headers: {
+              type: 'object',
+              description: 'Complete response header map. Values are Go templates in dynamic mode; header names are never templated.',
+              additionalProperties: { type: 'string' },
+            },
+            isDynamic: {
+              type: 'boolean',
+              description: 'Explicitly choose whether the body, header values, and optional code template are rendered as Go templates.',
+            },
+          },
+          required: ['isDynamic'],
+          additionalProperties: false,
+        },
+      },
+      minProperties: 1,
+      additionalProperties: false,
+    } as const,
+    outputSchema: {
+      type: 'object',
+      properties: {
+        inboxId: { type: 'string' },
+        name: { type: 'string' },
+        isPrivate: { type: 'boolean' },
+        response: {
+          type: 'object',
+          properties: {
+            code: { type: 'integer' },
+            codeTemplate: { type: 'string' },
+            body: { type: 'string' },
+            headers: { type: 'object', additionalProperties: { type: 'string' } },
+            isDynamic: { type: 'boolean' },
+          },
+          required: ['code', 'codeTemplate', 'body', 'headers', 'isDynamic'],
+          additionalProperties: false,
+        },
+      },
+      required: ['inboxId', 'name', 'isPrivate', 'response'],
+      additionalProperties: false,
+    } as const,
+    annotations: {
+      readOnlyHint: false,
+      untrustedContentHint: true,
+    },
+    execute: async (input) => {
+      if (input.name === undefined && input.isPrivate === undefined && input.response === undefined) {
+        throw new Error('Provide at least one inbox field to update.');
+      }
+      if (input.response !== undefined && typeof input.response.isDynamic !== 'boolean') {
+        throw new Error('response.isDynamic is required when updating the response.');
+      }
+
+      const current = await getInbox(inboxId);
+      const name = input.name?.trim();
+      if (input.name !== undefined && !name) {
+        throw new Error('name must not be empty.');
+      }
+
+      const updated = await updateInbox({
+        ...current,
+        ...(name === undefined ? {} : { Name: name }),
+        ...(input.isPrivate === undefined ? {} : { IsPrivate: input.isPrivate }),
+        ...(input.response === undefined
+          ? {}
+          : {
+              Response: {
+                ...current.Response,
+                ...(input.response.code === undefined ? {} : { Code: input.response.code }),
+                ...(input.response.codeTemplate === undefined
+                  ? {}
+                  : { CodeTemplate: input.response.codeTemplate }),
+                ...(input.response.body === undefined ? {} : { Body: input.response.body }),
+                ...(input.response.headers === undefined ? {} : { Headers: input.response.headers }),
+                IsDynamic: input.response.isDynamic,
+              },
+            }),
+      });
+      notifyInboxUpdated(updated);
+
+      return {
+        inboxId: updated.ID,
+        name: updated.Name,
+        isPrivate: updated.IsPrivate,
+        response: {
+          code: updated.Response.Code,
+          codeTemplate: updated.Response.CodeTemplate,
+          body: updated.Response.Body,
+          headers: updated.Response.Headers,
+          isDynamic: updated.Response.IsDynamic,
+        },
+      };
+    },
+  });
+
+  useWebMCPTool({
     name: 'add_request_inbox_callback',
     title: 'Add Request Inbox Callback',
     description:

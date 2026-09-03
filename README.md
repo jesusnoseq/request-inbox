@@ -207,6 +207,7 @@ WebMCP support uses both APIs:
 | `inspect_request_inbox` | Signed-in users | Returns up to 20 recent requests using `inboxId` and optional `requestLimit`. |
 | `open_api_documentation` | All pages | Opens the interactive API documentation. It has no inputs. |
 | `open_user_documentation` | All pages | Opens the user documentation. It has no inputs. |
+| `update_request_inbox` | Open inbox page | Partially updates the display `name`, `isPrivate` visibility, and HTTP `response`. Response fields include fallback `code`, optional `codeTemplate`, complete `headers`, `body`, and required `isDynamic` mode; omitted fields are preserved. |
 | `add_request_inbox_callback` | Open inbox page | Adds a custom or preset callback using `destinationUrl`, optional `template`, `method`, `headers`, `body`, `isEnabled`, `isDynamic`, and `forwardHeaders`. |
 | `get_request_inbox_requests` | Open inbox page | Reads captured requests using optional `requestLimit` and `afterRequestId` cursor values. |
 
@@ -217,7 +218,7 @@ The imperative `add_request_inbox_callback` tool intentionally remains registere
 | Form tool | Availability | Customized form behavior |
 | --- | --- | --- |
 | `create_request_inbox` | Landing/home create button | Creates an inbox with no parameters and navigates to it. It replaces the imperative tool on pages where this form is active, avoiding duplicate tool names. |
-| `update_request_inbox` | Editable open inbox | Replaces the inbox response using `code`, `codeTemplate`, `headers` as JSON, `body`, and `isDynamic`. The form remains discoverable while its visual editor is closed. |
+| `update_request_inbox_response` | Editable open inbox | Replaces the inbox response using `code`, `codeTemplate`, `headers` as JSON, `body`, and `isDynamic`. The form remains discoverable while its visual editor is closed. |
 | `update_request_inbox_callback_<index>` | Each callback in an editable open inbox | Replaces the complete callback at the zero-based `<index>` using `toURL`, `method`, `headers` as JSON, `body`, `isEnabled`, `isDynamic`, and `isForwardingHeaders`. The normal edit button still opens the visual editor. |
 | `delete_request_inbox_callback_<index>` | Each callback in an editable open inbox | Deletes the callback at the zero-based `<index>`. Agent invocation submits immediately; the normal delete button still asks the user for confirmation. |
 | `copy_request_as_curl_<requestId>` | Each captured request | Copies that request as a cURL command and returns the generated command. `<requestId>` is the request's stored zero-based ID. |

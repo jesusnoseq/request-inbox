@@ -277,7 +277,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
             }
             {!readonly && <form
                 aria-label="Update request inbox response"
-                toolname="update_request_inbox"
+                toolname="update_request_inbox_response"
                 tooltitle="Update Request Inbox Response"
                 tooldescription="Use this form when the user asks to change the HTTP response returned by the open request inbox. It persists the status code, body, complete header map, and dynamic-template mode."
                 toolautosubmit=""

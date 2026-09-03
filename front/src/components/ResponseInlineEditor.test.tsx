@@ -19,7 +19,7 @@ const renderEditor = (onSave = vi.fn()) => {
       <ResponseInlineEditor response={response} onSave={onSave} readonly={false} />
     </MemoryRouter>
   );
-  const form = view.container.querySelector<HTMLFormElement>('form[toolname="update_request_inbox"]');
+  const form = view.container.querySelector<HTMLFormElement>('form[toolname="update_request_inbox_response"]');
   if (!form) throw new Error('Declarative response form was not rendered.');
   return { ...view, form };
 };
@@ -38,7 +38,7 @@ const invokeTool = (form: HTMLFormElement) => {
 test('exposes response editing as a declarative WebMCP form while visually closed', () => {
   const { form } = renderEditor();
 
-  expect(form).toHaveAttribute('toolname', 'update_request_inbox');
+  expect(form).toHaveAttribute('toolname', 'update_request_inbox_response');
   expect(form).toHaveAttribute('tooltitle', 'Update Request Inbox Response');
   expect(form).toHaveAttribute('toolautosubmit');
   expect(form).toHaveAttribute('tooldescription', expect.stringContaining('persists the status code'));
@@ -92,5 +92,5 @@ test('does not expose the update tool when the inbox is read-only', () => {
     </MemoryRouter>
   );
 
-  expect(view.container.querySelector('form[toolname="update_request_inbox"]')).not.toBeInTheDocument();
+  expect(view.container.querySelector('form[toolname="update_request_inbox_response"]')).not.toBeInTheDocument();
 });

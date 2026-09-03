@@ -17,6 +17,7 @@ const mockUpdateInbox = updateInbox as MockedFunction<typeof updateInbox>;
 
 type RegisteredTool = {
   name: string;
+  description: string;
   inputSchema: Record<string, unknown>;
   annotations: Record<string, unknown>;
   execute: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
@@ -60,7 +61,7 @@ afterEach(() => {
   setModelContext();
 });
 
-test('registers only the remaining programmatic inbox tools on a detail page', () => {
+test('registers the imperative inbox tools on a detail page', () => {
   const registerTool = vi.fn().mockResolvedValue(undefined);
   setModelContext(registerTool);
 
@@ -71,12 +72,73 @@ test('registers only the remaining programmatic inbox tools on a detail page', (
   const names = registerTool.mock.calls.map((call) => (call[0] as RegisteredTool).name);
   const signals = registerTool.mock.calls.map((call) => call[1].signal as AbortSignal);
 
-  expect(names).toEqual(['add_request_inbox_callback', 'get_request_inbox_requests']);
-  expect(names).not.toContain('update_request_inbox');
+  expect(names).toEqual(['update_request_inbox', 'add_request_inbox_callback', 'get_request_inbox_requests']);
   expect(signals.every((signal) => !signal.aborted)).toBe(true);
 
   unmount();
   expect(signals.every((signal) => signal.aborted)).toBe(true);
+});
+
+test('updates every supported inbox field and describes the complete edit surface', async () => {
+  const registerTool = vi.fn().mockResolvedValue(undefined);
+  setModelContext(registerTool);
+  const current = anInbox();
+  const response = {
+    Code: 201,
+    CodeTemplate: '{{ if .Request.Body }}201{{ else }}204{{ end }}',
+    Body: '{{ .Request.Body }}',
+    Headers: { 'content-type': 'application/json' },
+    IsDynamic: true,
+  };
+  const updatedInbox = anInbox({ Name: 'Webhook', IsPrivate: true, Response: response });
+  const onInboxUpdated = vi.fn();
+  window.addEventListener(INBOX_UPDATED_EVENT, onInboxUpdated);
+  mockGetInbox.mockResolvedValue(current);
+  mockUpdateInbox.mockResolvedValue(updatedInbox);
+
+  renderTools('/inbox/inbox-1');
+  const tool = registerTool.mock.calls
+    .map((call) => call[0] as RegisteredTool)
+    .find((candidate) => candidate.name === 'update_request_inbox')!;
+  const result = await tool.execute({
+    name: ' Webhook ',
+    isPrivate: true,
+    response: {
+      code: response.Code,
+      codeTemplate: response.CodeTemplate,
+      body: response.Body,
+      headers: response.Headers,
+      isDynamic: response.IsDynamic,
+    },
+  });
+
+  expect(tool.description).toContain('display name');
+  expect(tool.description).toContain('visibility');
+  expect(tool.description).toContain('status code');
+  expect(tool.description).toContain('status-code template');
+  expect(tool.description).toContain('body');
+  expect(tool.description).toContain('header map');
+  expect(tool.description).toContain('Go-template rendering');
+  expect(mockUpdateInbox).toHaveBeenCalledWith({
+    ...current,
+    Name: 'Webhook',
+    IsPrivate: true,
+    Response: response,
+  });
+  expect(result).toEqual({
+    inboxId: 'inbox-1',
+    name: 'Webhook',
+    isPrivate: true,
+    response: {
+      code: response.Code,
+      codeTemplate: response.CodeTemplate,
+      body: response.Body,
+      headers: response.Headers,
+      isDynamic: true,
+    },
+  });
+  expect(onInboxUpdated).toHaveBeenCalledOnce();
+  window.removeEventListener(INBOX_UPDATED_EVENT, onInboxUpdated);
 });
 
 test('adds a pass-forward callback from the documented dynamic template', async () => {
