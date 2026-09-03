@@ -38,6 +38,7 @@ const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = (
             <Tooltip title={tooltipTitle}>
                 {label ? (
                     <Button
+                        type="button"
                         size="small"
                         startIcon={<ContentCopyIcon fontSize="small" />}
                         onClick={handleCopyToClipboard}
@@ -45,7 +46,7 @@ const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = (
                         {label}
                     </Button>
                 ) : (
-                    <IconButton onClick={handleCopyToClipboard}>
+                    <IconButton type="button" onClick={handleCopyToClipboard}>
                         <ContentCopyIcon />
                     </IconButton>
                 )}

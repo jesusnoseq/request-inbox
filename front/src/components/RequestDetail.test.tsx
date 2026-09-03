@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type MockedFunction, vi } from 'vitest';
 
@@ -59,8 +59,58 @@ const callbackBox = (position: number) => screen.getByRole('group', { name: `Cal
 const retryButtonOf = (position: number) =>
   within(callbackBox(position)).getByRole('button', { name: /retry/i });
 
+const invokeTool = (form: HTMLElement) => {
+  let response: Promise<unknown> | undefined;
+  const submitEvent = new Event('submit', { bubbles: true, cancelable: true }) as SubmitEvent;
+  Object.defineProperties(submitEvent, {
+    agentInvoked: { value: true },
+    respondWith: { value: vi.fn((value: Promise<unknown>) => { response = value; }) },
+  });
+  fireEvent(form, submitEvent);
+  return response;
+};
+
 afterEach(() => {
   vi.clearAllMocks();
+});
+
+test('exposes copying the captured request as a declarative WebMCP tool', async () => {
+  const writeText = vi.fn().mockResolvedValue(undefined);
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText },
+  });
+  renderDetail();
+
+  const form = screen.getByRole('form', { name: 'Copy request 4 as cURL' });
+  expect(form).toHaveAttribute('toolname', 'copy_request_as_curl_3');
+  expect(form).toHaveAttribute('tooltitle', 'Copy Request 4 as cURL');
+  expect(form).toHaveAttribute('toolautosubmit');
+
+  const response = invokeTool(form);
+  await expect(response).resolves.toEqual({
+    requestId: 3,
+    curl: expect.stringContaining("curl -X POST 'http://localhost/inboxes/inbox-1/in/hook'"),
+  });
+  expect(writeText).toHaveBeenCalledWith(expect.stringContaining('curl -X POST'));
+});
+
+test('exposes callback retry as a declarative WebMCP tool', async () => {
+  const user = userEvent.setup();
+  const retried = aCallbackResponse({ Code: 202, Body: 'accepted' });
+  mockRetryCallback.mockResolvedValue(retried);
+  renderDetail();
+  await showCallbacks(user);
+
+  const form = screen.getByRole('form', { name: 'Retry callback 1 for request 4' });
+  expect(form).toHaveAttribute('toolname', 'retry_callback_3_0');
+  expect(form).toHaveAttribute('tooltitle', 'Retry Callback 1 for Request 4');
+  expect(form).toHaveAttribute('toolautosubmit');
+
+  const response = invokeTool(form);
+  await expect(response).resolves.toEqual({ requestId: 3, callbackIndex: 0, response: retried });
+  expect(mockRetryCallback).toHaveBeenCalledWith('inbox-1', 3, 0);
+  expect(await screen.findByText('accepted')).toBeInTheDocument();
 });
 
 test('retries the callback of a request and shows the new response', async () => {

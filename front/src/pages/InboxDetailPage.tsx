@@ -17,6 +17,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import SignUpButton from '../components/SignUpButton';
 import { useUser } from '../context/UserContext';
+import { INBOX_UPDATED_EVENT } from '../utils/inboxEvents';
 
 const InboxDetailPage: React.FC = () => {
     const { inboxId } = useParams<'inboxId'>();
@@ -47,6 +48,19 @@ const InboxDetailPage: React.FC = () => {
             }
         };
         fetchInboxDetail();
+    }, [inboxId]);
+
+
+    useEffect(() => {
+        const handleInboxUpdated = (event: Event) => {
+            const updatedInbox = (event as CustomEvent<Inbox>).detail;
+            if (updatedInbox.ID === inboxId) {
+                setInbox(updatedInbox);
+            }
+        };
+
+        window.addEventListener(INBOX_UPDATED_EVENT, handleInboxUpdated);
+        return () => window.removeEventListener(INBOX_UPDATED_EVENT, handleInboxUpdated);
     }, [inboxId]);
 
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Inbox, InboxResponse, InboxCallback } from '../types/inbox';
 import { Typography, Paper, Box, Alert, Snackbar } from '@mui/material';
 import dayjs from 'dayjs';
@@ -23,6 +23,10 @@ const InboxDetail: React.FC<InboxDetailProps> = (props) => {
     const [inbox, setInbox] = useState<Inbox>(props.inbox);
     const [error, setError] = useState<string | null>(null);
     const inboxURL = buildInboxURL(props.inbox.ID);
+
+    useEffect(() => {
+        setInbox(props.inbox);
+    }, [props.inbox]);
 
     const handleSaveInboxName = async (name: string) => {
         try {

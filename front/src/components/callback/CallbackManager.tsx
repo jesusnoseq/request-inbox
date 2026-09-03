@@ -51,6 +51,16 @@ const CallbackManager: React.FC<CallbackManagerProps> = ({
         setDeleteDialogOpen(true);
     };
 
+    const handleUpdateCallback = async (index: number, callback: InboxCallback) => {
+        const newCallbacks = [...callbacks];
+        newCallbacks[index] = callback;
+        await onCallbacksChange(newCallbacks);
+    };
+
+    const handleDeleteCallbackImmediately = async (index: number) => {
+        await onCallbacksChange(callbacks.filter((_, i) => i !== index));
+    };
+
     const confirmDelete = async () => {
         if (deleteIndex !== null) {
             const newCallbacks = callbacks.filter((_, i) => i !== deleteIndex);
@@ -119,6 +129,8 @@ const CallbackManager: React.FC<CallbackManagerProps> = ({
                         callbacks={callbacks}
                         onEdit={handleEditCallback}
                         onDelete={handleDeleteCallback}
+                        onUpdate={handleUpdateCallback}
+                        onDeleteImmediately={handleDeleteCallbackImmediately}
                         onToggleEnabled={handleToggleEnabled}
                         readonly={readonly}
                     />

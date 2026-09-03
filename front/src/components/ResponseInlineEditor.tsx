@@ -21,7 +21,7 @@ import { monoFontFamily } from '../theme';
 
 type ResponseInlineEditorProps = {
     response: InboxResponse;
-    onSave: (resp: InboxResponse) => void;
+    onSave: (resp: InboxResponse) => void | Promise<void>;
     readonly: boolean
 };
 
@@ -71,16 +71,50 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
         setEditMode(true);
     };
 
-    const handleSave = () => {
+    const saveResponse = (resp: InboxResponse) => {
+        setStatusCode(resp.Code);
+        setStatusCodeInput(resp.Code.toString());
+        setStatusCodeTemplate(resp.CodeTemplate);
+        setHeaders(convertRecordToHeaders(resp.Headers));
+        setBody(resp.Body);
+        setIsDynamic(resp.IsDynamic);
         setEditMode(false);
-        const resp: InboxResponse = {
-            Body: body,
-            Code: statusCode,
-            CodeTemplate: statusCodeTemplate,
-            Headers: convertHeadersToRecord(headers),
-            IsDynamic: isDynamic
+        return Promise.resolve().then(() => onSave(resp)).then(() => ({
+            code: resp.Code,
+            codeTemplate: resp.CodeTemplate,
+            body: resp.Body,
+            headers: resp.Headers,
+            isDynamic: resp.IsDynamic,
+        }));
+    };
+
+    const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const formData = new FormData(form);
+        const update = Promise.resolve().then(() => {
+            const headersValue = String(formData.get('headers') ?? '{}');
+            const parsedHeaders: unknown = JSON.parse(headersValue);
+            if (!parsedHeaders || Array.isArray(parsedHeaders) || typeof parsedHeaders !== 'object'
+                || Object.values(parsedHeaders).some((value) => typeof value !== 'string')) {
+                throw new Error('headers must be a JSON object with string values.');
+            }
+
+            return saveResponse({
+                Body: String(formData.get('body') ?? ''),
+                Code: Number(formData.get('code')),
+                CodeTemplate: String(formData.get('codeTemplate') ?? ''),
+                Headers: parsedHeaders as Record<string, string>,
+                IsDynamic: (form.elements.namedItem('isDynamic') as HTMLInputElement).checked,
+            });
+        });
+        const submitEvent = event.nativeEvent as SubmitEvent;
+
+        if (submitEvent.agentInvoked && submitEvent.respondWith) {
+            submitEvent.respondWith(update);
+        } else {
+            void update.catch(() => undefined);
         }
-        onSave(resp);
     };
 
     const handleCancel = () => {
@@ -241,9 +275,57 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                     </Collapse>
                 </Box >
             }
-            {
-                editMode &&
-                <Box sx={{ mb: 2 }}>
+            {!readonly && <form
+                aria-label="Update request inbox response"
+                toolname="update_request_inbox"
+                tooltitle="Update Request Inbox Response"
+                tooldescription="Use this form when the user asks to change the HTTP response returned by the open request inbox. It persists the status code, body, complete header map, and dynamic-template mode."
+                toolautosubmit=""
+                onSubmit={handleSave}
+                style={{ display: editMode ? 'block' : 'none', marginBottom: '16px' }}
+            >
+                <input
+                    hidden
+                    name="code"
+                    type="number"
+                    min="100"
+                    max="999"
+                    value={statusCode}
+                    readOnly
+                    required
+                    toolparamdescription="Static HTTP status code from 100 through 999."
+                />
+                <textarea
+                    hidden
+                    name="codeTemplate"
+                    value={statusCodeTemplate}
+                    readOnly
+                    toolparamdescription="Optional Go template that renders an HTTP status code in dynamic mode."
+                />
+                <textarea
+                    hidden
+                    name="headers"
+                    value={JSON.stringify(convertHeadersToRecord(headers))}
+                    readOnly
+                    required
+                    toolparamdescription="Complete response headers as a JSON object whose values are strings."
+                />
+                <textarea
+                    hidden
+                    name="body"
+                    value={body}
+                    readOnly
+                    toolparamdescription="Complete HTTP response body. In dynamic mode it is rendered as a Go template."
+                />
+                <input
+                    hidden
+                    name="isDynamic"
+                    type="checkbox"
+                    checked={isDynamic}
+                    readOnly
+                    toolparamdescription="Whether body, headers, and the optional code template are rendered as Go templates."
+                />
+                <Box>
                     <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
                         <Typography variant="h6">
                             Manage Response
@@ -361,7 +443,10 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                             </Box>
                             <FormGroup row sx={{ mt: 1 }}>
                                 <FormControlLabel
-                                    control={<Switch checked={isDynamic} onChange={handleIsDynamicToggle} />}
+                                    control={<Switch
+                                        checked={isDynamic}
+                                        onChange={handleIsDynamicToggle}
+                                    />}
                                     label="Dynamic response"
                                 />
                                 <Tooltip
@@ -381,21 +466,22 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                     <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
                             onClick={handleCancel}
+                            type="button"
                             variant="outlined"
                             sx={{ mr: 1 }}
                         >
                             Cancel
                         </Button>
                         <Button
-                            onClick={handleSave}
+                            type="submit"
                             variant="contained"
                             disabled={errors}
                         >
                             Save
                         </Button>
                     </Box>
-                </Box >
-            }
+                </Box>
+            </form>}
         </>
     );
 };

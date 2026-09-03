@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type {} from '@mcp-b/react-webmcp';
 import {
     Alert,
     AlertColor,
@@ -51,8 +52,9 @@ const retryOutcome = (retry: CallbackRetry): { severity: AlertColor, message: st
 type CallbackResponseViewProps = {
     callbackResponse: CallbackResponse;
     index: number;
+    requestId: number;
     /** Sends the callback again. Omitted when the callback can not be retried. */
-    onRetry?: () => void;
+    onRetry?: () => Promise<CallbackResponse>;
     isRetrying?: boolean;
     /** Set once this callback has been retried, so the shown response is not the captured one. */
     retry?: CallbackRetry;
@@ -64,6 +66,7 @@ type CallbackResponseViewProps = {
 const CallbackResponseView: React.FC<CallbackResponseViewProps> = ({
     callbackResponse,
     index,
+    requestId,
     onRetry,
     isRetrying = false,
     retry,
@@ -79,6 +82,24 @@ const CallbackResponseView: React.FC<CallbackResponseViewProps> = ({
     const hasHeaders = callbackResponse.Headers && Object.keys(callbackResponse.Headers).length > 0;
     const outcome = retry && retryOutcome(retry);
 
+    const handleRetrySubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (!onRetry) return;
+
+        const submitEvent = event.nativeEvent as SubmitEvent;
+        const retryRequest = onRetry().then((response) => ({
+            requestId,
+            callbackIndex: index,
+            response,
+        }));
+
+        if (submitEvent.agentInvoked && submitEvent.respondWith) {
+            submitEvent.respondWith(retryRequest);
+        } else {
+            void retryRequest.catch(() => undefined);
+        }
+    };
+
     return (
         <Card
             variant="outlined"
@@ -92,21 +113,31 @@ const CallbackResponseView: React.FC<CallbackResponseViewProps> = ({
                         Callback {index + 1}
                     </Typography>
                     {onRetry && (
-                        <Tooltip title="Send this callback again using the captured request">
-                            <span>
-                                <Button
-                                    size="small"
-                                    startIcon={isRetrying
-                                        ? <CircularProgress size={14} color="inherit" />
-                                        : <ReplayIcon fontSize="small" />}
-                                    onClick={onRetry}
-                                    disabled={isRetrying}
-                                    sx={{ textTransform: 'none', flexShrink: 0 }}
-                                >
-                                    {isRetrying ? 'Retrying…' : 'Retry'}
-                                </Button>
-                            </span>
-                        </Tooltip>
+                        <form
+                            aria-label={`Retry callback ${index + 1} for request ${requestId + 1}`}
+                            toolname={`retry_callback_${requestId}_${index}`}
+                            tooltitle={`Retry Callback ${index + 1} for Request ${requestId + 1}`}
+                            tooldescription={`Send callback ${index + 1} for captured request ${requestId + 1} again and return the new response.`}
+                            toolautosubmit=""
+                            onSubmit={handleRetrySubmit}
+                            style={{ display: 'contents' }}
+                        >
+                            <Tooltip title="Send this callback again using the captured request">
+                                <span>
+                                    <Button
+                                        type="submit"
+                                        size="small"
+                                        startIcon={isRetrying
+                                            ? <CircularProgress size={14} color="inherit" />
+                                            : <ReplayIcon fontSize="small" />}
+                                        disabled={isRetrying}
+                                        sx={{ textTransform: 'none', flexShrink: 0 }}
+                                    >
+                                        {isRetrying ? 'Retrying…' : 'Retry'}
+                                    </Button>
+                                </span>
+                            </Tooltip>
+                        </form>
                     )}
                 </Box>
 

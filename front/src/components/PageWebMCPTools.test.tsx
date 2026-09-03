@@ -4,6 +4,7 @@ import { type Mock, type MockedFunction, vi } from 'vitest';
 
 import { getInbox, updateInbox } from '../services/inbox';
 import { type Inbox } from '../types/inbox';
+import { INBOX_UPDATED_EVENT } from '../utils/inboxEvents';
 import PageWebMCPTools from './PageWebMCPTools';
 
 vi.mock('../services/inbox', () => ({
@@ -59,7 +60,7 @@ afterEach(() => {
   setModelContext();
 });
 
-test('registers the update tool only on an inbox detail page and unregisters it on unmount', () => {
+test('registers only the remaining programmatic inbox tools on a detail page', () => {
   const registerTool = vi.fn().mockResolvedValue(undefined);
   setModelContext(registerTool);
 
@@ -67,109 +68,15 @@ test('registers the update tool only on an inbox detail page and unregisters it 
   expect(registerTool).not.toHaveBeenCalled();
 
   const { unmount } = renderTools('/inbox/inbox-1');
-  const tool = registerTool.mock.calls[0][0] as RegisteredTool;
-  const signal = registerTool.mock.calls[0][1].signal as AbortSignal;
+  const names = registerTool.mock.calls.map((call) => (call[0] as RegisteredTool).name);
+  const signals = registerTool.mock.calls.map((call) => call[1].signal as AbortSignal);
 
-  expect(tool).toMatchObject({
-    name: 'update_request_inbox',
-    inputSchema: {
-      minProperties: 1,
-      properties: {
-        response: {
-          required: ['isDynamic'],
-          properties: {
-            code: { minimum: 100, maximum: 999 },
-            codeTemplate: { type: 'string' },
-            isDynamic: { type: 'boolean' },
-          },
-        },
-      },
-    },
-    annotations: { readOnlyHint: false, untrustedContentHint: true },
-  });
-  expect(signal.aborted).toBe(false);
+  expect(names).toEqual(['add_request_inbox_callback', 'get_request_inbox_requests']);
+  expect(names).not.toContain('update_request_inbox');
+  expect(signals.every((signal) => !signal.aborted)).toBe(true);
 
   unmount();
-  expect(signal.aborted).toBe(true);
-});
-
-test('merges a dynamic response patch without dropping inbox or response fields', async () => {
-  const registerTool = vi.fn().mockResolvedValue(undefined);
-  setModelContext(registerTool);
-  const current = anInbox();
-  const saved = anInbox({
-    Name: 'Webhook test',
-    Response: {
-      Code: 202,
-      CodeTemplate: '{{ if eq .Request.Method "POST" }}201{{ else }}202{{ end }}',
-      Body: '{"method":"{{ .Request.Method }}"}',
-      Headers: current.Response.Headers,
-      IsDynamic: true,
-    },
-  });
-  mockGetInbox.mockResolvedValue(current);
-  mockUpdateInbox.mockResolvedValue(saved);
-
-  renderTools('/inbox/inbox-1');
-  const tool = registerTool.mock.calls[0][0] as RegisteredTool;
-  const result = await tool.execute({
-    name: ' Webhook test ',
-    response: {
-      code: 202,
-      codeTemplate: '{{ if eq .Request.Method "POST" }}201{{ else }}202{{ end }}',
-      body: '{"method":"{{ .Request.Method }}"}',
-      isDynamic: true,
-    },
-  });
-
-  expect(mockGetInbox).toHaveBeenCalledWith('inbox-1');
-  expect(mockUpdateInbox).toHaveBeenCalledWith({
-    ...current,
-    Name: 'Webhook test',
-    Response: {
-      ...current.Response,
-      Code: 202,
-      CodeTemplate: '{{ if eq .Request.Method "POST" }}201{{ else }}202{{ end }}',
-      Body: '{"method":"{{ .Request.Method }}"}',
-      IsDynamic: true,
-    },
-  });
-  expect(result).toEqual({
-    inboxId: 'inbox-1',
-    name: 'Webhook test',
-    isPrivate: false,
-    response: {
-      code: 202,
-      codeTemplate: '{{ if eq .Request.Method "POST" }}201{{ else }}202{{ end }}',
-      body: '{"method":"{{ .Request.Method }}"}',
-      headers: { 'content-type': 'text/plain' },
-      isDynamic: true,
-    },
-  });
-});
-
-test('rejects an empty update before reading the inbox', async () => {
-  const registerTool = vi.fn().mockResolvedValue(undefined);
-  setModelContext(registerTool);
-  renderTools('/inbox/inbox-1');
-  const tool = registerTool.mock.calls[0][0] as RegisteredTool;
-
-  await expect(tool.execute({})).rejects.toThrow('Provide at least one inbox field');
-  expect(mockGetInbox).not.toHaveBeenCalled();
-  expect(mockUpdateInbox).not.toHaveBeenCalled();
-});
-
-test('requires an explicit dynamic-mode choice for every response update', async () => {
-  const registerTool = vi.fn().mockResolvedValue(undefined);
-  setModelContext(registerTool);
-  renderTools('/inbox/inbox-1');
-  const tool = registerTool.mock.calls[0][0] as RegisteredTool;
-
-  await expect(tool.execute({ response: { body: '{{ .Request.Body }}' } })).rejects.toThrow(
-    'response.isDynamic is required'
-  );
-  expect(mockGetInbox).not.toHaveBeenCalled();
-  expect(mockUpdateInbox).not.toHaveBeenCalled();
+  expect(signals.every((signal) => signal.aborted)).toBe(true);
 });
 
 test('adds a pass-forward callback from the documented dynamic template', async () => {
@@ -185,8 +92,11 @@ test('adds a pass-forward callback from the documented dynamic template', async 
     Body: '{{.Request.Body}}',
     IsForwardingHeaders: true,
   };
+  const updatedInbox = anInbox({ Callbacks: [callback] });
+  const onInboxUpdated = vi.fn();
+  window.addEventListener(INBOX_UPDATED_EVENT, onInboxUpdated);
   mockGetInbox.mockResolvedValue(current);
-  mockUpdateInbox.mockResolvedValue(anInbox({ Callbacks: [callback] }));
+  mockUpdateInbox.mockResolvedValue(updatedInbox);
 
   renderTools('/inbox/inbox-1');
   const tool = registerTool.mock.calls
@@ -198,6 +108,8 @@ test('adds a pass-forward callback from the documented dynamic template', async 
   });
 
   expect(mockUpdateInbox).toHaveBeenCalledWith({ ...current, Callbacks: [callback] });
+  expect(onInboxUpdated).toHaveBeenCalledOnce();
+  expect((onInboxUpdated.mock.calls[0][0] as CustomEvent<Inbox>).detail).toEqual(updatedInbox);
   expect(result).toEqual({
     inboxId: 'inbox-1',
     callbackIndex: 0,
@@ -213,6 +125,7 @@ test('adds a pass-forward callback from the documented dynamic template', async 
       forwardHeaders: true,
     },
   });
+  window.removeEventListener(INBOX_UPDATED_EVENT, onInboxUpdated);
 });
 
 test('lets custom fields override callback template defaults', async () => {

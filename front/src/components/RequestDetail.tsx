@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type {} from '@mcp-b/react-webmcp';
 import { CallbackResponse, InboxRequest } from '../types/inbox';
 import {
     Typography,
@@ -64,9 +65,11 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request, inboxId }) => {
                     attempts: (previous[index]?.attempts ?? 0) + 1,
                 },
             }));
+            return response;
         } catch (err) {
             const reason = err instanceof Error ? err.message : 'Failed to retry callback';
             setRetryErrors((previous) => ({ ...previous, [index]: reason }));
+            throw err;
         } finally {
             setRetryingIndex(null);
         }
@@ -89,6 +92,21 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request, inboxId }) => {
     const [URIDefaulPath, URICustomPath] = splitPath(request.URI)
 
     const curlCommand = buildCurlCommand(request);
+
+    const handleCopyCurlToolSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const submitEvent = event.nativeEvent as SubmitEvent;
+        const copy = navigator.clipboard.writeText(curlCommand).then(() => ({
+            requestId: request.ID,
+            curl: curlCommand,
+        }));
+
+        if (submitEvent.agentInvoked && submitEvent.respondWith) {
+            submitEvent.respondWith(copy);
+        } else {
+            void copy.catch(() => undefined);
+        }
+    };
 
     return (
         <Card variant="outlined" sx={{ marginBottom: 2 }}>
@@ -115,12 +133,22 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request, inboxId }) => {
                         <Typography>Show headers</Typography>
                         {headersOpen ? <ExpandLess /> : <ExpandMore />}
                     </Button>
-                    <CopyToClipboardButton
-                        textToCopy={curlCommand}
-                        label="Copy cURL"
-                        tooltipTitle="Copy this request as a cURL command"
-                        copyEventMessage="cURL command copied to clipboard"
-                    />
+                    <form
+                        aria-label={`Copy request ${request.ID + 1} as cURL`}
+                        toolname={`copy_request_as_curl_${request.ID}`}
+                        tooltitle={`Copy Request ${request.ID + 1} as cURL`}
+                        tooldescription={`Copy captured request ${request.ID + 1} to the clipboard as a cURL command and return the command.`}
+                        toolautosubmit=""
+                        onSubmit={handleCopyCurlToolSubmit}
+                        style={{ display: 'contents' }}
+                    >
+                        <CopyToClipboardButton
+                            textToCopy={curlCommand}
+                            label="Copy cURL"
+                            tooltipTitle="Copy this request as a cURL command"
+                            copyEventMessage="cURL command copied to clipboard"
+                        />
+                    </form>
                 </Box>
 
                 <Collapse in={headersOpen} timeout="auto" unmountOnExit>
@@ -175,6 +203,7 @@ const RequestDetail: React.FC<RequestDetailProps> = ({ request, inboxId }) => {
                                         key={index}
                                         callbackResponse={callbackResponse}
                                         index={index}
+                                        requestId={request.ID}
                                         onRetry={() => handleRetryCallback(index)}
                                         isRetrying={retryingIndex === index}
                                         retry={retries[index]}
