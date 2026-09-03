@@ -179,13 +179,51 @@ Configure an MCP client with the endpoint URL above. To access inboxes owned by 
 
 The server provides these tools:
 
-- `create_request_inbox`
-- `edit_request_inbox`
-- `list_request_inboxes`
-- `add_request_inbox_callback`
-- `delete_request_inbox`
-- `clear_request_inbox_requests`
-- `list_request_inbox_requests`
+- `create_request_inbox` - Create an inbox.
+- `edit_request_inbox` - Replace an inbox configuration.
+- `list_request_inboxes` - List accessible inboxes.
+- `add_request_inbox_callback` - Add a callback to an inbox.
+- `delete_request_inbox` - Delete an inbox.
+- `clear_request_inbox_requests` - Remove all captured requests from an inbox.
+- `list_request_inbox_requests` - List captured requests.
+
+### Browser WebMCP
+
+The frontend also exposes contextual [WebMCP](https://webmachinelearning.github.io/webmcp/) tools to compatible browser agents. Unlike the backend MCP server, these tools operate in the active browser session, use the current page and authenticated user, and can navigate or update the visible application.
+
+WebMCP support uses both APIs:
+
+- **Imperative tools** are registered from React with `navigator.modelContext.registerTool()`.
+- **Declarative tools** are customized HTML forms marked with `toolname`, `tooltitle`, `tooldescription`, `toolautosubmit`, and `toolparamdescription`. Agent submissions return their asynchronous result through `SubmitEvent.respondWith()`.
+
+#### Imperative WebMCP Tools
+
+| Tool | Availability | Purpose and inputs |
+| --- | --- | --- |
+| `create_request_inbox` | All pages except where the declarative create form is active | Creates an inbox. It has no inputs. |
+| `open_request_inbox` | All pages | Opens an inbox after validating `inboxId`. |
+| `list_request_inboxes` | Signed-in users | Lists the user's inboxes. It has no inputs. |
+| `search_request_inboxes` | Signed-in users | Searches inbox names and IDs using `query`. |
+| `inspect_request_inbox` | Signed-in users | Returns up to 20 recent requests using `inboxId` and optional `requestLimit`. |
+| `open_api_documentation` | All pages | Opens the interactive API documentation. It has no inputs. |
+| `open_user_documentation` | All pages | Opens the user documentation. It has no inputs. |
+| `add_request_inbox_callback` | Open inbox page | Adds a custom or preset callback using `destinationUrl`, optional `template`, `method`, `headers`, `body`, `isEnabled`, `isDynamic`, and `forwardHeaders`. |
+| `get_request_inbox_requests` | Open inbox page | Reads captured requests using optional `requestLimit` and `afterRequestId` cursor values. |
+
+The imperative `add_request_inbox_callback` tool intentionally remains registered. Callback editing and deletion use the declarative forms below.
+
+#### Declarative WebMCP Forms
+
+| Form tool | Availability | Customized form behavior |
+| --- | --- | --- |
+| `create_request_inbox` | Landing/home create button | Creates an inbox with no parameters and navigates to it. It replaces the imperative tool on pages where this form is active, avoiding duplicate tool names. |
+| `update_request_inbox` | Editable open inbox | Replaces the inbox response using `code`, `codeTemplate`, `headers` as JSON, `body`, and `isDynamic`. The form remains discoverable while its visual editor is closed. |
+| `update_request_inbox_callback_<index>` | Each callback in an editable open inbox | Replaces the complete callback at the zero-based `<index>` using `toURL`, `method`, `headers` as JSON, `body`, `isEnabled`, `isDynamic`, and `isForwardingHeaders`. The normal edit button still opens the visual editor. |
+| `delete_request_inbox_callback_<index>` | Each callback in an editable open inbox | Deletes the callback at the zero-based `<index>`. Agent invocation submits immediately; the normal delete button still asks the user for confirmation. |
+| `copy_request_as_curl_<requestId>` | Each captured request | Copies that request as a cURL command and returns the generated command. `<requestId>` is the request's stored zero-based ID. |
+| `retry_callback_<requestId>_<index>` | Each callback response that can be retried | Sends callback `<index>` for the captured request again and returns the new response. Both dynamic suffixes are zero-based. |
+
+Inbox response and callback mutation forms are omitted for read-only inboxes. Form values are initialized from the current UI state, validated before persistence, and the open inbox state is refreshed after callback changes so the page reflects an agent action without requiring a reload.
 
 ## 📄 Template Docs
 
