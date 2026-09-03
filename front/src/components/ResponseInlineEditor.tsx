@@ -117,6 +117,17 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
         }
     };
 
+    const handleEditorSave = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        void saveResponse({
+            Body: body,
+            Code: statusCode,
+            CodeTemplate: statusCodeTemplate,
+            Headers: convertHeadersToRecord(headers),
+            IsDynamic: isDynamic,
+        }).catch(() => undefined);
+    };
+
     const handleCancel = () => {
         setStatusCode(response.Code);
         setStatusCodeInput(response.Code.toString());
@@ -282,7 +293,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                 tooldescription="Use this form when the user asks to change the HTTP response returned by the open request inbox. It persists the status code, body, complete header map, and dynamic-template mode."
                 toolautosubmit=""
                 onSubmit={handleSave}
-                style={{ display: editMode ? 'block' : 'none', marginBottom: '16px' }}
+                style={{ display: 'none' }}
             >
                 <input
                     hidden
@@ -325,6 +336,12 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
                     readOnly
                     toolparamdescription="Whether body, headers, and the optional code template are rendered as Go templates."
                 />
+            </form>}
+            {!readonly && editMode && <form
+                aria-label="Edit request inbox response"
+                onSubmit={handleEditorSave}
+                style={{ display: 'block', marginBottom: '16px' }}
+            >
                 <Box>
                     <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
                         <Typography variant="h6">

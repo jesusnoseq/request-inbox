@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import type {
   InferArgsFromInputSchema,
   InferJsonSchema,
@@ -40,7 +40,9 @@ const useWebMCPTool = <TInputSchema extends InputSchema, TOutputSchema extends I
   const toolRef = useRef(tool);
   toolRef.current = tool;
 
-  useEffect(() => {
+  // Tear down registrations before React mutates the DOM. This prevents a
+  // declarative form replacing a route-scoped tool from briefly duplicating it.
+  useLayoutEffect(() => {
     if (!enabled) {
       return;
     }

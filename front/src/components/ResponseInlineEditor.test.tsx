@@ -49,6 +49,9 @@ test('exposes response editing as a declarative WebMCP form while visually close
   expect(form.querySelector('[name="isDynamic"]')).toHaveAttribute('toolparamdescription');
   expect(form.elements.namedItem('codeTemplate')).toHaveValue('200');
   expect(form).toHaveStyle({ display: 'none' });
+  expect(Array.from(form.querySelectorAll('input, textarea, select')).every(
+    (control) => Boolean(control.getAttribute('name'))
+  )).toBe(true);
 });
 
 test('saves and returns values supplied by an agent invocation', async () => {
