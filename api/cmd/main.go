@@ -22,6 +22,7 @@ import (
 	"github.com/jesusnoseq/request-inbox/pkg/instrumentation"
 	"github.com/jesusnoseq/request-inbox/pkg/login"
 	"github.com/jesusnoseq/request-inbox/pkg/login/provider"
+	"github.com/jesusnoseq/request-inbox/pkg/mcpserver"
 	"github.com/jesusnoseq/request-inbox/pkg/route"
 )
 
@@ -133,6 +134,7 @@ func getRouter() (*gin.Engine, func()) {
 
 	ih := handler.NewInboxHandler(dao, eventTracker)
 	route.SetInboxRoutes(r, ih)
+	route.SetMCPRoute(r, mcpserver.New(dao, eventTracker))
 
 	akh := apikey.NewAPIKeyHandler(dao)
 	route.SetAPIKeyRoutes(r, akh)

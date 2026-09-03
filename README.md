@@ -168,6 +168,25 @@ Our REST API is documented using OpenAPI 3.1 specification:
 - **Production**: `https://api.request-inbox.com/api/v1`
 - **Local Development**: `http://localhost:8080/api/v1`
 
+### MCP Server
+
+The backend exposes a stateless Streamable HTTP MCP server alongside the REST API:
+
+- **Production**: `https://api.request-inbox.com/mcp`
+- **Local Development**: `http://localhost:8080/mcp`
+
+Configure an MCP client with the endpoint URL above. To access inboxes owned by your account, send an existing Request Inbox API key in the `X-API-KEY` header. Without that header, MCP tools follow the same anonymous and public-inbox rules as the REST API.
+
+The server provides these tools:
+
+- `create_request_inbox`
+- `edit_request_inbox`
+- `list_request_inboxes`
+- `add_request_inbox_callback`
+- `delete_request_inbox`
+- `clear_request_inbox_requests`
+- `list_request_inbox_requests`
+
 ## 📄 Template Docs
 
 Responses can work as golang templates is the response is mark as dynamic.
