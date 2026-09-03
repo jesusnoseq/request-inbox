@@ -62,7 +62,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
     const [isDynamic, setIsDynamic] = useState<boolean>(response.IsDynamic);
     const [statusCode, setStatusCode] = useState<number>(response.Code);
     const [statusCodeInput, setStatusCodeInput] = useState<string>(response.Code.toString());
-    const [statusCodeTemplate, setStatusCodeTemplate] = useState<string>(response.CodeTemplate);
+    const [statusCodeTemplate, setStatusCodeTemplate] = useState<string>(response.CodeTemplate || response.Code.toString());
     const [statusCodeError, setStatusCodeError] = useState<boolean>(false);
     const [errors, setErrors] = useState<boolean>(false);
     const navigate = useNavigate();
@@ -120,7 +120,7 @@ const ResponseInlineEditor: React.FC<ResponseInlineEditorProps> = ({ response, o
     const handleCancel = () => {
         setStatusCode(response.Code);
         setStatusCodeInput(response.Code.toString());
-        setStatusCodeTemplate(response.CodeTemplate);
+        setStatusCodeTemplate(response.CodeTemplate || response.Code.toString());
         setHeaders(convertRecordToHeaders(response.Headers))
         setBody(response.Body);
         setIsDynamic(response.IsDynamic);

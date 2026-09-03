@@ -47,6 +47,7 @@ test('exposes response editing as a declarative WebMCP form while visually close
   expect(form.querySelector('[name="headers"]')).toHaveAttribute('toolparamdescription');
   expect(form.querySelector('[name="body"]')).toHaveAttribute('toolparamdescription');
   expect(form.querySelector('[name="isDynamic"]')).toHaveAttribute('toolparamdescription');
+  expect(form.elements.namedItem('codeTemplate')).toHaveValue('200');
   expect(form).toHaveStyle({ display: 'none' });
 });
 
