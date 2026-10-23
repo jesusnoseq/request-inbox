@@ -25,15 +25,20 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.DEPLOY_MODULE_GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.1
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: "22.x"
+          cache: pnpm
+          cache-dependency-path: front/pnpm-lock.yaml
       - name: Install front dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
         working-directory: ./front
       - name: Build front
-        run: npm run build
+        run: pnpm build
         working-directory: ./front
       - name: Set up Go
         uses: actions/setup-go@v4

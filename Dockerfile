@@ -8,8 +8,8 @@ ARG API_HTTP_PORT=8080
 WORKDIR /app/front
 
 # Copy frontend package files and install dependencies
-COPY front/package*.json ./
-RUN npm install
+COPY front/package.json front/pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile
 
 # Copy frontend source and build
 COPY docs/* ../docs/
@@ -19,10 +19,10 @@ COPY front/ ./
 # Use /api for production to go through nginx proxy (avoids CORS issues)
 RUN echo "REACT_APP_REQUEST_INBOX_API_URL=/api" > .env.production
 
-RUN npm run build
+RUN pnpm build
 
 # Stage 2: Build Backend
-FROM golang:1.26.6-alpine AS backend-builder
+FROM golang:1.26.10-alpine AS backend-builder
 
 RUN apk update && \
     apk add --no-cache --no-progress \

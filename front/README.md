@@ -6,21 +6,23 @@ The frontend is built with [Vite](https://vite.dev/).
 
 In the project directory, you can run:
 
-### `npm start`
+Install frontend dependencies with `pnpm install` (the project pins pnpm 9.15.1).
+
+### `pnpm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page reloads when source files change.
 
-### `npm test`
+### `pnpm test`
 
-Launches Vitest in watch mode. Use `npm test -- --run` for a single run.
+Launches Vitest in watch mode. Use `pnpm test -- --run` for a single run.
 
-### `npm run build`
+### `pnpm build`
 
 Type-checks the project and creates a production bundle in the `build` folder.
 
-### `npm run preview`
+### `pnpm preview`
 
 Serves the production build locally for verification.

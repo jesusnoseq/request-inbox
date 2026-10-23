@@ -4,10 +4,10 @@ FROM node:22
 
 WORKDIR /usr/src/app
 
-COPY front/package*.json .
-RUN npm install
+COPY front/package.json front/pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile
 COPY front .
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]

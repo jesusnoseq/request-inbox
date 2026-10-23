@@ -83,17 +83,17 @@ run-api-hot:	## Run API with hot reloading
 show-version:	## Shows API version
 	@echo $(VERSION)
 
-.PHONY: install-web
-install-web:	## Install web app dependencies
-	cd $(WEB_DIR) && npm install
+.PHONY: install-front
+install-front:	## Install frontend dependencies with pnpm
+	cd $(WEB_DIR) && pnpm install --frozen-lockfile
 
-.PHONY: run-web
-run-web:	## Run web app
-	cd $(WEB_DIR) && npm start
+.PHONY: run-front
+run-front:	## Launch frontend development server with pnpm
+	cd $(WEB_DIR) && pnpm start
 
 .PHONY: build-web
 build-web:	## Build web app
-	cd $(WEB_DIR) && npm run build
+	cd $(WEB_DIR) && pnpm build
 
 .PHONY: build-package
 build-package: build-web build-api-linux

@@ -15,24 +15,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.1
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
           node-version: "22.x"
-          cache: npm
-          cache-dependency-path: front/package-lock.json
+          cache: pnpm
+          cache-dependency-path: front/pnpm-lock.yaml
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
         working-directory: ./front
 
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
         working-directory: ./front
 
       - name: Test
-        run: npm test -- --run
+        run: pnpm test -- --run
         working-directory: ./front
 
       - name: Build
-        run: npm run build
+        run: pnpm build
         working-directory: ./front

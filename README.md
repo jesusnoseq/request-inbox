@@ -75,8 +75,8 @@ This will start:
 ### Prerequisites
 
 - Docker and Docker Compose (for containerized deployment)
-- Go 1.26.6+ (for local development)
-- Node.js 20+ (for local development)
+- Go 1.26.10+ (for local development)
+- Node.js 22+ and pnpm 9.15.1 (for local development)
 
 ### Local Development
 
@@ -91,9 +91,8 @@ make run-api-hot      # Start with hot reloading
 1. **Frontend setup:**
 
 ```bash
-cd front
-npm install           # Install dependencies
-npm start            # Start development server
+make install-front    # Install frontend dependencies with pnpm
+make launch-front     # Start frontend development server
 ```
 
 1. **View all available commands:**
