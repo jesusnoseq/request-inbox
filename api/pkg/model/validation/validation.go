@@ -92,24 +92,45 @@ func IsValidCallbackURL(urlStr string) (bool, error) {
 		return false, &ValidationError{message: "Callback URL is not a valid URL"}
 	}
 
+	err := ValidateCallbackURL(urlStr)
+	return err == nil, err
+}
+
+// ValidateCallbackURL validates a final URL without removing template expressions.
+// DNS answers are validated separately at connection time.
+func ValidateCallbackURL(urlStr string) error {
+	if !config.GetBool(config.EnableCallbackURLValidation) {
+		return nil
+	}
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
-		return false, &ValidationError{message: "Callback URL is not a valid URL"}
+		return &ValidationError{message: "Callback URL is not a valid URL"}
 	}
 
-	if parsedURL.Scheme == "" || parsedURL.Host == "" {
-		return false, &ValidationError{message: "Callback URL is not a valid URL"}
+	if parsedURL.Scheme == "" || parsedURL.Hostname() == "" || strings.ContainsAny(urlStr, "{}") {
+		return &ValidationError{message: "Callback URL is not a valid URL"}
 	}
 
 	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
-		return false, &ValidationError{message: "Callback URL must use HTTP or HTTPS scheme"}
+		return &ValidationError{message: "Callback URL must use HTTP or HTTPS scheme"}
+	}
+	if parsedURL.User != nil {
+		return &ValidationError{message: "Callback URL cannot contain credentials"}
+	}
+	if strings.Contains(parsedURL.Hostname(), "%") {
+		return &ValidationError{message: "Scoped callback IP addresses are not supported"}
 	}
 
 	if isSelfURL(parsedURL.Host) {
-		return false, &ValidationError{message: "Callback URL cannot point to the same service to prevent infinite loops"}
+		return &ValidationError{message: "Callback URL cannot point to the same service to prevent infinite loops"}
 	}
-
-	return true, nil
+	if err := ValidateCallbackHost(parsedURL.Hostname()); err != nil {
+		return err
+	}
+	if ip := net.ParseIP(parsedURL.Hostname()); ip != nil {
+		return ValidateCallbackIP(ip)
+	}
+	return nil
 }
 
 func isSelfURL(host string) bool {
@@ -136,20 +157,17 @@ func isSelfURL(host string) bool {
 		}
 	}
 
-	// Check for IPv6 localhost in expanded form before net.ParseIP
-	if hostWithoutPort == "0:0:0:0:0:0:0:1" || hostWithoutPort == "0000:0000:0000:0000:0000:0000:0000:0001" {
-		return true
-	}
-
 	// List of domain hosts that represent this service
 	serviceDomains := []string{
 		config.GetString(config.BackendApplicationDomain),
-		"localhost",
+	}
+	if !config.GetBool(config.CallbackAllowLoopbackIPs) {
+		serviceDomains = append(serviceDomains, "localhost")
 	}
 
 	// Check against known service domains
 	for _, domain := range serviceDomains {
-		if strings.EqualFold(hostWithoutPort, domain) {
+		if normalizeCallbackHost(hostWithoutPort) == normalizeCallbackHost(domain) {
 			return true
 		}
 	}
@@ -157,7 +175,7 @@ func isSelfURL(host string) bool {
 	// Parse as IP address and check if it's a loopback
 	if ip := net.ParseIP(hostWithoutPort); ip != nil {
 		// this is less expensive than checking strings
-		if ip.IsLoopback() {
+		if ip.IsLoopback() && !config.GetBool(config.CallbackAllowLoopbackIPs) {
 			return true
 		}
 	}

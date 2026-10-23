@@ -87,18 +87,30 @@ const (
 	MonitoringTrackedMethodsDefault string = "POST PUT PATCH DELETE"
 
 	// Features
-	EnableListingPublicInbox             Key  = "ENABLE_LISTING_PUBLIC_INBOX"
-	EnableListingInboxDefault            bool = false
-	EnablePrintConfig                    Key  = "PRINT_CONFIG"
-	EnablePrintConfigDefault             bool = false
-	EnabledMonitoring                    Key  = "ENABLED_MONITORING"
-	EnabledMonitoringDefault             bool = false
-	MaxCallbacksKey                      Key  = "MAX_CALLBACKS"
-	MaxCallbacksDefault                  int  = 3
-	EnableCallbackURLValidation          Key  = "ENABLE_CALLBACK_URL_VALIDATION"
-	EnableCallbackURLValidationDefault   bool = true
-	EnableCallbackFollowRedirects        Key  = "ENABLE_CALLBACK_FOLLOW_REDIRECTS"
-	EnableCallbackFollowRedirectsDefault bool = false
+	EnableListingPublicInbox             Key    = "ENABLE_LISTING_PUBLIC_INBOX"
+	EnableListingInboxDefault            bool   = false
+	EnablePrintConfig                    Key    = "PRINT_CONFIG"
+	EnablePrintConfigDefault             bool   = false
+	EnabledMonitoring                    Key    = "ENABLED_MONITORING"
+	EnabledMonitoringDefault             bool   = false
+	MaxCallbacksKey                      Key    = "MAX_CALLBACKS"
+	MaxCallbacksDefault                  int    = 3
+	EnableCallbackURLValidation          Key    = "ENABLE_CALLBACK_URL_VALIDATION"
+	EnableCallbackURLValidationDefault   bool   = true
+	EnableCallbackFollowRedirects        Key    = "ENABLE_CALLBACK_FOLLOW_REDIRECTS"
+	EnableCallbackFollowRedirectsDefault bool   = false
+	CallbackAllowedHosts                 Key    = "CALLBACK_ALLOWED_HOSTS"
+	CallbackAllowedHostsDefault          string = ""
+	CallbackBlockedHosts                 Key    = "CALLBACK_BLOCKED_HOSTS"
+	CallbackBlockedHostsDefault          string = ""
+	CallbackAllowPublicIPs               Key    = "CALLBACK_ALLOW_PUBLIC_IPS"
+	CallbackAllowPublicIPsDefault        bool   = true
+	CallbackAllowPrivateIPs              Key    = "CALLBACK_ALLOW_PRIVATE_IPS"
+	CallbackAllowPrivateIPsDefault       bool   = false
+	CallbackAllowLoopbackIPs             Key    = "CALLBACK_ALLOW_LOOPBACK_IPS"
+	CallbackAllowLoopbackIPsDefault      bool   = false
+	CallbackAllowLinkLocalIPs            Key    = "CALLBACK_ALLOW_LINK_LOCAL_IPS"
+	CallbackAllowLinkLocalIPsDefault     bool   = false
 )
 
 func LoadConfig(app App) {
@@ -163,6 +175,12 @@ func setDefaults(app App) {
 	setDefault(MaxCallbacksKey, MaxCallbacksDefault)
 	setDefault(EnableCallbackURLValidation, EnableCallbackURLValidationDefault)
 	setDefault(EnableCallbackFollowRedirects, EnableCallbackFollowRedirectsDefault)
+	setDefault(CallbackAllowedHosts, CallbackAllowedHostsDefault)
+	setDefault(CallbackBlockedHosts, CallbackBlockedHostsDefault)
+	setDefault(CallbackAllowPublicIPs, CallbackAllowPublicIPsDefault)
+	setDefault(CallbackAllowPrivateIPs, CallbackAllowPrivateIPsDefault)
+	setDefault(CallbackAllowLoopbackIPs, CallbackAllowLoopbackIPsDefault)
+	setDefault(CallbackAllowLinkLocalIPs, CallbackAllowLinkLocalIPsDefault)
 }
 
 func setDefault[T string | int | bool](k Key, v T) {

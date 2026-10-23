@@ -78,14 +78,12 @@ func SendCallback(inbox model.Inbox, k int, c model.Callback, request model.Requ
 	callbackCopy := c
 
 	timeout := time.Duration(config.GetInt(config.CallbackTimeoutSeconds)) * time.Second
-	client := &http.Client{
-		Timeout: timeout,
+	if err := validation.ValidateCallbackURL(c.ToURL); err != nil {
+		response.Error = fmt.Sprintf("Invalid callback URL: %v", err)
+		return response
 	}
-	if !config.GetBool(config.EnableCallbackFollowRedirects) {
-		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		}
-	}
+	client, cleanup := newCallbackClient(timeout)
+	defer cleanup()
 
 	var bodyReader io.Reader
 	if callbackCopy.Body != "" {

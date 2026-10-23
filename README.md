@@ -254,6 +254,16 @@ API_MODE=server
 # CORS
 CORS_ALLOW_ORIGINS=http://localhost:3000
 
+# Permissive callbacks for local development
+ENABLE_CALLBACK_URL_VALIDATION=false
+CALLBACK_ALLOWED_HOSTS=""
+CALLBACK_BLOCKED_HOSTS=""
+CALLBACK_ALLOW_PUBLIC_IPS=true
+CALLBACK_ALLOW_PRIVATE_IPS=true
+CALLBACK_ALLOW_LOOPBACK_IPS=true
+CALLBACK_ALLOW_LINK_LOCAL_IPS=true
+ENABLE_CALLBACK_FOLLOW_REDIRECTS=false
+
 # Authentication (optional for local development)
 LOGIN_GITHUB_CLIENT_ID=your_github_client_id
 LOGIN_GITHUB_CLIENT_SECRET=your_github_client_secret
@@ -261,6 +271,61 @@ LOGIN_GOOGLE_CLIENT_ID=your_google_client_id
 LOGIN_GOOGLE_CLIENT_SECRET=your_google_client_secret
 JWT_SECRET=your_jwt_secret
 ```
+
+#### Development and production callback policies
+
+`api/.env.development` and `docker-compose.yml` use a permissive local policy:
+`ENABLE_CALLBACK_URL_VALIDATION=false` bypasses URL, host-list, and destination
+IP checks. The development IP-type flags are all `true`; redirects remain
+disabled. Docker Compose accepts overrides from shell variables or its `.env`
+file.
+
+Production AWS Lambda uses the application's secure built-in defaults below
+when no callback environment overrides are set. No callback settings are needed
+in `deploy/back.tf`; the local development env file and Compose settings do not
+apply to Lambda:
+
+```dotenv
+ENABLE_CALLBACK_URL_VALIDATION=true
+CALLBACK_ALLOWED_HOSTS=""
+CALLBACK_BLOCKED_HOSTS=""
+CALLBACK_ALLOW_PUBLIC_IPS=true
+CALLBACK_ALLOW_PRIVATE_IPS=false
+CALLBACK_ALLOW_LOOPBACK_IPS=false
+CALLBACK_ALLOW_LINK_LOCAL_IPS=false
+ENABLE_CALLBACK_FOLLOW_REDIRECTS=false
+```
+
+In production, private, loopback, link-local (including cloud metadata), and
+reserved destinations are blocked. DNS answers are checked and connections are
+pinned to validated IPs. The configured `BACKEND_APPLICATION_DOMAIN` is also
+blocked as a callback destination. To enable host-list restrictions during local
+development, set
+`ENABLE_CALLBACK_URL_VALIDATION=true` and select the appropriate IP-type flags.
+
+#### Callback host-list format
+
+`CALLBACK_ALLOWED_HOSTS` and `CALLBACK_BLOCKED_HOSTS` accept **space-separated
+exact hostnames or IP addresses**. Quote the value when listing multiple hosts:
+
+```dotenv
+CALLBACK_ALLOWED_HOSTS="hooks.example.com events.example.net 10.20.0.5 ::1"
+CALLBACK_BLOCKED_HOSTS="retired.example.com 192.168.1.10"
+```
+
+- Use hostnames or IP literals only, without a scheme (`https://`), port, path,
+  wildcard, or CIDR notation. Separate entries with spaces, not commas.
+- Matching is case-insensitive, ignores a trailing DNS dot, and normalizes
+  equivalent IP representations. A hostname entry matches only that hostname,
+  not its subdomains; an IP entry does not match a different hostname that
+  resolves to that IP.
+- An empty `CALLBACK_ALLOWED_HOSTS` permits any host that passes the other
+  checks; an empty `CALLBACK_BLOCKED_HOSTS` adds no blocked hosts. If a host is
+  in both lists, blocking takes precedence.
+- Entries apply across all ports and paths. Allowlisting a host does not
+  override the IP-type policy: private, loopback, and link-local destinations
+  require their corresponding `CALLBACK_ALLOW_*_IPS` setting to be `true`.
+- Both lists are enforced only when `ENABLE_CALLBACK_URL_VALIDATION=true`.
 
 ## 🤝 Contributing
 

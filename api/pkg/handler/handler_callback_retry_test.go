@@ -216,3 +216,26 @@ func TestRetryInboxRequestCallbackOnPrivateInbox(t *testing.T) {
 		t.Errorf("Expected the callback target not to be called, got %d calls", *calls)
 	}
 }
+
+func TestRetryInboxRequestCallbackRevalidatesStoredTarget(t *testing.T) {
+	config.LoadConfig(config.Test)
+	allowLocalhostCallbacks(t)
+	previous := config.GetBool(config.CallbackAllowLoopbackIPs)
+	config.Set(config.CallbackAllowLoopbackIPs, false)
+	t.Cleanup(func() { config.Set(config.CallbackAllowLoopbackIPs, previous) })
+
+	server, calls := callbackTargetServer(t, `{"retried": true}`)
+	ih, closer := mustGetInboxHandler()
+	defer closer()
+	createdInbox := shouldExistInbox(t, ih, inboxWithCallbackTo(server.URL))
+
+	// A callback saved under an older policy must obey the current policy.
+	config.Set(config.EnableCallbackURLValidation, true)
+	w := retryCallback(t, ih, createdInbox.ID.String(), "0", "0")
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("expected rejected callback, got %d: %s", w.Code, w.Body.String())
+	}
+	if *calls != 0 {
+		t.Fatalf("blocked callback was sent %d times", *calls)
+	}
+}
