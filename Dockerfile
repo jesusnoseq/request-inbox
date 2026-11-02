@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Stage 1: Build Frontend
-FROM node:22 AS frontend-builder
+FROM node:26 AS frontend-builder
 
 ARG API_HTTP_PORT=8080
 
@@ -22,7 +22,7 @@ RUN echo "REACT_APP_REQUEST_INBOX_API_URL=/api" > .env.production
 RUN pnpm build
 
 # Stage 2: Build Backend
-FROM golang:1.26.10-alpine AS backend-builder
+FROM golang:1.27.3-alpine AS backend-builder
 
 RUN apk update && \
     apk add --no-cache --no-progress \
@@ -50,7 +50,7 @@ COPY api ./api
 RUN cd api && CGO_ENABLED=0 GOOS=linux go build -tags=jsoniter -ldflags="-w -s" -o main cmd/main.go
 
 # Stage 3: Final Runtime Image
-FROM nginx:1.29.1-alpine
+FROM nginx:1.30.6-alpine
 
 RUN apk --no-cache add ca-certificates tzdata supervisor && \
     rm -rf /var/cache/apk/*

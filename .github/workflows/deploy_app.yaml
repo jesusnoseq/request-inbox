@@ -31,7 +31,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22.x"
+          node-version: "26.x"
           cache: pnpm
           cache-dependency-path: front/pnpm-lock.yaml
       - name: Install front dependencies
@@ -43,7 +43,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.26.6"
+          go-version: "1.27.3"
           cache-dependency-path: api/go.sum
       - name: Build back
         working-directory: ./api
