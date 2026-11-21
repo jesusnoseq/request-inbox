@@ -47,7 +47,7 @@ func hasEmptyField(t *testing.T, structVar any, ignoreFields []string) bool {
 
 	v := reflect.ValueOf(structVar)
 
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		v = v.Elem()
 	}
 
@@ -75,7 +75,7 @@ func hasEmptyField(t *testing.T, structVar any, ignoreFields []string) bool {
 			if field.String() == "" {
 				return true
 			}
-		case reflect.Ptr, reflect.Interface:
+		case reflect.Pointer, reflect.Interface:
 			if field.IsNil() {
 				return true
 			}

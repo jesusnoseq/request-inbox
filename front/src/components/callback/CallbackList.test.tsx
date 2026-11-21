@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { vi } from 'vitest';
 
 import { type InboxCallback } from '../../types/inbox';
@@ -21,7 +21,7 @@ const submitAsAgent = (form: HTMLFormElement) => {
         agentInvoked: { value: true },
         respondWith: { value: vi.fn((value: Promise<unknown>) => { response = value; }) },
     });
-    form.dispatchEvent(event);
+    fireEvent(form, event);
     return response;
 };
 
@@ -35,31 +35,32 @@ const renderList = (readonly = false) => {
         onToggleEnabled: vi.fn(),
         readonly,
     };
-    return { ...render(<CallbackList {...props} />), props };
+    render(<CallbackList {...props} />);
+    return props;
 };
 
 test('exposes a declarative form that updates the complete callback', async () => {
-    const view = renderList();
-    const form = view.container.querySelector<HTMLFormElement>('form[toolname="update_request_inbox_callback_0"]');
+    const { onUpdate } = renderList();
+    const form = screen.getByRole<HTMLFormElement>('form', { name: 'Update callback 1' });
 
-    expect(form).not.toBeNull();
+    expect(form).toHaveAttribute('toolname', 'update_request_inbox_callback_0');
     expect(form).toHaveAttribute('tooltitle', 'Update Request Inbox Callback 1');
     expect(form).toHaveAttribute('tooldescription');
     expect(form).toHaveAttribute('toolautosubmit');
     for (const name of ['toURL', 'method', 'headers', 'body', 'isEnabled', 'isDynamic', 'isForwardingHeaders']) {
-        expect(form!.elements.namedItem(name)).toHaveAttribute('toolparamdescription');
+        expect(form.elements.namedItem(name)).toHaveAttribute('toolparamdescription');
     }
 
-    (form!.elements.namedItem('toURL') as HTMLInputElement).value = 'https://example.com/updated';
-    (form!.elements.namedItem('method') as HTMLInputElement).value = 'PUT';
-    (form!.elements.namedItem('headers') as HTMLTextAreaElement).value = '{"X-Test":"yes"}';
-    (form!.elements.namedItem('body') as HTMLTextAreaElement).value = 'updated body';
-    (form!.elements.namedItem('isDynamic') as HTMLInputElement).checked = true;
-    (form!.elements.namedItem('isForwardingHeaders') as HTMLInputElement).checked = true;
+    (form.elements.namedItem('toURL') as HTMLInputElement).value = 'https://example.com/updated';
+    (form.elements.namedItem('method') as HTMLInputElement).value = 'PUT';
+    (form.elements.namedItem('headers') as HTMLTextAreaElement).value = '{"X-Test":"yes"}';
+    (form.elements.namedItem('body') as HTMLTextAreaElement).value = 'updated body';
+    (form.elements.namedItem('isDynamic') as HTMLInputElement).checked = true;
+    (form.elements.namedItem('isForwardingHeaders') as HTMLInputElement).checked = true;
 
-    const result = await submitAsAgent(form!);
+    const result = await submitAsAgent(form);
 
-    expect(view.props.onUpdate).toHaveBeenCalledWith(0, {
+    expect(onUpdate).toHaveBeenCalledWith(0, {
         IsEnabled: true,
         IsDynamic: true,
         ToURL: 'https://example.com/updated',
@@ -75,28 +76,28 @@ test('exposes a declarative form that updates the complete callback', async () =
 });
 
 test('exposes declarative deletion while preserving the confirmation button', async () => {
-    const view = renderList();
-    const form = view.container.querySelector<HTMLFormElement>('form[toolname="delete_request_inbox_callback_0"]');
+    const { onDelete, onDeleteImmediately } = renderList();
+    const form = screen.getByRole<HTMLFormElement>('form', { name: 'Delete callback 1' });
 
-    expect(form).not.toBeNull();
+    expect(form).toHaveAttribute('toolname', 'delete_request_inbox_callback_0');
     expect(form).toHaveAttribute('tooltitle', 'Delete Request Inbox Callback 1');
     expect(form).toHaveAttribute('tooldescription');
     expect(form).toHaveAttribute('toolautosubmit');
 
-    fireEvent.click(form!.querySelector('button')!);
-    expect(view.props.onDelete).toHaveBeenCalledWith(0);
-    expect(view.props.onDeleteImmediately).not.toHaveBeenCalled();
+    fireEvent.click(within(form).getByRole('button'));
+    expect(onDelete).toHaveBeenCalledWith(0);
+    expect(onDeleteImmediately).not.toHaveBeenCalled();
 
-    await expect(submitAsAgent(form!)).resolves.toEqual({
+    await expect(submitAsAgent(form)).resolves.toEqual({
         deletedCallbackIndex: 0,
         deletedCallback: callback,
     });
-    expect(view.props.onDeleteImmediately).toHaveBeenCalledWith(0);
+    expect(onDeleteImmediately).toHaveBeenCalledWith(0);
 });
 
 test('does not expose callback mutation tools in readonly mode', () => {
-    const view = renderList(true);
+    renderList(true);
 
-    expect(view.container.querySelector('form[toolname^="update_request_inbox_callback_"]')).not.toBeInTheDocument();
-    expect(view.container.querySelector('form[toolname^="delete_request_inbox_callback_"]')).not.toBeInTheDocument();
+    expect(screen.queryByRole('form', { name: 'Update callback 1' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('form', { name: 'Delete callback 1' })).not.toBeInTheDocument();
 });
