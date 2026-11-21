@@ -22,6 +22,7 @@
     "types": [
       "vite/client",
       "vitest/globals",
+      "vitest/jsdom",
       "node"
     ]
   },

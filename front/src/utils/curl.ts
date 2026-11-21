@@ -6,7 +6,7 @@ const SKIPPED_HEADERS = ['host', 'content-length'];
 
 const LOCAL_HOSTS = ['localhost', '127.0.0.1', '[::1]', '::1'];
 
-const shellQuote = (value: string): string => `'${value.replace(/'/g, `'\''`)}'`;
+const shellQuote = (value: string): string => `'${value.replace(/'/g, "'\\''")}'`;
 
 const headerValues = (value: string | string[] | undefined): string[] => {
     if (value === undefined || value === null) {

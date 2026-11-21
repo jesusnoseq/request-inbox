@@ -22,7 +22,7 @@ RUN echo "REACT_APP_REQUEST_INBOX_API_URL=/api" > .env.production
 RUN pnpm build
 
 # Stage 2: Build Backend
-FROM golang:1.27.3-alpine AS backend-builder
+FROM golang:1.27.4-alpine AS backend-builder
 
 RUN apk update && \
     apk add --no-cache --no-progress \

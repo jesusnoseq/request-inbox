@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 
@@ -13,15 +13,14 @@ const response: InboxResponse = {
   IsDynamic: false,
 };
 
+const toolFormLabel = 'Update request inbox response';
+
 const renderEditor = (onSave = vi.fn()) => {
-  const view = render(
+  render(
     <MemoryRouter>
       <ResponseInlineEditor response={response} onSave={onSave} readonly={false} />
     </MemoryRouter>
   );
-  const form = view.container.querySelector<HTMLFormElement>('form[toolname="update_request_inbox_response"]');
-  if (!form) throw new Error('Declarative response form was not rendered.');
-  return { ...view, form };
 };
 
 const invokeTool = (form: HTMLFormElement) => {
@@ -36,27 +35,27 @@ const invokeTool = (form: HTMLFormElement) => {
 };
 
 test('exposes response editing as a declarative WebMCP form while visually closed', () => {
-  const { form } = renderEditor();
+  renderEditor();
+  const form = screen.getByLabelText<HTMLFormElement>(toolFormLabel);
 
   expect(form).toHaveAttribute('toolname', 'update_request_inbox_response');
   expect(form).toHaveAttribute('tooltitle', 'Update Request Inbox Response');
   expect(form).toHaveAttribute('toolautosubmit');
   expect(form).toHaveAttribute('tooldescription', expect.stringContaining('persists the status code'));
-  expect(form.querySelector('[name="code"]')).toHaveAttribute('toolparamdescription');
-  expect(form.querySelector('[name="codeTemplate"]')).toHaveAttribute('toolparamdescription');
-  expect(form.querySelector('[name="headers"]')).toHaveAttribute('toolparamdescription');
-  expect(form.querySelector('[name="body"]')).toHaveAttribute('toolparamdescription');
-  expect(form.querySelector('[name="isDynamic"]')).toHaveAttribute('toolparamdescription');
+  // The agent-only fields are deliberately hidden from the visual editor.
+  for (const name of ['code', 'codeTemplate', 'headers', 'body', 'isDynamic']) {
+    expect(form.elements.namedItem(name)).toHaveAttribute('toolparamdescription');
+  }
   expect(form.elements.namedItem('codeTemplate')).toHaveValue('200');
   expect(form).toHaveStyle({ display: 'none' });
-  expect(Array.from(form.querySelectorAll('input, textarea, select')).every(
-    (control) => Boolean(control.getAttribute('name'))
-  )).toBe(true);
+  expect(Array.from(form.elements, (control) => control.getAttribute('name')).sort())
+    .toEqual(['body', 'code', 'codeTemplate', 'headers', 'isDynamic']);
 });
 
 test('saves and returns values supplied by an agent invocation', async () => {
   const onSave = vi.fn().mockResolvedValue(undefined);
-  const { form } = renderEditor(onSave);
+  renderEditor(onSave);
+  const form = screen.getByLabelText<HTMLFormElement>(toolFormLabel);
   const code = form.elements.namedItem('code') as HTMLInputElement;
   const codeTemplate = form.elements.namedItem('codeTemplate') as HTMLTextAreaElement;
   const headers = form.elements.namedItem('headers') as HTMLTextAreaElement;
@@ -89,11 +88,11 @@ test('saves and returns values supplied by an agent invocation', async () => {
 });
 
 test('does not expose the update tool when the inbox is read-only', () => {
-  const view = render(
+  render(
     <MemoryRouter>
       <ResponseInlineEditor response={response} onSave={vi.fn()} readonly />
     </MemoryRouter>
   );
 
-  expect(view.container.querySelector('form[toolname="update_request_inbox_response"]')).not.toBeInTheDocument();
+  expect(screen.queryByLabelText(toolFormLabel)).not.toBeInTheDocument();
 });

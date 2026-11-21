@@ -62,7 +62,7 @@ describe('buildCurlCommand', () => {
 
     it('escapes single quotes so the command stays valid', () => {
         const curl = buildCurlCommand(makeRequest({ Body: "it's here" }));
-        expect(curl).toContain(`--data-raw 'it'\''s here'`);
+        expect(curl).toContain("--data-raw 'it'\\''s here'");
     });
 
     it('keeps an absolute request URI as-is', () => {
